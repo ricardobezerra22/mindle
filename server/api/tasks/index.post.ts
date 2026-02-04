@@ -1,0 +1,34 @@
+import { prisma } from "../../utils/prisma";
+
+export default defineEventHandler(async (event) => {
+  try {
+    const body = await readBody(event);
+    const userId = "000000000000000000000001";
+
+    const { title, description, status, priority, dueDate, color } = body;
+
+    if (!title) {
+      return sendError(event, "Title is required", 400);
+    }
+
+    const task = await prisma.task.create({
+      data: {
+        title,
+        description,
+        status: status || "NOT_STARTED",
+        priority: priority || "MEDIUM",
+        dueDate: dueDate ? new Date(dueDate) : undefined,
+        color,
+        userId,
+      },
+      include: {
+        subTasks: true,
+      },
+    });
+
+    return sendSuccess(event, task, 201);
+  } catch (error) {
+    console.error("Error creating task:", error);
+    return sendError(event, "Failed to create task", 500);
+  }
+});

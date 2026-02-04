@@ -1,0 +1,35 @@
+{
+  "colors": {
+    "primary": "#6FAF8E",
+    "primary-dark": "#4E8A6D",
+    "background": "#F7FAF9",
+    "surface": "#FFFFFF",
+    "text-primary": "#1F2D2B",
+    "text-secondary": "#6B7C7A",
+    "border": "#E3ECE9"
+  },
+  "typography": {
+    "fontFamily": "Inter, system-ui, sans-serif",
+    "headings": {
+      "h1": { "size": "32px", "weight": 600 },
+      "h2": { "size": "24px", "weight": 600 },
+      "h3": { "size": "18px", "weight": 500 }
+    },
+    "body": {
+      "base": { "size": "14px", "weight": 400 },
+      "small": { "size": "12px", "weight": 400 }
+    }
+  },
+  "spacing": {
+    "xs": "4px",
+    "sm": "8px",
+    "md": "16px",
+    "lg": "24px",
+    "xl": "32px"
+  },
+  "radius": {
+    "sm": "6px",
+    "md": "10px",
+    "lg": "14px"
+  }
+}
