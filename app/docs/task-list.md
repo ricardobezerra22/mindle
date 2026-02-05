@@ -4,22 +4,23 @@
 - [ X] Criar layout base (sidebar + header)
 - [ X] Definir design system (cores, tipografia, espaçamentos)
 - [X ] Implementar navegação principal
-- [ ] Criar sistema de estados de tarefa
+- [ X ] Criar sistema de estados de tarefa
 
 ## Funcionalidades
 - [ ] Dashboard semanal
-- [ ] Lista de tarefas (Kanban simples)
+- [X ] Lista de tarefas (Kanban simples)
 - [ ] Planner semanal
 - [ ] Planner mensal (deadlines)
-- [ ] Área de foco (Pomodoro simples)
+- [ ] Login
+- [ X] Área de foco (Pomodoro simples)
 - [ ] Hábitos e bem-estar (check simples)
 - [ ] Registo financeiro (somente listagem)
 
 ## UX
-- [ ] Feedback visual suave (done / progresso)
-- [ ] Evitar duplicação de tarefas
-- [ ] Prioridade visual clara
-- [ ] Mobile responsive (desktop-first)
+- [ X] Feedback visual suave (done / progresso)
+- [ X] Evitar duplicação de tarefas
+- [ X] Prioridade visual clara
+- [ X] Mobile responsive (desktop-first)
 
 ## Integrações (opcional)
 - [ ] Google Calendar (read-only)

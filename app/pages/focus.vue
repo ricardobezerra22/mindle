@@ -10,11 +10,12 @@
           Você focou por {{ formatDuration(elapsedMinutes) }}
         </p>
         <div class="completion-actions">
-          <button @click="logSession" class="log-btn">
-            <Icon name="lucide:bookmark" />
-            Registrar sessão
+          <button @click="logSession" :disabled="isLoggingSession" class="log-btn">
+            <Icon v-if="!isLoggingSession" name="lucide:bookmark" />
+            <Icon v-else name="lucide:loader-2" class="spinning" />
+            {{ isLoggingSession ? 'Registrando...' : 'Registrar sessão' }}
           </button>
-          <button @click="resetSession" class="reset-btn">Iniciar outra</button>
+          <button @click="resetSession" :disabled="isLoggingSession" class="reset-btn">Iniciar outra</button>
         </div>
       </div>
     </div>
@@ -162,6 +163,7 @@ const timeRemaining = ref(0);
 const sessionDuration = ref(0);
 const elapsedSeconds = ref(0);
 const elapsedMinutes = ref(0);
+const isLoggingSession = ref(false);
 let intervalId: NodeJS.Timeout | null = null;
 let startTime: number | null = null;
 
@@ -263,6 +265,7 @@ const resetSession = () => {
 };
 
 const logSession = async () => {
+  isLoggingSession.value = true;
   try {
     await $fetch("/api/focus", {
       method: "POST",
@@ -272,10 +275,15 @@ const logSession = async () => {
         elapsedMinutes: elapsedMinutes.value,
       },
     });
+    resetSession();
+    focusContext.value = "";
+    selectedDuration.value = 0;
+    showCustom.value = false;
   } catch (error) {
     console.error("Failed to log session:", error);
+  } finally {
+    isLoggingSession.value = false;
   }
-  resetSession();
 };
 
 const formattedTime = computed(() => {
@@ -755,6 +763,24 @@ onUnmounted(() => {
   height: 18px;
 }
 
+.log-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .reset-btn {
   background: transparent;
   color: var(--color-primary);
@@ -763,6 +789,11 @@ onUnmounted(() => {
 
 .reset-btn:hover {
   background: #E8F3ED;
+}
+
+.reset-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {

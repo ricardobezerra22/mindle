@@ -15,8 +15,8 @@ export default defineEventHandler(async (event) => {
       data: {
         userId,
         focusContext: focusContext || null,
-        durationMinutes: parseInt(durationMinutes),
-        elapsedMinutes: parseInt(elapsedMinutes)
+        duration: parseInt(durationMinutes),
+        elapsed: parseInt(elapsedMinutes)
       }
     })
 

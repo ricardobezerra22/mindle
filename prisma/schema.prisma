@@ -70,9 +70,11 @@ model PlannerEntry {
 }
 
 model FocusSession {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  duration Int // minutos
-  date     DateTime @default(now())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  duration     Int // minutos
+  elapsed      Int // minutos
+  focusContext String?
+  date         DateTime @default(now())
 
   userId String @db.ObjectId
   user   User   @relation(fields: [userId], references: [id])
