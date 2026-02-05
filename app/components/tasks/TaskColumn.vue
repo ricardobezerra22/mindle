@@ -1,16 +1,25 @@
 <template>
-  <div class="task-column">
+  <div
+    class="task-column"
+    @dragover.prevent="handleDragOver"
+    @dragleave="handleDragLeave"
+    @drop="handleDrop"
+    :class="{ 'drag-over': isDragOver }"
+  >
     <div class="column-header">
-      <div class="column-title">
+      <div
+        class="column-title"
+        :class="['task-status-badge', `status-${status.toLowerCase()}`]"
+      >
         <Icon :name="icon" :class="`status-${status.toLowerCase()}`" />
         <h3>{{ title }}</h3>
         <span class="task-count">{{ taskCount }}</span>
       </div>
     </div>
-    
+
     <div class="column-content">
       <slot />
-      
+
       <div v-if="taskCount === 0" class="empty-state">
         <Icon name="lucide:inbox" />
         <p>Nenhuma tarefa</p>
@@ -20,16 +29,51 @@
 </template>
 
 <script setup lang="ts">
-import type { TaskStatus } from '~/types'
+import type { TaskStatus } from "~/types";
 
 interface Props {
-  title: string
-  status: TaskStatus
-  taskCount: number
-  icon: string
+  title: string;
+  status: TaskStatus;
+  taskCount: number;
+  icon: string;
 }
 
-defineProps<Props>()
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  drop: [taskId: string, newStatus: TaskStatus];
+}>();
+
+const isDragOver = ref(false);
+
+const handleDragOver = (e: DragEvent) => {
+  e.preventDefault();
+  isDragOver.value = true;
+  if (e.dataTransfer) {
+    e.dataTransfer.dropEffect = "move";
+  }
+};
+
+const handleDragLeave = (e: DragEvent) => {
+  const target = e.currentTarget as HTMLElement;
+  const relatedTarget = e.relatedTarget as HTMLElement;
+
+  if (!target.contains(relatedTarget)) {
+    isDragOver.value = false;
+  }
+};
+
+const handleDrop = (e: DragEvent) => {
+  e.preventDefault();
+  isDragOver.value = false;
+
+  if (e.dataTransfer) {
+    const taskId = e.dataTransfer.getData("text/plain");
+    if (taskId) {
+      emit("drop", taskId, props.status);
+    }
+  }
+};
 </script>
 
 <style scoped>
@@ -40,6 +84,13 @@ defineProps<Props>()
   min-height: 400px;
   display: flex;
   flex-direction: column;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.task-column.drag-over {
+  border-color: var(--color-primary);
+  background-color: rgba(var(--color-primary-rgb, 59, 130, 246), 0.05);
 }
 
 .column-header {
@@ -76,7 +127,37 @@ defineProps<Props>()
   margin: 0;
   flex: 1;
 }
+.task-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
+.task-status-badge :deep(svg) {
+  width: 14px;
+  height: 14px;
+}
+
+.task-status-badge.status-not_started {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.task-status-badge.status-in_progress {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.task-status-badge.status-done {
+  background-color: #d1fae5;
+  color: #065f46;
+}
 .task-count {
   display: inline-flex;
   align-items: center;

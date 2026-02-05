@@ -1,33 +1,94 @@
 <template>
-  <div :class="['task-item', `priority-${priority.toLowerCase()}`]">
-    <div class="task-header">
-      <div class="task-status">
-        <Icon 
-          :name="statusIcon" 
-          :class="['status-icon', `status-${status.toLowerCase()}`]"
-        />
-      </div>
-      
-      <div class="task-content">
-        <h4 class="task-title">{{ title }}</h4>
-        <p v-if="description" class="task-description">{{ description }}</p>
-        
-        <div class="task-meta">
-          <span v-if="dueDate" class="task-date">
-            <Icon name="lucide:calendar" />
-            {{ formatDate(dueDate) }}
-          </span>
-          <span :class="['task-priority', `priority-${priority.toLowerCase()}`]">
-            {{ priorityLabel }}
-          </span>
+  <div
+    :class="['task-item', `priority-${priority.toLowerCase()}`]"
+    draggable="true"
+    @dragstart="handleDragStart"
+    @dragend="handleDragEnd"
+  >
+    <div class="task-wrapper">
+      <div
+        v-if="status !== 'DONE'"
+        class="task-checkbox"
+        @click.stop="handleComplete"
+        :class="{ completing: isCompleting }"
+      >
+        <div class="checkbox-inner">
+          <Icon v-if="isCompleting" name="lucide:check" class="check-icon" />
         </div>
       </div>
-      
+
+      <div class="task-content">
+      <input
+        v-if="editMode"
+        v-model="editData.title"
+        type="text"
+        class="edit-input title-input"
+        placeholder="Título da tarefa"
+        @click.stop
+      />
+      <h4 v-else class="task-title">{{ title }}</h4>
+
+      <textarea
+        v-if="editMode"
+        v-model="editData.description"
+        class="edit-input description-input"
+        placeholder="Descrição da tarefa"
+        rows="2"
+        @click.stop
+      />
+      <p v-else-if="description" class="task-description">{{ description }}</p>
+
+      <div class="task-meta">
+        <div v-if="editMode" class="edit-date-wrapper">
+          <Icon name="lucide:calendar" />
+          <input
+            v-model="editData.dueDate"
+            type="date"
+            class="edit-input date-input"
+            @click.stop
+          />
+        </div>
+        <span v-else-if="dueDate" class="task-date">
+          <Icon name="lucide:calendar" />
+          {{ formatDate(dueDate) }}
+        </span>
+        <span :class="['task-priority', `priority-${priority.toLowerCase()}`]">
+          {{ priorityLabel }}
+        </span>
+      </div>
+      </div>
+
       <div class="task-actions">
-        <button @click="$emit('edit', id)" class="action-btn" title="Editar">
+        <button
+          v-if="!editMode"
+          @click.stop="toggleEditMode"
+          class="action-btn"
+          title="Editar"
+        >
           <Icon name="lucide:pencil" />
         </button>
-        <button @click="$emit('delete', id)" class="action-btn delete" title="Excluir">
+        <button
+          v-if="editMode"
+          @click.stop="saveEdit"
+          class="action-btn save"
+          title="Salvar"
+        >
+          <Icon name="lucide:check" />
+        </button>
+        <button
+          v-if="editMode"
+          @click.stop="cancelEdit"
+          class="action-btn cancel"
+          title="Cancelar"
+        >
+          <Icon name="lucide:x" />
+        </button>
+        <button
+          v-if="!editMode"
+          @click.stop="$emit('delete', id)"
+          class="action-btn delete"
+          title="Excluir"
+        >
           <Icon name="lucide:trash-2" />
         </button>
       </div>
@@ -36,48 +97,144 @@
 </template>
 
 <script setup lang="ts">
-import type { TaskStatus, Priority } from '~/types'
+import type { TaskStatus, Priority } from "~/types";
 
 interface Props {
-  id: string
-  title: string
-  description?: string
-  status: TaskStatus
-  priority: Priority
-  dueDate?: Date
+  id: string;
+  title: string;
+  description?: string;
+  status: TaskStatus;
+  priority: Priority;
+  dueDate?: Date;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
-defineEmits<{
-  edit: [id: string]
-  delete: [id: string]
-}>()
+const emit = defineEmits<{
+  edit: [
+    id: string,
+    data: { title: string; description?: string; dueDate?: Date },
+  ];
+  delete: [id: string];
+  complete: [id: string];
+  dragStart: [id: string];
+  dragEnd: [];
+}>();
+
+const editMode = ref(false);
+const isCompleting = ref(false);
+const editData = ref({
+  title: "",
+  description: "",
+  dueDate: "",
+});
+
+const handleComplete = async () => {
+  if (props.status === "DONE" || isCompleting.value) return;
+
+  isCompleting.value = true;
+
+  const audio = new Audio(
+    "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwPUKXi8LdjHAU2kdXzzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r9sIQYqgc7y2Ik2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK/bCEGKoHO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs",
+  );
+  audio.volume = 0.3;
+  audio.play().catch(() => {});
+
+  setTimeout(() => {
+    emit("complete", props.id);
+    isCompleting.value = false;
+  }, 600);
+};
+
+const toggleEditMode = () => {
+  editMode.value = true;
+  editData.value = {
+    title: props.title,
+    description: props.description || "",
+    dueDate: props.dueDate ? formatDateForInput(props.dueDate) : "",
+  };
+};
+
+const saveEdit = () => {
+  if (!editData.value.title.trim()) return;
+
+  emit("edit", props.id, {
+    title: editData.value.title,
+    description: editData.value.description || undefined,
+    dueDate: editData.value.dueDate
+      ? new Date(editData.value.dueDate)
+      : undefined,
+  });
+
+  editMode.value = false;
+};
+
+const cancelEdit = () => {
+  editMode.value = false;
+  editData.value = {
+    title: "",
+    description: "",
+    dueDate: "",
+  };
+};
+
+const handleDragStart = (e: DragEvent) => {
+  if (editMode.value) {
+    e.preventDefault();
+    return;
+  }
+  emit("dragStart", props.id);
+  if (e.dataTransfer) {
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", props.id);
+  }
+};
+
+const handleDragEnd = () => {
+  emit("dragEnd");
+};
 
 const statusIcon = computed(() => {
   const icons = {
-    NOT_STARTED: 'lucide:circle',
-    IN_PROGRESS: 'lucide:circle-dot',
-    DONE: 'lucide:check-circle'
-  }
-  return icons[props.status]
-})
+    NOT_STARTED: "lucide:circle",
+    IN_PROGRESS: "lucide:loader",
+    DONE: "lucide:check-circle-2",
+  };
+  return icons[props.status];
+});
+
+const statusLabel = computed(() => {
+  const labels = {
+    NOT_STARTED: "Não Iniciado",
+    IN_PROGRESS: "Em Progresso",
+    DONE: "Concluído",
+  };
+  return labels[props.status];
+});
 
 const priorityLabel = computed(() => {
   const labels = {
-    LOW: 'Baixa',
-    MEDIUM: 'Média',
-    HIGH: 'Alta'
-  }
-  return labels[props.priority]
-})
+    LOW: "Baixa",
+    MEDIUM: "Média",
+    HIGH: "Alta",
+  };
+  return labels[props.priority];
+});
 
 const formatDate = (date: Date) => {
-  return new Date(date).toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: 'short'
-  })
-}
+  return new Date(date).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "short",
+  });
+};
+
+const formatDateForInput = (date: Date) => {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 </script>
 
 <style scoped>
@@ -87,7 +244,12 @@ const formatDate = (date: Date) => {
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
   transition: all 0.2s ease;
-  cursor: pointer;
+  cursor: grab;
+  position: relative;
+}
+
+.task-item:active {
+  cursor: grabbing;
 }
 
 .task-item:hover {
@@ -95,49 +257,101 @@ const formatDate = (date: Date) => {
   border-color: var(--color-primary);
 }
 
-.task-item.priority-high {
-  border-left: 3px solid #ef4444;
-}
-
-.task-item.priority-medium {
-  border-left: 3px solid #f59e0b;
-}
-
-.task-item.priority-low {
-  border-left: 3px solid #10b981;
-}
-
-.task-header {
+.task-wrapper {
   display: flex;
   gap: var(--spacing-sm);
   align-items: flex-start;
 }
 
-.task-status {
+.task-checkbox {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  padding-top: 2px;
+  margin-right: var(--spacing-sm);
+  background-color: var(--color-surface);
 }
 
-.status-icon {
-  width: 20px;
-  height: 20px;
+.task-checkbox:hover {
+  border-color: #10b981;
+  transform: scale(1.1);
 }
 
-.status-icon.status-not_started {
-  color: var(--color-text-secondary);
+.task-checkbox.completing {
+  background-color: #10b981;
+  border-color: #10b981;
+  animation: checkboxPulse 0.6s ease;
 }
 
-.status-icon.status-in_progress {
-  color: #3b82f6;
+@keyframes checkboxPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
-.status-icon.status-done {
-  color: #10b981;
+.checkbox-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.check-icon {
+  color: white;
+  width: 14px;
+  height: 14px;
+  animation: checkAppear 0.3s ease;
+}
+
+@keyframes checkAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.task-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.task-status-badge :deep(svg) {
+  width: 14px;
+  height: 14px;
+}
+
+.status-text {
+  font-size: 10px;
 }
 
 .task-content {
   flex: 1;
   min-width: 0;
+  padding-right: 80px;
 }
 
 .task-title {
@@ -152,6 +366,56 @@ const formatDate = (date: Date) => {
   color: var(--color-text-secondary);
   margin: 0 0 var(--spacing-sm) 0;
   line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+
+.edit-input {
+  width: 100%;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+  transition: border-color 0.2s ease;
+  margin-bottom: var(--spacing-xs);
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.title-input {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.description-input {
+  resize: vertical;
+  min-height: 50px;
+}
+
+.edit-date-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.edit-date-wrapper :deep(svg) {
+  width: 14px;
+  height: 14px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.date-input {
+  margin-bottom: 0;
+  padding: 2px var(--spacing-xs);
+  font-size: 12px;
+  max-width: 140px;
 }
 
 .task-meta {
@@ -199,14 +463,48 @@ const formatDate = (date: Date) => {
 }
 
 .task-actions {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
   display: flex;
   gap: var(--spacing-xs);
   opacity: 0;
   transition: opacity 0.2s ease;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-sm);
+  padding: 2px;
 }
 
 .task-item:hover .task-actions {
   opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .task-actions {
+    opacity: 1;
+  }
+  
+  .task-content {
+    padding-right: 60px;
+  }
+}
+
+.action-btn.save {
+  color: #10b981;
+}
+
+.action-btn.save:hover {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.action-btn.cancel {
+  color: #f59e0b;
+}
+
+.action-btn.cancel:hover {
+  background-color: #fef3c7;
+  color: #92400e;
 }
 
 .action-btn {

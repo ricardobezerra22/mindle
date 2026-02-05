@@ -49,39 +49,48 @@ export const useTasks = () => {
   }
 
   const updateTask = async (id: string, updates: Partial<Task>) => {
-    loading.value = true
     error.value = null
+    const index = tasks.value.findIndex(t => t.id === id)
+    if (index === -1) return
+
+    const previousTask = { ...tasks.value[index] }
+    tasks.value[index] = { ...tasks.value[index], ...updates }
+
     try {
       const response = await $fetch<{ success: boolean; data: Task }>(`/api/tasks/${id}`, {
         method: 'PUT',
         body: updates
       })
       if (response.success) {
-        const index = tasks.value.findIndex(t => t.id === id)
-        if (index !== -1) {
-          tasks.value[index] = response.data
-        }
+        tasks.value[index] = response.data
         return response.data
+      } else {
+        tasks.value[index] = previousTask
+        error.value = 'Failed to update task'
       }
     } catch (e) {
+      tasks.value[index] = previousTask
       error.value = 'Failed to update task'
       console.error(e)
-    } finally {
-      loading.value = false
+      throw e
     }
   }
 
   const deleteTask = async (id: string) => {
-    loading.value = true
     error.value = null
+    const taskIndex = tasks.value.findIndex(t => t.id === id)
+    if (taskIndex === -1) return
+
+    const deletedTask = tasks.value[taskIndex]
+    tasks.value = tasks.value.filter(t => t.id !== id)
+
     try {
       await $fetch(`/api/tasks/${id}`, { method: 'DELETE' })
-      tasks.value = tasks.value.filter(t => t.id !== id)
     } catch (e) {
+      tasks.value.splice(taskIndex, 0, deletedTask)
       error.value = 'Failed to delete task'
       console.error(e)
-    } finally {
-      loading.value = false
+      throw e
     }
   }
 

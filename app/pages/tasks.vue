@@ -1,5 +1,16 @@
 <template>
   <div class="tasks-page">
+    <div v-if="toast" :class="['toast', `toast-${toast.type}`]">
+      <Icon
+        :name="
+          toast.type === 'error'
+            ? 'lucide:alert-circle'
+            : 'lucide:check-circle-2'
+        "
+      />
+      <span>{{ toast.message }}</span>
+    </div>
+
     <div class="page-header">
       <UiButton @click="showCreateModal = true">
         <Icon name="lucide:plus" />
@@ -17,6 +28,7 @@
         status="NOT_STARTED"
         :task-count="tasksByStatus.NOT_STARTED.length"
         icon="lucide:circle"
+        @drop="handleDrop"
       >
         <TasksTaskItem
           v-for="task in tasksByStatus.NOT_STARTED"
@@ -27,8 +39,11 @@
           :status="task.status"
           :priority="task.priority"
           :due-date="task.dueDate"
-          @click="changeStatus(task.id, 'IN_PROGRESS')"
-          @delete="handleDelete(task.id)"
+          @edit="handleEdit"
+          @delete="confirmDelete"
+          @complete="handleComplete"
+          @drag-start="handleDragStart"
+          @drag-end="handleDragEnd"
         />
       </TasksTaskColumn>
 
@@ -36,7 +51,8 @@
         title="Em Progresso"
         status="IN_PROGRESS"
         :task-count="tasksByStatus.IN_PROGRESS.length"
-        icon="lucide:circle-dot"
+        icon="lucide:loader"
+        @drop="handleDrop"
       >
         <TasksTaskItem
           v-for="task in tasksByStatus.IN_PROGRESS"
@@ -47,8 +63,11 @@
           :status="task.status"
           :priority="task.priority"
           :due-date="task.dueDate"
-          @click="changeStatus(task.id, 'DONE')"
-          @delete="handleDelete(task.id)"
+          @edit="handleEdit"
+          @delete="confirmDelete"
+          @complete="handleComplete"
+          @drag-start="handleDragStart"
+          @drag-end="handleDragEnd"
         />
       </TasksTaskColumn>
 
@@ -56,7 +75,8 @@
         title="Concluído"
         status="DONE"
         :task-count="tasksByStatus.DONE.length"
-        icon="lucide:check-circle"
+        icon="lucide:check-circle-2"
+        @drop="handleDrop"
       >
         <TasksTaskItem
           v-for="task in tasksByStatus.DONE"
@@ -67,8 +87,10 @@
           :status="task.status"
           :priority="task.priority"
           :due-date="task.dueDate"
-          @click="changeStatus(task.id, 'NOT_STARTED')"
-          @delete="handleDelete(task.id)"
+          @edit="handleEdit"
+          @delete="confirmDelete"
+          @drag-start="handleDragStart"
+          @drag-end="handleDragEnd"
         />
       </TasksTaskColumn>
     </div>
@@ -139,6 +161,51 @@
         </form>
       </div>
     </div>
+
+    <div
+      v-if="showDeleteModal"
+      class="modal-overlay"
+      @click.self="showDeleteModal = false"
+    >
+      <div class="modal-content delete-modal">
+        <div class="modal-header">
+          <h2>Confirmar Exclusão</h2>
+          <button @click="showDeleteModal = false" class="close-btn">
+            <Icon name="lucide:x" />
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="delete-icon">
+            <Icon name="lucide:alert-triangle" />
+          </div>
+          <h3 class="delete-title">Excluir Tarefa</h3>
+          <p class="delete-message">
+            Tem certeza que deseja excluir esta tarefa?
+          </p>
+          <p class="delete-warning">Esta ação não pode ser desfeita.</p>
+        </div>
+
+        <div class="modal-actions delete-actions">
+          <UiButton
+            type="button"
+            variant="secondary"
+            @click="showDeleteModal = false"
+            class="action-button"
+          >
+            Cancelar
+          </UiButton>
+          <UiButton
+            type="button"
+            class="delete-button action-button"
+            @click="handleDelete"
+          >
+            <Icon name="lucide:trash-2" />
+            Excluir
+          </UiButton>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -146,10 +213,31 @@
 import { TaskStatus } from "~/types";
 import type { Task } from "~/types";
 
-const { tasks, loading, fetchTasks, createTask, updateTaskStatus, deleteTask } =
-  useTasks();
+const {
+  tasks,
+  loading,
+  error,
+  fetchTasks,
+  createTask,
+  updateTask,
+  updateTaskStatus,
+  deleteTask,
+} = useTasks();
+
+const toast = ref<{ message: string; type: "success" | "error" } | null>(null);
+
+const showToast = (message: string, type: "success" | "error" = "success") => {
+  toast.value = { message, type };
+  setTimeout(() => {
+    toast.value = null;
+  }, 3000);
+};
 
 const showCreateModal = ref(false);
+const showDeleteModal = ref(false);
+const taskToDelete = ref<string | null>(null);
+const draggedTaskId = ref<string | null>(null);
+
 const newTask = ref({
   title: "",
   description: "",
@@ -185,13 +273,59 @@ const handleCreate = async () => {
   };
 };
 
-const changeStatus = async (id: string, newStatus: TaskStatus) => {
-  await updateTaskStatus(id, newStatus);
+const handleEdit = async (
+  id: string,
+  data: { title: string; description?: string; dueDate?: Date },
+) => {
+  try {
+    await updateTask(id, data);
+  } catch (e) {
+    showToast("Erro ao atualizar tarefa", "error");
+  }
 };
 
-const handleDelete = async (id: string) => {
-  if (confirm("Tem certeza que deseja excluir esta tarefa?")) {
-    await deleteTask(id);
+const confirmDelete = (id: string) => {
+  taskToDelete.value = id;
+  showDeleteModal.value = true;
+};
+
+const handleDelete = async () => {
+  if (taskToDelete.value) {
+    try {
+      await deleteTask(taskToDelete.value);
+      showDeleteModal.value = false;
+    } catch (e) {
+      showToast("Erro ao excluir tarefa", "error");
+    } finally {
+      taskToDelete.value = null;
+    }
+  }
+};
+
+const handleDragStart = (id: string) => {
+  draggedTaskId.value = id;
+};
+
+const handleDragEnd = () => {
+  draggedTaskId.value = null;
+};
+
+const handleComplete = async (taskId: string) => {
+  try {
+    await updateTaskStatus(taskId, TaskStatus.DONE);
+  } catch (e) {
+    showToast("Erro ao concluir tarefa", "error");
+  }
+};
+
+const handleDrop = async (taskId: string, newStatus: TaskStatus) => {
+  const task = tasks.value.find((t) => t.id === taskId);
+  if (task && task.status !== newStatus) {
+    try {
+      await updateTaskStatus(taskId, newStatus);
+    } catch (e) {
+      showToast("Erro ao alterar status da tarefa", "error");
+    }
   }
 };
 
@@ -346,9 +480,157 @@ onMounted(() => {
   border-top: 1px solid var(--color-border);
 }
 
+.delete-modal {
+  max-width: 440px;
+}
+
+.modal-body {
+  padding: var(--spacing-xl) var(--spacing-lg);
+  text-align: center;
+}
+
+.delete-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto var(--spacing-lg);
+  background-color: #fee2e2;
+  border-radius: 50%;
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.delete-icon :deep(svg) {
+  width: 36px;
+  height: 36px;
+  color: #dc2626;
+}
+
+.delete-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.delete-message {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: 15px;
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+.delete-warning {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.delete-actions {
+  padding: var(--spacing-lg);
+  margin-top: 0;
+  padding-top: var(--spacing-lg);
+}
+
+.action-button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  min-width: 100px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+}
+
+.delete-button {
+  background-color: #dc2626;
+}
+
+.delete-button:hover {
+  background-color: #b91c1c;
+}
+
+.delete-button :deep(svg) {
+  width: 16px;
+  height: 16px;
+}
+
 @media (max-width: 1024px) {
   .kanban-board {
     grid-template-columns: 1fr;
   }
+}
+
+:deep(.delete-button) {
+  background-color: #dc2626 !important;
+  color: white !important;
+}
+
+:deep(.delete-button:hover) {
+  background-color: #b91c1c !important;
+  color: white !important;
+}
+
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 2000;
+  animation: slideIn 0.3s ease;
+  min-width: 300px;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.toast-success {
+  border-left: 4px solid #10b981;
+}
+
+.toast-success :deep(svg) {
+  color: #10b981;
+  width: 20px;
+  height: 20px;
+}
+
+.toast-error {
+  border-left: 4px solid #ef4444;
+}
+
+.toast-error :deep(svg) {
+  color: #ef4444;
+  width: 20px;
+  height: 20px;
+}
+
+.toast span {
+  font-size: 14px;
+  color: var(--color-text-primary);
+  font-weight: 500;
 }
 </style>
