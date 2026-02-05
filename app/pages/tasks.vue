@@ -12,6 +12,42 @@
     </div>
 
     <div class="page-header">
+      <div class="filters-section">
+        <div class="search-box">
+          <Icon name="lucide:search" />
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Buscar tarefa por nome..."
+            class="search-input"
+          />
+          <button
+            v-if="searchQuery"
+            @click="searchQuery = ''"
+            class="clear-search"
+          >
+            <Icon name="lucide:x" />
+          </button>
+        </div>
+
+        <div class="date-filter">
+          <Icon name="lucide:calendar" />
+          <input
+            v-model="dateFilter"
+            type="date"
+            class="date-input"
+            placeholder="Filtrar por data"
+          />
+          <button
+            v-if="dateFilter"
+            @click="dateFilter = ''"
+            class="clear-date"
+          >
+            <Icon name="lucide:x" />
+          </button>
+        </div>
+      </div>
+
       <UiButton @click="showCreateModal = true">
         <Icon name="lucide:plus" />
         Nova Tarefa
@@ -238,6 +274,9 @@ const showDeleteModal = ref(false);
 const taskToDelete = ref<string | null>(null);
 const draggedTaskId = ref<string | null>(null);
 
+const searchQuery = ref('');
+const dateFilter = ref('');
+
 const newTask = ref({
   title: "",
   description: "",
@@ -245,11 +284,33 @@ const newTask = ref({
   dueDate: "",
 });
 
+const filteredTasks = computed(() => {
+  let filtered = tasks.value;
+
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    filtered = filtered.filter(t => 
+      t.title.toLowerCase().includes(query) ||
+      (t.description && t.description.toLowerCase().includes(query))
+    );
+  }
+
+  if (dateFilter.value) {
+    filtered = filtered.filter(t => {
+      if (!t.dueDate) return false;
+      const taskDate = new Date(t.dueDate).toISOString().split('T')[0];
+      return taskDate === dateFilter.value;
+    });
+  }
+
+  return filtered;
+});
+
 const tasksByStatus = computed(() => {
   return {
-    NOT_STARTED: tasks.value.filter((t) => t.status === TaskStatus.NOT_STARTED),
-    IN_PROGRESS: tasks.value.filter((t) => t.status === TaskStatus.IN_PROGRESS),
-    DONE: tasks.value.filter((t) => t.status === TaskStatus.DONE),
+    NOT_STARTED: filteredTasks.value.filter((t) => t.status === TaskStatus.NOT_STARTED),
+    IN_PROGRESS: filteredTasks.value.filter((t) => t.status === TaskStatus.IN_PROGRESS),
+    DONE: filteredTasks.value.filter((t) => t.status === TaskStatus.DONE),
   };
 });
 
@@ -343,8 +404,88 @@ onMounted(() => {
 
 .page-header {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.filters-section {
+  display: flex;
+  gap: var(--spacing-md);
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.search-box,
+.date-filter {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs) var(--spacing-md);
+  transition: all 0.2s ease;
+  min-width: 250px;
+}
+
+.search-box:focus-within,
+.date-filter:focus-within {
+  border-color: var(--color-primary);
+}
+
+.search-box :deep(svg),
+.date-filter :deep(svg) {
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.search-input,
+.date-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  outline: none;
+  padding: var(--spacing-xs) 0;
+}
+
+.search-input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.clear-search,
+.clear-date {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.clear-search:hover,
+.clear-date:hover {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+.clear-search :deep(svg),
+.clear-date :deep(svg) {
+  width: 14px;
+  height: 14px;
 }
 
 .loading-state {
