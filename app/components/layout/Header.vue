@@ -27,11 +27,13 @@ withDefaults(defineProps<Props>(), {
 <style scoped>
 .header {
   height: 64px;
-  background-color: var(--color-surface);
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 100;
+  width: 100%;
 }
 
 .header-content {

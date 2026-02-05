@@ -1,0 +1,70 @@
+interface User {
+  id: string;
+  name: string | null;
+  email: string | null;
+}
+
+const user = ref<User | null>(null);
+const loading = ref(true);
+
+export const useAuth = () => {
+  const fetchUser = async () => {
+    loading.value = true;
+    try {
+      const response = await $fetch("/api/auth/me");
+      if (response.success) {
+        user.value = response.data;
+      } else {
+        user.value = null;
+      }
+    } catch {
+      user.value = null;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    const response = await $fetch("/api/auth/login", {
+      method: "POST",
+      body: { email, password },
+    });
+
+    if (response.success) {
+      user.value = response.data;
+    }
+
+    return response;
+  };
+
+  const register = async (name: string, email: string, password: string) => {
+    const response = await $fetch("/api/auth/register", {
+      method: "POST",
+      body: { name, email, password },
+    });
+
+    if (response.success) {
+      user.value = response.data;
+    }
+
+    return response;
+  };
+
+  const logout = async () => {
+    await $fetch("/api/auth/logout", { method: "POST" });
+    user.value = null;
+    navigateTo("/auth/login");
+  };
+
+  const isAuthenticated = computed(() => !!user.value);
+
+  return {
+    user,
+    loading,
+    isAuthenticated,
+    fetchUser,
+    login,
+    register,
+    logout,
+  };
+};

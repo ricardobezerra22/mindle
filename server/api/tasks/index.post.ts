@@ -3,7 +3,7 @@ import { prisma } from "../../utils/prisma";
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event);
-    const userId = "000000000000000000000001";
+    const userId = event.context.userId;
 
     const { title, description, status, priority, dueDate, color } = body;
 

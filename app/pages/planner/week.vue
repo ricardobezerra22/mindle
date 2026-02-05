@@ -8,7 +8,10 @@
 
       <div class="weekly-overview-toggle">
         <button @click="showOverview = !showOverview" class="overview-btn">
-          <Icon :name="showOverview ? 'lucide:chevron-up' : 'lucide:chevron-down'" size="18" />
+          <Icon
+            :name="showOverview ? 'lucide:chevron-up' : 'lucide:chevron-down'"
+            size="18"
+          />
           Visão geral
         </button>
       </div>
@@ -57,36 +60,59 @@
                 class="task-check"
               >
                 <Icon
-                  :name="task.status === 'DONE' ? 'lucide:check-circle-2' : 'lucide:circle'"
+                  :name="
+                    task.status === 'DONE'
+                      ? 'lucide:check-circle-2'
+                      : 'lucide:circle'
+                  "
                 />
               </button>
 
               <div class="task-content">
                 <h3 class="task-title">{{ task.title }}</h3>
                 <div class="task-meta">
-                  <span :class="['status-badge', `status-${task.status.toLowerCase()}`]">
+                  <span
+                    :class="[
+                      'status-badge',
+                      `status-${task.status.toLowerCase()}`,
+                    ]"
+                  >
                     {{ getStatusLabel(task.status) }}
                   </span>
-                  <span v-if="task.priority" class="priority-badge" :class="`priority-${task.priority.toLowerCase()}`">
-                    {{ task.priority === 'HIGH' ? 'Alta' : task.priority === 'MEDIUM' ? 'Média' : 'Baixa' }}
+                  <span
+                    v-if="task.priority"
+                    class="priority-badge"
+                    :class="`priority-${task.priority.toLowerCase()}`"
+                  >
+                    {{
+                      task.priority === "HIGH"
+                        ? "Alta"
+                        : task.priority === "MEDIUM"
+                          ? "Média"
+                          : "Baixa"
+                    }}
                   </span>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script setup lang="ts">
+const toast = useToast();
+const { playDone } = useSound();
+
 const loading = ref(false);
 const showOverview = ref(false);
 
 const tasks = ref<any[]>([]);
+const toggleTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const toggleVersions = new Map<string, number>();
+const toggleInFlight = new Set<string>();
 
 const weekDays = computed(() => {
   const days = [];
@@ -103,21 +129,24 @@ const weekDays = computed(() => {
     const isToday = i === 0;
     const isTomorrow = i === 1;
 
-    let label = '';
+    let label = "";
     if (isToday) {
-      label = 'Hoje';
+      label = "Hoje";
     } else if (isTomorrow) {
-      label = 'Amanhã';
+      label = "Amanhã";
     } else {
-      label = date.toLocaleDateString('pt-PT', { weekday: 'long' });
+      label = date.toLocaleDateString("pt-PT", { weekday: "long" });
       label = label.charAt(0).toUpperCase() + label.slice(1);
     }
 
     days.push({
-      date: date.toISOString().split('T')[0],
-      dateFormatted: date.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' }),
+      date: date.toISOString().split("T")[0],
+      dateFormatted: date.toLocaleDateString("pt-PT", {
+        day: "2-digit",
+        month: "short",
+      }),
       label,
-      isToday
+      isToday,
     });
   }
 
@@ -125,7 +154,7 @@ const weekDays = computed(() => {
 });
 
 const weekDateRange = computed(() => {
-  if (weekDays.value.length === 0) return '';
+  if (weekDays.value.length === 0) return "";
   const first = weekDays.value[0];
   const last = weekDays.value[weekDays.value.length - 1];
   return `${first.dateFormatted} - ${last.dateFormatted}`;
@@ -133,31 +162,30 @@ const weekDateRange = computed(() => {
 
 const totalPlannedTasks = computed(() => {
   const weekTaskIds = new Set<string>();
-  weekDays.value.forEach(day => {
-    getTasksForDay(day.date).forEach(task => weekTaskIds.add(task.id));
+  weekDays.value.forEach((day) => {
+    getTasksForDay(day.date).forEach((task) => weekTaskIds.add(task.id));
   });
   return weekTaskIds.size;
 });
 
 const completedTasks = computed(() => {
   const weekTasks = new Set<string>();
-  weekDays.value.forEach(day => {
-    getTasksForDay(day.date).forEach(task => {
-      if (task.status === 'DONE') weekTasks.add(task.id);
+  weekDays.value.forEach((day) => {
+    getTasksForDay(day.date).forEach((task) => {
+      if (task.status === "DONE") weekTasks.add(task.id);
     });
   });
   return weekTasks.size;
 });
 
-
 const getTasksForDay = (date: string) => {
-  const tasksWithDueDate = tasks.value.filter(t => 
-    t.dueDate && t.dueDate.split('T')[0] === date
+  const tasksWithDueDate = tasks.value.filter(
+    (t) => t.dueDate && t.dueDate.split("T")[0] === date,
   );
 
   return tasksWithDueDate.sort((a, b) => {
-    if (a.status === 'DONE' && b.status !== 'DONE') return 1;
-    if (a.status !== 'DONE' && b.status === 'DONE') return -1;
+    if (a.status === "DONE" && b.status !== "DONE") return 1;
+    if (a.status !== "DONE" && b.status === "DONE") return -1;
     return 0;
   });
 };
@@ -165,54 +193,77 @@ const getTasksForDay = (date: string) => {
 const fetchTasks = async () => {
   loading.value = true;
   try {
-    const response = await $fetch('/api/tasks');
+    const response = await $fetch("/api/tasks");
     if (response.success) {
       tasks.value = response.data;
     }
   } catch (error) {
-    console.error('Error fetching tasks:', error);
+    console.error("Error fetching tasks:", error);
   } finally {
     loading.value = false;
   }
 };
 
+const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
+  if (toggleInFlight.has(taskId)) return;
 
-const toggleTaskStatus = async (taskId: string, currentStatus: string) => {
-  const newStatus = currentStatus === 'DONE' ? 'IN_PROGRESS' : 'DONE';
-  
-  const index = tasks.value.findIndex(t => t.id === taskId);
+  const index = tasks.value.findIndex((t) => t.id === taskId);
   if (index === -1) return;
 
-  const originalTask = { ...tasks.value[index] };
-  
-  tasks.value[index] = {
-    ...tasks.value[index],
-    status: newStatus
-  };
-  
-  try {
-    const response = await $fetch(`/api/tasks/${taskId}`, {
-      method: 'PUT',
-      body: { status: newStatus }
-    });
-    
-    if (response.success) {
-      tasks.value[index] = response.data;
-    } else {
-      tasks.value[index] = originalTask;
-    }
-  } catch (error) {
-    console.error('Error updating task status:', error);
-    tasks.value[index] = originalTask;
-  }
-};
+  const current = tasks.value[index].status;
+  const newStatus = current === "DONE" ? "IN_PROGRESS" : "DONE";
 
+  tasks.value[index] = { ...tasks.value[index], status: newStatus };
+
+  if (newStatus === "DONE") {
+    playDone();
+    toast.success("Tarefa concluída");
+  }
+
+  const version = (toggleVersions.get(taskId) || 0) + 1;
+  toggleVersions.set(taskId, version);
+
+  if (toggleTimers.has(taskId)) {
+    clearTimeout(toggleTimers.get(taskId)!);
+  }
+
+  const timer = setTimeout(async () => {
+    toggleTimers.delete(taskId);
+
+    if (toggleVersions.get(taskId) !== version) return;
+
+    const idx = tasks.value.findIndex((t) => t.id === taskId);
+    if (idx === -1) return;
+    const finalStatus = tasks.value[idx].status;
+
+    toggleInFlight.add(taskId);
+    try {
+      const response = await $fetch(`/api/tasks/${taskId}`, {
+        method: "PUT",
+        body: { status: finalStatus },
+      });
+
+      if (response.success && toggleVersions.get(taskId) === version) {
+        const i = tasks.value.findIndex((t) => t.id === taskId);
+        if (i !== -1) tasks.value[i] = response.data;
+      }
+    } catch (error) {
+      console.error("Error updating task status:", error);
+      toast.error("Erro ao atualizar tarefa");
+    } finally {
+      toggleInFlight.delete(taskId);
+      toggleVersions.delete(taskId);
+    }
+  }, 500);
+
+  toggleTimers.set(taskId, timer);
+};
 
 const getStatusLabel = (status: string) => {
   const labels: Record<string, string> = {
-    NOT_STARTED: 'Não iniciado',
-    IN_PROGRESS: 'Em progresso',
-    DONE: 'Concluído'
+    NOT_STARTED: "Não iniciado",
+    IN_PROGRESS: "Em progresso",
+    DONE: "Concluído",
   };
   return labels[status] || status;
 };
@@ -323,8 +374,12 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .days-grid {
@@ -347,7 +402,7 @@ onMounted(() => {
 
 .day-column.today {
   border-color: var(--color-primary);
-  background: #F7FBF9;
+  background: #f7fbf9;
 }
 
 .day-header {
@@ -509,36 +564,34 @@ onMounted(() => {
 }
 
 .priority-badge.priority-high {
-  background: #FFEBEE;
-  color: #C62828;
+  background: #ffebee;
+  color: #c62828;
 }
 
 .priority-badge.priority-medium {
-  background: #FFF3E0;
-  color: #EF6C00;
+  background: #fff3e0;
+  color: #ef6c00;
 }
 
 .priority-badge.priority-low {
-  background: #E8F5E9;
-  color: #2E7D32;
+  background: #e8f5e9;
+  color: #2e7d32;
 }
 
 .status-badge.status-not_started {
-  background: #E8EAED;
-  color: #5F6368;
+  background: #e8eaed;
+  color: #5f6368;
 }
 
 .status-badge.status-in_progress {
-  background: #E3F2FD;
-  color: #1976D2;
+  background: #e3f2fd;
+  color: #1976d2;
 }
 
 .status-badge.status-done {
-  background: #D1F4E0;
-  color: #2D7A4F;
+  background: #d1f4e0;
+  color: #2d7a4f;
 }
-
-
 
 @media (max-width: 1200px) {
   .days-grid {

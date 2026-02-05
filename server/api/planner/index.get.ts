@@ -2,7 +2,7 @@ import { prisma } from '../../utils/prisma'
 
 export default defineEventHandler(async (event) => {
   try {
-    const userId = '000000000000000000000001'
+    const userId = event.context.userId
     
     const entries = await prisma.plannerEntry.findMany({
       where: { userId },

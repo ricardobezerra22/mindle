@@ -47,8 +47,39 @@
         <span>Configurações</span>
       </NuxtLink>
     </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">
+          {{ userInitial }}
+        </div>
+        <div class="user-details">
+          <span class="user-name">{{ userName }}</span>
+          <span class="user-email">{{ userEmail }}</span>
+        </div>
+      </div>
+      <button class="logout-btn" @click="handleLogout">
+        <Icon name="lucide:log-out" size="18" />
+      </button>
+    </div>
   </aside>
 </template>
+
+<script setup lang="ts">
+const { user, logout } = useAuth();
+const toast = useToast();
+
+const userName = computed(() => user.value?.name || "Usuário");
+const userEmail = computed(() => user.value?.email || "");
+const userInitial = computed(() =>
+  (user.value?.name || "U").charAt(0).toUpperCase(),
+);
+
+const handleLogout = async () => {
+  toast.info("Saindo...");
+  await logout();
+};
+</script>
 
 <style scoped>
 .sidebar {
@@ -130,5 +161,78 @@
 
 .nav-group .nav-item {
   padding-left: var(--spacing-lg);
+}
+
+.sidebar-footer {
+  padding: var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.user-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-width: 0;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logout-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.logout-btn:hover {
+  background: #fef2f2;
+  color: #dc2626;
 }
 </style>

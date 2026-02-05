@@ -95,9 +95,15 @@
 </template>
 
 <script setup lang="ts">
+const toast = useToast();
+const { playDone } = useSound();
+
 const loading = ref(false);
 const tasks = ref<any[]>([]);
 const currentDate = ref(new Date());
+const toggleTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const toggleVersions = new Map<string, number>();
+const toggleInFlight = new Set<string>();
 
 const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
@@ -205,34 +211,59 @@ const fetchTasks = async () => {
   }
 };
 
-const toggleTaskStatus = async (taskId: string, currentStatus: string) => {
-  const newStatus = currentStatus === "DONE" ? "IN_PROGRESS" : "DONE";
-    
+const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
+  if (toggleInFlight.has(taskId)) return;
+
   const index = tasks.value.findIndex((t) => t.id === taskId);
   if (index === -1) return;
 
-  const originalTask = { ...tasks.value[index] };
+  const current = tasks.value[index].status;
+  const newStatus = current === "DONE" ? "IN_PROGRESS" : "DONE";
 
-  tasks.value[index] = {
-    ...tasks.value[index],
-    status: newStatus,
-  };
+  tasks.value[index] = { ...tasks.value[index], status: newStatus };
 
-  try {
-    const response = await $fetch(`/api/tasks/${taskId}`, {
-      method: "PUT",
-      body: { status: newStatus },
-    });
-
-    if (response.success) {
-      tasks.value[index] = response.data;
-    } else {
-      tasks.value[index] = originalTask;
-    }
-  } catch (error) {
-    console.error("Error updating task status:", error);
-    tasks.value[index] = originalTask;
+  if (newStatus === "DONE") {
+    playDone();
+    toast.success("Tarefa concluída");
   }
+
+  const version = (toggleVersions.get(taskId) || 0) + 1;
+  toggleVersions.set(taskId, version);
+
+  if (toggleTimers.has(taskId)) {
+    clearTimeout(toggleTimers.get(taskId)!);
+  }
+
+  const timer = setTimeout(async () => {
+    toggleTimers.delete(taskId);
+
+    if (toggleVersions.get(taskId) !== version) return;
+
+    const idx = tasks.value.findIndex((t) => t.id === taskId);
+    if (idx === -1) return;
+    const finalStatus = tasks.value[idx].status;
+
+    toggleInFlight.add(taskId);
+    try {
+      const response = await $fetch(`/api/tasks/${taskId}`, {
+        method: "PUT",
+        body: { status: finalStatus },
+      });
+
+      if (response.success && toggleVersions.get(taskId) === version) {
+        const i = tasks.value.findIndex((t) => t.id === taskId);
+        if (i !== -1) tasks.value[i] = response.data;
+      }
+    } catch (error) {
+      console.error("Error updating task status:", error);
+      toast.error("Erro ao atualizar tarefa");
+    } finally {
+      toggleInFlight.delete(taskId);
+      toggleVersions.delete(taskId);
+    }
+  }, 500);
+
+  toggleTimers.set(taskId, timer);
 };
 
 const previousMonth = () => {

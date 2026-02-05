@@ -7,8 +7,8 @@ export default defineNuxtConfig({
   },
 
   css: ["~/assets/css/main.css"],
-  routeRules: {
-    "/": { prerender: true },
+  runtimeConfig: {
+    jwtSecret: process.env.JWT_SECRET || "mindle-secret-key-change-in-production",
   },
 
   compatibilityDate: "2025-01-15",
