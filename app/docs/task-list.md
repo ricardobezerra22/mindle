@@ -14,7 +14,7 @@
 - [ ] Login
 - [ X] Área de foco (Pomodoro simples)
 - [ ] Hábitos e bem-estar (check simples)
-- [ ] Registo financeiro (somente listagem)
+- [ X ] Registo financeiro (somente listagem)
 
 ## UX
 - [ X] Feedback visual suave (done / progresso)

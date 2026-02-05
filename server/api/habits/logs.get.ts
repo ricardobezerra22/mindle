@@ -4,16 +4,16 @@ export default defineEventHandler(async (event) => {
   try {
     const userId = '000000000000000000000001'
     
-    const habits = await prisma.habit.findMany({
+    const logs = await prisma.habitLog.findMany({
       where: { userId },
       orderBy: {
-        createdAt: 'asc'
+        date: 'desc'
       }
     })
     
-    return sendSuccess(event, habits)
+    return sendSuccess(event, logs)
   } catch (error) {
-    console.error('Error fetching habits:', error)
-    return sendError(event, 'Failed to fetch habits', 500)
+    console.error('Error fetching habit logs:', error)
+    return sendError(event, 'Failed to fetch habit logs', 500)
   }
 })

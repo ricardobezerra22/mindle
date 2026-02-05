@@ -32,9 +32,9 @@
         <span>Foco</span>
       </NuxtLink>
 
-      <NuxtLink to="/well-being" class="nav-item" active-class="active">
+      <NuxtLink to="/habits" class="nav-item" active-class="active">
         <Icon name="lucide:heart" />
-        <span>Bem-estar</span>
+        <span>Hábitos</span>
       </NuxtLink>
 
       <NuxtLink to="/finance" class="nav-item" active-class="active">

@@ -22,7 +22,7 @@ const pageTitle = computed(() => {
     "/planner/week": "Planner Semanal",
     "/planner/month": "Planner Mensal",
     "/focus": "Foco",
-    "/well-being": "Bem-estar",
+    "/habits": "Hábitos",
     "/finance": "Finanças",
     "/settings": "Configurações",
   };

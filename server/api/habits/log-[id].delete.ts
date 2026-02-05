@@ -8,17 +8,13 @@ export default defineEventHandler(async (event) => {
       return sendError(event, 'ID is required', 400)
     }
 
-    await prisma.habitLog.deleteMany({
-      where: { habitId: id }
-    })
-
-    await prisma.habit.delete({
+    await prisma.habitLog.delete({
       where: { id }
     })
 
     return sendSuccess(event, { deleted: true })
   } catch (error) {
-    console.error('Error deleting habit:', error)
-    return sendError(event, 'Failed to delete habit', 500)
+    console.error('Error deleting habit log:', error)
+    return sendError(event, 'Failed to delete habit log', 500)
   }
 })
