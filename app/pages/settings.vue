@@ -375,10 +375,16 @@ const exportData = async () => {
     a.download = `mindle-export-${new Date().toISOString().split("T")[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success("Dados exportados");
+    toast.success({
+      title: "Dados exportados",
+      message: "Continue assim!",
+    });
   } catch (error) {
     console.error("Error exporting data:", error);
-    toast.error("Erro ao exportar dados");
+    toast.error({
+      title: "Erro ao exportar dados",
+      message: "Tente novamente mais tarde",
+    });
   } finally {
     exporting.value = false;
   }
@@ -386,7 +392,10 @@ const exportData = async () => {
 
 const clearCache = () => {
   localStorage.clear();
-  toast.info("Cache limpo");
+  toast.info({
+    title: "Cache limpo",
+    message: "Continue assim!",
+  });
 };
 
 onMounted(() => {

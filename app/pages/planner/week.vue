@@ -217,7 +217,7 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
 
   if (newStatus === "DONE") {
     playDone();
-    toast.success("Tarefa concluída");
+    toast.success({ title: "Tarefa concluída" });
   }
 
   const version = (toggleVersions.get(taskId) || 0) + 1;
@@ -249,7 +249,7 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
       }
     } catch (error) {
       console.error("Error updating task status:", error);
-      toast.error("Erro ao atualizar tarefa");
+      toast.error({ title: "Erro ao atualizar tarefa" });
     } finally {
       toggleInFlight.delete(taskId);
       toggleVersions.delete(taskId);

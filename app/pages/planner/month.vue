@@ -36,11 +36,7 @@
 
       <div v-else class="calendar-container">
         <div class="calendar-grid">
-          <div
-            v-for="day in weekDays"
-            :key="day"
-            class="calendar-header-cell"
-          >
+          <div v-for="day in weekDays" :key="day" class="calendar-header-cell">
             {{ day }}
           </div>
 
@@ -135,8 +131,7 @@ const calendarDays = computed(() => {
   while (currentDateObj <= endDate) {
     const date = new Date(currentDateObj);
     const isCurrentMonth = date.getMonth() === month;
-    const isToday =
-      date.toDateString() === new Date().toDateString();
+    const isToday = date.toDateString() === new Date().toDateString();
     const isWeekend = date.getDay() === 0 || date.getDay() === 6;
 
     days.push({
@@ -160,9 +155,7 @@ const monthlyTasksCount = computed(() => {
   return tasks.value.filter((t) => {
     if (!t.dueDate) return false;
     const taskDate = new Date(t.dueDate);
-    return (
-      taskDate.getFullYear() === year && taskDate.getMonth() === month
-    );
+    return taskDate.getFullYear() === year && taskDate.getMonth() === month;
   }).length;
 });
 
@@ -173,9 +166,7 @@ const completedTasksCount = computed(() => {
   return tasks.value.filter((t) => {
     if (!t.dueDate || t.status !== "DONE") return false;
     const taskDate = new Date(t.dueDate);
-    return (
-      taskDate.getFullYear() === year && taskDate.getMonth() === month
-    );
+    return taskDate.getFullYear() === year && taskDate.getMonth() === month;
   }).length;
 });
 
@@ -224,7 +215,7 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
 
   if (newStatus === "DONE") {
     playDone();
-    toast.success("Tarefa concluída");
+    toast.success({ title: "Tarefa concluída" });
   }
 
   const version = (toggleVersions.get(taskId) || 0) + 1;
@@ -256,7 +247,7 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
       }
     } catch (error) {
       console.error("Error updating task status:", error);
-      toast.error("Erro ao atualizar tarefa");
+      toast.error({ title: "Erro ao atualizar tarefa" });
     } finally {
       toggleInFlight.delete(taskId);
       toggleVersions.delete(taskId);

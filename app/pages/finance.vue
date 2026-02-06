@@ -5,8 +5,9 @@
         <h1 class="page-title">Finanças</h1>
         <div class="monthly-summary">
           <p class="summary-text">
-            {{ pendingCount }} {{ pendingCount === 1 ? 'item pendente' : 'itens pendentes' }} · 
-            {{ paidCount }} {{ paidCount === 1 ? 'pago' : 'pagos' }}
+            {{ pendingCount }}
+            {{ pendingCount === 1 ? "item pendente" : "itens pendentes" }} ·
+            {{ paidCount }} {{ paidCount === 1 ? "pago" : "pagos" }}
           </p>
           <p v-if="totalAmount > 0" class="total-amount">
             Total: {{ formatCurrency(totalAmount) }}
@@ -23,7 +24,11 @@
             placeholder="Buscar por título, categoria ou nota..."
             class="search-input"
           />
-          <button v-if="searchQuery" @click="searchQuery = ''" class="clear-btn">
+          <button
+            v-if="searchQuery"
+            @click="searchQuery = ''"
+            class="clear-btn"
+          >
             <Icon name="lucide:x" />
           </button>
         </div>
@@ -39,7 +44,10 @@
           </div>
           <button
             v-if="dateFrom || dateTo"
-            @click="dateFrom = ''; dateTo = ''"
+            @click="
+              dateFrom = '';
+              dateTo = '';
+            "
             class="clear-dates-btn"
           >
             <Icon name="lucide:x" size="14" />
@@ -49,14 +57,14 @@
       </div>
 
       <div class="filter-section">
-        <button 
-          @click="showArchived = false" 
+        <button
+          @click="showArchived = false"
           :class="['filter-btn', { active: !showArchived }]"
         >
           Ativos
         </button>
-        <button 
-          @click="showArchived = true" 
+        <button
+          @click="showArchived = true"
           :class="['filter-btn', { active: showArchived }]"
         >
           Arquivados
@@ -70,7 +78,13 @@
 
       <div v-else-if="filteredEntries.length === 0" class="empty-state">
         <Icon name="lucide:inbox" />
-        <p>{{ showArchived ? 'Nenhum item arquivado' : 'Nenhum item financeiro ainda' }}</p>
+        <p>
+          {{
+            showArchived
+              ? "Nenhum item arquivado"
+              : "Nenhum item financeiro ainda"
+          }}
+        </p>
       </div>
 
       <div v-else class="entries-list">
@@ -81,7 +95,9 @@
         >
           <div class="entry-header">
             <h3 class="entry-title">{{ entry.title }}</h3>
-            <span v-if="entry.category" class="entry-category">{{ entry.category }}</span>
+            <span v-if="entry.category" class="entry-category">{{
+              entry.category
+            }}</span>
           </div>
 
           <div class="entry-details">
@@ -90,11 +106,18 @@
                 <Icon name="lucide:calendar" />
                 {{ formatDate(entry.dueDate) }}
               </span>
-              <span class="entry-amount">{{ formatCurrency(entry.amount) }}</span>
+              <span class="entry-amount">{{
+                formatCurrency(entry.amount)
+              }}</span>
             </div>
-            
+
             <div class="entry-status">
-              <span :class="['status-badge', `status-${entry.status.toLowerCase()}`]">
+              <span
+                :class="[
+                  'status-badge',
+                  `status-${entry.status.toLowerCase()}`,
+                ]"
+              >
                 {{ getStatusLabel(entry.status) }}
               </span>
             </div>
@@ -124,7 +147,11 @@
               @click="toggleArchive(entry.id, entry.archived)"
               class="action-btn secondary"
             >
-              <Icon :name="entry.archived ? 'lucide:archive-restore' : 'lucide:archive'" />
+              <Icon
+                :name="
+                  entry.archived ? 'lucide:archive-restore' : 'lucide:archive'
+                "
+              />
             </button>
           </div>
         </div>
@@ -136,10 +163,14 @@
       </button>
     </div>
 
-    <div v-if="showAddModal || editingEntry" class="modal-overlay" @click.self="closeModal">
+    <div
+      v-if="showAddModal || editingEntry"
+      class="modal-overlay"
+      @click.self="closeModal"
+    >
       <div class="modal-content">
         <div class="modal-header">
-          <h2>{{ editingEntry ? 'Editar item' : 'Novo item financeiro' }}</h2>
+          <h2>{{ editingEntry ? "Editar item" : "Novo item financeiro" }}</h2>
           <button @click="closeModal" class="close-btn">
             <Icon name="lucide:x" />
           </button>
@@ -183,11 +214,7 @@
 
           <div class="form-group">
             <label for="dueDate">Data de vencimento</label>
-            <input
-              id="dueDate"
-              v-model="formData.dueDate"
-              type="date"
-            />
+            <input id="dueDate" v-model="formData.dueDate" type="date" />
           </div>
 
           <div class="form-group">
@@ -215,7 +242,13 @@
             </button>
             <button type="submit" :disabled="isSaving" class="btn-primary">
               <Icon v-if="isSaving" name="lucide:loader-2" class="spinning" />
-              {{ isSaving ? 'Salvando...' : editingEntry ? 'Atualizar' : 'Adicionar' }}
+              {{
+                isSaving
+                  ? "Salvando..."
+                  : editingEntry
+                    ? "Atualizar"
+                    : "Adicionar"
+              }}
             </button>
           </div>
         </form>
@@ -233,46 +266,50 @@ const loading = ref(false);
 const isSaving = ref(false);
 const editingEntry = ref<any>(null);
 
-const searchQuery = ref('');
-const dateFrom = ref('');
-const dateTo = ref('');
+const searchQuery = ref("");
+const dateFrom = ref("");
+const dateTo = ref("");
 let searchTimer: ReturnType<typeof setTimeout> | null = null;
 
 const formData = ref({
-  title: '',
+  title: "",
   amount: 0,
-  category: '',
-  dueDate: '',
-  status: 'NOT_STARTED',
-  note: ''
+  category: "",
+  dueDate: "",
+  status: "NOT_STARTED",
+  note: "",
 });
 
 const entries = ref<any[]>([]);
 
 const filteredEntries = computed(() => {
   return entries.value
-    .filter(entry => entry.archived === showArchived.value)
+    .filter((entry) => entry.archived === showArchived.value)
     .sort((a, b) => {
-      if (a.status === 'PENDING' && b.status !== 'PENDING') return -1;
-      if (a.status !== 'PENDING' && b.status === 'PENDING') return 1;
-      if (a.status === 'NOT_STARTED' && b.status === 'PAID') return -1;
-      if (a.status === 'PAID' && b.status === 'NOT_STARTED') return 1;
+      if (a.status === "PENDING" && b.status !== "PENDING") return -1;
+      if (a.status !== "PENDING" && b.status === "PENDING") return 1;
+      if (a.status === "NOT_STARTED" && b.status === "PAID") return -1;
+      if (a.status === "PAID" && b.status === "NOT_STARTED") return 1;
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 });
 
-const pendingCount = computed(() => 
-  entries.value.filter(e => !e.archived && (e.status === 'PENDING' || e.status === 'NOT_STARTED')).length
+const pendingCount = computed(
+  () =>
+    entries.value.filter(
+      (e) =>
+        !e.archived && (e.status === "PENDING" || e.status === "NOT_STARTED"),
+    ).length,
 );
 
-const paidCount = computed(() => 
-  entries.value.filter(e => !e.archived && e.status === 'PAID').length
+const paidCount = computed(
+  () => entries.value.filter((e) => !e.archived && e.status === "PAID").length,
 );
 
-const totalAmount = computed(() => 
+const totalAmount = computed(() =>
   entries.value
-    .filter(e => !e.archived && e.status !== 'PAID')
-    .reduce((sum, e) => sum + e.amount, 0)
+    .filter((e) => !e.archived && e.status !== "PAID")
+    .reduce((sum, e) => sum + e.amount, 0),
 );
 
 const fetchEntries = async () => {
@@ -284,14 +321,14 @@ const fetchEntries = async () => {
     if (dateTo.value) params.to = dateTo.value;
 
     const queryStr = new URLSearchParams(params).toString();
-    const url = queryStr ? `/api/finance?${queryStr}` : '/api/finance';
+    const url = queryStr ? `/api/finance?${queryStr}` : "/api/finance";
 
     const response = await $fetch(url);
     if (response.success) {
       entries.value = response.data;
     }
   } catch (error) {
-    console.error('Error fetching finance entries:', error);
+    console.error("Error fetching finance entries:", error);
   } finally {
     loading.value = false;
   }
@@ -311,34 +348,44 @@ const saveEntry = async () => {
   try {
     const payload = {
       ...formData.value,
-      dueDate: formData.value.dueDate ? new Date(formData.value.dueDate).toISOString() : null
+      dueDate: formData.value.dueDate
+        ? new Date(formData.value.dueDate).toISOString()
+        : null,
     };
 
     if (editingEntry.value) {
       const response = await $fetch(`/api/finance/${editingEntry.value.id}`, {
-        method: 'PUT',
-        body: payload
+        method: "PUT",
+        body: payload,
       });
       if (response.success) {
-        const index = entries.value.findIndex(e => e.id === editingEntry.value.id);
+        const index = entries.value.findIndex(
+          (e) => e.id === editingEntry.value.id,
+        );
         if (index !== -1) {
           entries.value[index] = response.data;
         }
       }
     } else {
-      const response = await $fetch('/api/finance', {
-        method: 'POST',
-        body: payload
+      const response = await $fetch("/api/finance", {
+        method: "POST",
+        body: payload,
       });
       if (response.success) {
         entries.value.unshift(response.data);
       }
     }
     closeModal();
-    toast.success(editingEntry.value ? 'Item atualizado' : 'Item adicionado');
+    toast.success({
+      title: editingEntry.value ? "Item atualizado" : "Item adicionado",
+      message: "Parabéns!",
+    });
   } catch (error) {
-    console.error('Error saving entry:', error);
-    toast.error('Erro ao salvar item');
+    console.error("Error saving entry:", error);
+    toast.error({
+      title: "Erro ao salvar item",
+      message: "Tente novamente mais tarde",
+    });
   } finally {
     isSaving.value = false;
   }
@@ -347,38 +394,44 @@ const saveEntry = async () => {
 const markAsPaid = async (id: string) => {
   try {
     const response = await $fetch(`/api/finance/${id}`, {
-      method: 'PUT',
-      body: { status: 'PAID', paidAt: new Date().toISOString() }
+      method: "PUT",
+      body: { status: "PAID", paidAt: new Date().toISOString() },
     });
     if (response.success) {
-      const index = entries.value.findIndex(e => e.id === id);
+      const index = entries.value.findIndex((e) => e.id === id);
       if (index !== -1) {
         entries.value[index] = response.data;
       }
-      toast.success('Marcado como pago');
+      toast.success("Marcado como pago");
     }
   } catch (error) {
-    console.error('Error marking as paid:', error);
-    toast.error('Erro ao marcar como pago');
+    console.error("Error marking as paid:", error);
+    toast.error({
+      title: "Erro ao marcar como pago",
+      message: "Tente novamente mais tarde",
+    });
   }
 };
 
 const toggleArchive = async (id: string, currentArchived: boolean) => {
   try {
     const response = await $fetch(`/api/finance/${id}`, {
-      method: 'PUT',
-      body: { archived: !currentArchived }
+      method: "PUT",
+      body: { archived: !currentArchived },
     });
     if (response.success) {
-      const index = entries.value.findIndex(e => e.id === id);
+      const index = entries.value.findIndex((e) => e.id === id);
       if (index !== -1) {
         entries.value[index] = response.data;
       }
-      toast.success(currentArchived ? 'Item restaurado' : 'Item arquivado');
+      toast.success(currentArchived ? "Item restaurado" : "Item arquivado");
     }
   } catch (error) {
-    console.error('Error toggling archive:', error);
-    toast.error('Erro ao arquivar item');
+    console.error("Error toggling archive:", error);
+    toast.error({
+      title: "Erro ao arquivar item",
+      message: "Tente novamente mais tarde",
+    });
   }
 };
 
@@ -387,10 +440,12 @@ const openEditModal = (entry: any) => {
   formData.value = {
     title: entry.title,
     amount: entry.amount,
-    category: entry.category || '',
-    dueDate: entry.dueDate ? new Date(entry.dueDate).toISOString().split('T')[0] : '',
+    category: entry.category || "",
+    dueDate: entry.dueDate
+      ? new Date(entry.dueDate).toISOString().split("T")[0]
+      : "",
     status: entry.status,
-    note: entry.note || ''
+    note: entry.note || "",
   };
 };
 
@@ -398,34 +453,34 @@ const closeModal = () => {
   showAddModal.value = false;
   editingEntry.value = null;
   formData.value = {
-    title: '',
+    title: "",
     amount: 0,
-    category: '',
-    dueDate: '',
-    status: 'NOT_STARTED',
-    note: ''
+    category: "",
+    dueDate: "",
+    status: "NOT_STARTED",
+    note: "",
   };
 };
 
 const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('pt-PT', {
-    style: 'currency',
-    currency: 'EUR'
+  return new Intl.NumberFormat("pt-PT", {
+    style: "currency",
+    currency: "EUR",
   }).format(value);
 };
 
 const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString('pt-pt', {
-    day: '2-digit',
-    month: 'short'
+  return new Date(date).toLocaleDateString("pt-pt", {
+    day: "2-digit",
+    month: "short",
   });
 };
 
 const getStatusLabel = (status: string) => {
   const labels: Record<string, string> = {
-    NOT_STARTED: 'Não iniciado',
-    PENDING: 'Pendente',
-    PAID: 'Pago'
+    NOT_STARTED: "Não iniciado",
+    PENDING: "Pendente",
+    PAID: "Pago",
   };
   return labels[status] || status;
 };
@@ -623,7 +678,7 @@ onMounted(() => {
 
 .filter-btn.active {
   border-color: var(--color-primary);
-  background: #E8F3ED;
+  background: #e8f3ed;
   color: var(--color-primary-dark);
 }
 
@@ -647,8 +702,12 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .entries-list {
@@ -688,7 +747,7 @@ onMounted(() => {
 .entry-category {
   font-size: 12px;
   color: var(--color-text-secondary);
-  background: #F0F4F3;
+  background: #f0f4f3;
   padding: 4px 12px;
   border-radius: 12px;
 }
@@ -735,18 +794,18 @@ onMounted(() => {
 }
 
 .status-badge.status-paid {
-  background: #D1F4E0;
-  color: #2D7A4F;
+  background: #d1f4e0;
+  color: #2d7a4f;
 }
 
 .status-badge.status-pending {
-  background: #F5E6D3;
-  color: #8B6914;
+  background: #f5e6d3;
+  color: #8b6914;
 }
 
 .status-badge.status-not_started {
-  background: #E8EAED;
-  color: #5F6368;
+  background: #e8eaed;
+  color: #5f6368;
 }
 
 .entry-note {
@@ -796,7 +855,7 @@ onMounted(() => {
 }
 
 .action-btn.secondary:hover {
-  background: #F0F4F3;
+  background: #f0f4f3;
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
@@ -888,7 +947,7 @@ onMounted(() => {
 }
 
 .close-btn:hover {
-  background: #F0F4F3;
+  background: #f0f4f3;
   color: var(--color-text-primary);
 }
 
@@ -974,7 +1033,7 @@ onMounted(() => {
 }
 
 .btn-secondary:hover {
-  background: #F0F4F3;
+  background: #f0f4f3;
   border-color: var(--color-primary);
   color: var(--color-primary);
 }

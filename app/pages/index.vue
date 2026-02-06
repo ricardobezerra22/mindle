@@ -36,7 +36,11 @@
               @click="toggleTaskStatus(task.id, task.status)"
             >
               <Icon
-                :name="task.status === 'DONE' ? 'lucide:check-circle-2' : 'lucide:circle'"
+                :name="
+                  task.status === 'DONE'
+                    ? 'lucide:check-circle-2'
+                    : 'lucide:circle'
+                "
                 size="20"
                 class="task-icon"
               />
@@ -66,7 +70,10 @@
               v-for="day in weekDaysPreview"
               :key="day.date"
               to="/planner/week"
-              :class="['week-day-cell', { today: day.isToday, 'has-tasks': day.taskCount > 0 }]"
+              :class="[
+                'week-day-cell',
+                { today: day.isToday, 'has-tasks': day.taskCount > 0 },
+              ]"
             >
               <span class="week-day-name">{{ day.label }}</span>
               <span class="week-day-number">{{ day.dayNumber }}</span>
@@ -112,7 +119,9 @@
                 <Icon name="lucide:clock" size="18" />
               </div>
               <div class="progress-info">
-                <span class="progress-value">{{ weekPlanned - weekCompleted }}</span>
+                <span class="progress-value">{{
+                  weekPlanned - weekCompleted
+                }}</span>
                 <span class="progress-label">pendentes</span>
               </div>
             </div>
@@ -125,7 +134,9 @@
                 :style="{ width: completionPercent + '%' }"
               ></div>
             </div>
-            <span class="completion-text">{{ completionPercent }}% concluído</span>
+            <span class="completion-text"
+              >{{ completionPercent }}% concluído</span
+            >
           </div>
         </section>
 
@@ -140,7 +151,10 @@
               v-for="habit in habits"
               :key="habit.id"
               @click="toggleHabit(habit.id)"
-              :class="['habit-bubble', { checked: isHabitCheckedToday(habit.id) }]"
+              :class="[
+                'habit-bubble',
+                { checked: isHabitCheckedToday(habit.id) },
+              ]"
             >
               <Icon :name="habit.icon || 'lucide:circle'" size="22" />
             </button>
@@ -150,7 +164,13 @@
         <section v-if="pendingFinanceCount > 0" class="finance-section">
           <NuxtLink to="/finance" class="finance-card">
             <Icon name="lucide:wallet" size="18" />
-            <span>{{ pendingFinanceCount }} {{ pendingFinanceCount === 1 ? "item precisa" : "itens precisam" }} de atenção</span>
+            <span
+              >{{ pendingFinanceCount }}
+              {{
+                pendingFinanceCount === 1 ? "item precisa" : "itens precisam"
+              }}
+              de atenção</span
+            >
             <Icon name="lucide:arrow-right" size="14" />
           </NuxtLink>
         </section>
@@ -200,7 +220,15 @@ const greetingMessage = computed(() => {
 
 const todayFormatted = computed(() => {
   const now = new Date();
-  const dayNames = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+  const dayNames = [
+    "Domingo",
+    "Segunda",
+    "Terça",
+    "Quarta",
+    "Quinta",
+    "Sexta",
+    "Sábado",
+  ];
   return {
     day: dayNames[now.getDay()],
     full: now.toLocaleDateString("pt-BR", { day: "numeric", month: "long" }),
@@ -306,7 +334,8 @@ const completionPercent = computed(() => {
 });
 
 const pendingFinanceCount = computed(() => {
-  return finances.value.filter((f) => f.status !== "PAID" && !f.archived).length;
+  return finances.value.filter((f) => f.status !== "PAID" && !f.archived)
+    .length;
 });
 
 const isHabitCheckedToday = (habitId: string) => {
@@ -379,7 +408,10 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
 
   if (newStatus === "DONE") {
     playDone();
-    toast.success("Tarefa concluída");
+    toast.success({
+      title: "Tarefa concluída",
+      message: "Continue assim!",
+    });
   }
 
   const version = (toggleVersions.get(taskId) || 0) + 1;
@@ -411,7 +443,10 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
       }
     } catch (error) {
       console.error("Error updating task status:", error);
-      toast.error("Erro ao atualizar tarefa");
+      toast.error({
+        title: "Erro ao atualizar tarefa",
+        message: "Tente novamente mais tarde",
+      });
     } finally {
       toggleInFlight.delete(taskId);
       toggleVersions.delete(taskId);
@@ -444,12 +479,18 @@ const toggleHabit = async (habitId: string) => {
       if (response.success) {
         habitLogs.value.push(response.data);
         playDone();
-        toast.success("Hábito registrado");
+        toast.success({
+          title: "Hábito registrado",
+          message: "Continue assim!",
+        });
       }
     }
   } catch (error) {
     console.error("Error toggling habit:", error);
-    toast.error("Erro ao registrar hábito");
+    toast.error({
+      title: "Erro ao registrar hábito",
+      message: "Tente novamente mais tarde",
+    });
   }
 };
 
@@ -572,8 +613,12 @@ onMounted(async () => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .empty-focus {

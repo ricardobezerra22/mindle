@@ -161,7 +161,10 @@ const handleComplete = async () => {
   isCompleting.value = true;
 
   playDone();
-  toast.success("Tarefa concluída");
+  toast.success({
+    title: "Tarefa concluída",
+    message: "Parabéns!",
+  });
 
   setTimeout(() => {
     emit("complete", props.id);

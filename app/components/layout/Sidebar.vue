@@ -66,6 +66,9 @@
 </template>
 
 <script setup lang="ts">
+import { useAuth } from "../../composables/useAuth";
+// import { useToast } from "../../composables/useToast";
+
 const { user, logout } = useAuth();
 const toast = useToast();
 
@@ -76,7 +79,7 @@ const userInitial = computed(() =>
 );
 
 const handleLogout = async () => {
-  toast.info("Saindo...");
+  toast.info({ title: "Saindo..." });
   await logout();
 };
 </script>

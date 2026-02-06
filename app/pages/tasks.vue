@@ -27,11 +27,7 @@
             class="date-input"
             placeholder="Filtrar por data"
           />
-          <button
-            v-if="dateFilter"
-            @click="dateFilter = ''"
-            class="clear-date"
-          >
+          <button v-if="dateFilter" @click="dateFilter = ''" class="clear-date">
             <Icon name="lucide:x" />
           </button>
         </div>
@@ -302,9 +298,9 @@ const showDeleteModal = ref(false);
 const taskToDelete = ref<string | null>(null);
 const draggedTaskId = ref<string | null>(null);
 
-const searchQuery = ref('');
-const dateFilter = ref('');
-const categoryFilter = ref('');
+const searchQuery = ref("");
+const dateFilter = ref("");
+const categoryFilter = ref("");
 
 const newTask = ref({
   title: "",
@@ -317,7 +313,7 @@ const newTask = ref({
 
 const availableCategories = computed(() => {
   const cats = new Set<string>();
-  tasks.value.forEach(t => {
+  tasks.value.forEach((t) => {
     if (t.category) cats.add(t.category);
   });
   return Array.from(cats).sort();
@@ -328,22 +324,23 @@ const filteredTasks = computed(() => {
 
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
-    filtered = filtered.filter(t => 
-      t.title.toLowerCase().includes(query) ||
-      (t.description && t.description.toLowerCase().includes(query))
+    filtered = filtered.filter(
+      (t) =>
+        t.title.toLowerCase().includes(query) ||
+        (t.description && t.description.toLowerCase().includes(query)),
     );
   }
 
   if (dateFilter.value) {
-    filtered = filtered.filter(t => {
+    filtered = filtered.filter((t) => {
       if (!t.dueDate) return false;
-      const taskDate = new Date(t.dueDate).toISOString().split('T')[0];
+      const taskDate = new Date(t.dueDate).toISOString().split("T")[0];
       return taskDate === dateFilter.value;
     });
   }
 
   if (categoryFilter.value) {
-    filtered = filtered.filter(t => t.category === categoryFilter.value);
+    filtered = filtered.filter((t) => t.category === categoryFilter.value);
   }
 
   return filtered;
@@ -351,8 +348,12 @@ const filteredTasks = computed(() => {
 
 const tasksByStatus = computed(() => {
   return {
-    NOT_STARTED: filteredTasks.value.filter((t) => t.status === TaskStatus.NOT_STARTED),
-    IN_PROGRESS: filteredTasks.value.filter((t) => t.status === TaskStatus.IN_PROGRESS),
+    NOT_STARTED: filteredTasks.value.filter(
+      (t) => t.status === TaskStatus.NOT_STARTED,
+    ),
+    IN_PROGRESS: filteredTasks.value.filter(
+      (t) => t.status === TaskStatus.IN_PROGRESS,
+    ),
     DONE: filteredTasks.value.filter((t) => t.status === TaskStatus.DONE),
   };
 });
@@ -368,16 +369,18 @@ const handleCreate = async () => {
         : undefined,
       status: TaskStatus.NOT_STARTED,
       category: newTask.value.category || undefined,
-      categoryColor: newTask.value.category ? newTask.value.categoryColor : undefined,
+      categoryColor: newTask.value.category
+        ? newTask.value.categoryColor
+        : undefined,
     });
 
     if (result) {
-      toast.success("Tarefa criada");
+      toast.success({ title: "Tarefa Criada" });
     } else {
-      toast.error("Erro ao criar tarefa");
+      toast.error({ title: "Erro ao criar tarefa" });
     }
   } catch (e) {
-    toast.error("Erro ao criar tarefa");
+    toast.error({ title: "Erro ao criar tarefa" });
   } finally {
     showCreateModal.value = false;
     newTask.value = {
@@ -398,7 +401,7 @@ const handleEdit = async (
   try {
     await updateTask(id, data);
   } catch (e) {
-    toast.error("Erro ao atualizar tarefa");
+    toast.error({ title: "Erro ao atualizar tarefa" });
   }
 };
 
@@ -412,9 +415,9 @@ const handleDelete = async () => {
     try {
       await deleteTask(taskToDelete.value);
       showDeleteModal.value = false;
-      toast.success("Tarefa excluída");
+      toast.success({ title: "Tarefa excluída" });
     } catch (e) {
-      toast.error("Erro ao excluir tarefa");
+      toast.error({ title: "Erro ao excluir tarefa" });
     } finally {
       taskToDelete.value = null;
     }
@@ -433,7 +436,7 @@ const handleComplete = async (taskId: string) => {
   try {
     await updateTaskStatus(taskId, TaskStatus.DONE);
   } catch (e) {
-    toast.error("Erro ao concluir tarefa");
+    toast.error({ title: "Erro ao concluir tarefa" });
   }
 };
 
@@ -443,7 +446,7 @@ const handleDrop = async (taskId: string, newStatus: TaskStatus) => {
     try {
       await updateTaskStatus(taskId, newStatus);
     } catch (e) {
-      toast.error("Erro ao alterar status da tarefa");
+      toast.error({ title: "Erro ao alterar status da tarefa" });
     }
   }
 };
