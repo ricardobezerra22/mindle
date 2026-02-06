@@ -25,16 +25,24 @@ export const useAuth = () => {
   };
 
   const login = async (email: string, password: string) => {
-    const response = await $fetch("/api/auth/login", {
-      method: "POST",
-      body: { email, password },
-    });
+    try {
+      const response = await $fetch("/api/auth/login", {
+        method: "POST",
+        body: { email, password },
+      });
 
-    if (response.success) {
-      user.value = response.data;
+      if (response.success) {
+        user.value = response.data;
+      }
+
+      return response;
+    } catch (err: any) {
+      const data = err?.data;
+      if (data && data.error) {
+        return { success: false, error: data.error };
+      }
+      return { success: false, error: "Erro ao fazer login" };
     }
-
-    return response;
   };
 
   const register = async (name: string, email: string, password: string) => {

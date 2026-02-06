@@ -20,6 +20,10 @@ export default defineEventHandler(async (event) => {
       return sendError(event, "Email ou senha incorretos", 401);
     }
 
+    if (!user.isActive) {
+      return sendError(event, "Sua conta está inativa. Entre em contato com o administrador para ser ativado.", 403);
+    }
+
     const token = generateToken(user.id);
 
     setCookie(event, "auth-token", token, {

@@ -18,44 +18,55 @@
       </div>
 
       <div class="task-content">
-      <input
-        v-if="editMode"
-        v-model="editData.title"
-        type="text"
-        class="edit-input title-input"
-        placeholder="Título da tarefa"
-        @click.stop
-      />
-      <h4 v-else class="task-title">{{ title }}</h4>
+        <input
+          v-if="editMode"
+          v-model="editData.title"
+          type="text"
+          class="edit-input title-input"
+          placeholder="Título da tarefa"
+          @click.stop
+        />
+        <h4 v-else class="task-title">{{ title }}</h4>
 
-      <textarea
-        v-if="editMode"
-        v-model="editData.description"
-        class="edit-input description-input"
-        placeholder="Descrição da tarefa"
-        rows="2"
-        @click.stop
-      />
-      <p v-else-if="description" class="task-description">{{ description }}</p>
+        <textarea
+          v-if="editMode"
+          v-model="editData.description"
+          class="edit-input description-input"
+          placeholder="Descrição da tarefa"
+          rows="2"
+          @click.stop
+        />
+        <p v-else-if="description" class="task-description">
+          {{ description }}
+        </p>
 
-      <div class="task-meta">
-        <div v-if="editMode" class="edit-date-wrapper">
-          <Icon name="lucide:calendar" />
-          <input
-            v-model="editData.dueDate"
-            type="date"
-            class="edit-input date-input"
-            @click.stop
-          />
+        <div class="task-meta">
+          <div v-if="editMode" class="edit-date-wrapper">
+            <Icon name="lucide:calendar" />
+            <input
+              v-model="editData.dueDate"
+              type="date"
+              class="edit-input date-input"
+              @click.stop
+            />
+          </div>
+          <span v-else-if="dueDate" class="task-date">
+            <Icon name="lucide:calendar" />
+            {{ formatDate(dueDate) }}
+          </span>
+          <span
+            :class="['task-priority', `priority-${priority.toLowerCase()}`]"
+          >
+            {{ priorityLabel }}
+          </span>
+          <span
+            v-if="category"
+            class="category-badge"
+            :style="categoryBadgeStyle"
+          >
+            {{ category }}
+          </span>
         </div>
-        <span v-else-if="dueDate" class="task-date">
-          <Icon name="lucide:calendar" />
-          {{ formatDate(dueDate) }}
-        </span>
-        <span :class="['task-priority', `priority-${priority.toLowerCase()}`]">
-          {{ priorityLabel }}
-        </span>
-      </div>
       </div>
 
       <div class="task-actions">
@@ -106,6 +117,8 @@ interface Props {
   status: TaskStatus;
   priority: Priority;
   dueDate?: Date;
+  category?: string;
+  categoryColor?: string;
 }
 
 const props = defineProps<Props>();
@@ -121,8 +134,21 @@ const emit = defineEmits<{
   dragEnd: [];
 }>();
 
+const { playDone } = useSound();
+const toast = useToast();
+
 const editMode = ref(false);
 const isCompleting = ref(false);
+
+const categoryBadgeStyle = computed(() => {
+  if (!props.categoryColor) return {};
+  const color = props.categoryColor;
+  return {
+    backgroundColor: color.startsWith("rgba") ? color : `${color}20`,
+    color: color.startsWith("rgba") ? undefined : color,
+    borderColor: color.startsWith("rgba") ? "transparent" : `${color}40`,
+  };
+});
 const editData = ref({
   title: "",
   description: "",
@@ -134,11 +160,8 @@ const handleComplete = async () => {
 
   isCompleting.value = true;
 
-  const audio = new Audio(
-    "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwPUKXi8LdjHAU2kdXzzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r9sIQYqgc7y2Ik2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK/bCEGKoHO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs",
-  );
-  audio.volume = 0.3;
-  audio.play().catch(() => {});
+  playDone();
+  toast.success("Tarefa concluída");
 
   setTimeout(() => {
     emit("complete", props.id);
@@ -369,7 +392,6 @@ const formatDateForInput = (date: Date) => {
   white-space: pre-wrap;
 }
 
-
 .edit-input {
   width: 100%;
   padding: var(--spacing-xs) var(--spacing-sm);
@@ -462,6 +484,16 @@ const formatDateForInput = (date: Date) => {
   color: #065f46;
 }
 
+.category-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-text-secondary);
+}
+
 .task-actions {
   position: absolute;
   top: var(--spacing-sm);
@@ -483,7 +515,7 @@ const formatDateForInput = (date: Date) => {
   .task-actions {
     opacity: 1;
   }
-  
+
   .task-content {
     padding-right: 60px;
   }

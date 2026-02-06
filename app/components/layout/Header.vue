@@ -34,6 +34,7 @@ withDefaults(defineProps<Props>(), {
   top: 0;
   z-index: 100;
   width: 100%;
+  padding: 38px;
 }
 
 .header-content {

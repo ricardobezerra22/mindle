@@ -35,17 +35,20 @@ model User {
   focusSessions FocusSession[]
   finances      FinanceEntry[]
   dailyMoods    DailyMood[]
+  preferences   UserPreferences?
 }
 
 model Task {
-  id          String     @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  description String?
-  status      TaskStatus @default(NOT_STARTED)
-  priority    Priority   @default(MEDIUM)
-  dueDate     DateTime?
-  color       String? // visual only
-  createdAt   DateTime   @default(now())
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  description   String?
+  status        TaskStatus @default(NOT_STARTED)
+  priority      Priority   @default(MEDIUM)
+  dueDate       DateTime?
+  color         String?
+  category      String?
+  categoryColor String?
+  createdAt     DateTime   @default(now())
 
   userId String @db.ObjectId
   user   User   @relation(fields: [userId], references: [id])
@@ -116,6 +119,26 @@ model DailyMood {
   createdAt DateTime @default(now())
 
   userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model UserPreferences {
+  id              String  @id @default(auto()) @map("_id") @db.ObjectId
+  focusDuration   String  @default("30")
+  autoBreak       Boolean @default(false)
+  focusSound      Boolean @default(true)
+  weekStart       String  @default("monday")
+  showOnlyToday   Boolean @default(false)
+  showCompleted   Boolean @default(true)
+  dailyReminder   Boolean @default(false)
+  showInsights    Boolean @default(true)
+  financeReminder Boolean @default(true)
+  autoArchivePaid Boolean @default(false)
+  theme           String  @default("light")
+  reducedMotion   Boolean @default(false)
+  fontSize        String  @default("normal")
+
+  userId String @unique @db.ObjectId
   user   User   @relation(fields: [userId], references: [id])
 }
 

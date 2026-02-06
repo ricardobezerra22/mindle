@@ -5,12 +5,16 @@ interface Toast {
   duration?: number;
 }
 
-const toasts = ref<Toast[]>([]);
-
 export const useToast = () => {
-  const show = (message: string, type: Toast["type"] = "info", duration = 2500) => {
-    const id = Date.now().toString();
-    toasts.value.push({ id, message, type, duration });
+  const toasts = useState<Toast[]>("app-toasts", () => []);
+
+  const show = (
+    message: string,
+    type: Toast["type"] = "info",
+    duration = 2500,
+  ) => {
+    const id = Date.now().toString() + Math.random().toString(36).slice(2);
+    toasts.value = [...toasts.value, { id, message, type, duration }];
 
     setTimeout(() => {
       toasts.value = toasts.value.filter((t) => t.id !== id);

@@ -23,10 +23,7 @@
               <span class="setting-label">Duração padrão</span>
               <span class="setting-description">Tempo de cada sessão</span>
             </div>
-            <select
-              v-model="preferences.focusDuration"
-              class="setting-select"
-            >
+            <select v-model="preferences.focusDuration" class="setting-select">
               <option
                 v-for="opt in focusDurationOptions"
                 :key="opt.value"
@@ -78,10 +75,7 @@
               <span class="setting-label">Início da semana</span>
               <span class="setting-description">Qual dia começa</span>
             </div>
-            <select
-              v-model="preferences.weekStart"
-              class="setting-select"
-            >
+            <select v-model="preferences.weekStart" class="setting-select">
               <option
                 v-for="opt in weekStartOptions"
                 :key="opt.value"
@@ -108,7 +102,9 @@
           <div class="setting-row">
             <div class="setting-info">
               <span class="setting-label">Mostrar concluídas</span>
-              <span class="setting-description">Exibir tarefas finalizadas</span>
+              <span class="setting-description"
+                >Exibir tarefas finalizadas</span
+              >
             </div>
             <button
               :class="['toggle', { active: preferences.showCompleted }]"
@@ -167,11 +163,15 @@
           <div class="setting-row">
             <div class="setting-info">
               <span class="setting-label">Lembrete no dashboard</span>
-              <span class="setting-description">Itens pendentes na tela inicial</span>
+              <span class="setting-description"
+                >Itens pendentes na tela inicial</span
+              >
             </div>
             <button
               :class="['toggle', { active: preferences.financeReminder }]"
-              @click="preferences.financeReminder = !preferences.financeReminder"
+              @click="
+                preferences.financeReminder = !preferences.financeReminder
+              "
             >
               <span class="toggle-thumb"></span>
             </button>
@@ -180,11 +180,15 @@
           <div class="setting-row">
             <div class="setting-info">
               <span class="setting-label">Arquivar pagos</span>
-              <span class="setting-description">Mover pagos automaticamente</span>
+              <span class="setting-description"
+                >Mover pagos automaticamente</span
+              >
             </div>
             <button
               :class="['toggle', { active: preferences.autoArchivePaid }]"
-              @click="preferences.autoArchivePaid = !preferences.autoArchivePaid"
+              @click="
+                preferences.autoArchivePaid = !preferences.autoArchivePaid
+              "
             >
               <span class="toggle-thumb"></span>
             </button>
@@ -260,8 +264,16 @@
               <span class="setting-label">Exportar dados</span>
               <span class="setting-description">Baixar tudo em JSON</span>
             </div>
-            <button class="action-btn" @click="exportData" :disabled="exporting">
-              <Icon :name="exporting ? 'lucide:loader-2' : 'lucide:download'" size="16" :class="{ spinning: exporting }" />
+            <button
+              class="action-btn"
+              @click="exportData"
+              :disabled="exporting"
+            >
+              <Icon
+                :name="exporting ? 'lucide:loader-2' : 'lucide:download'"
+                size="16"
+                :class="{ spinning: exporting }"
+              />
               {{ exporting ? "Exportando..." : "Exportar" }}
             </button>
           </div>
@@ -269,7 +281,9 @@
           <div class="setting-row">
             <div class="setting-info">
               <span class="setting-label">Limpar cache local</span>
-              <span class="setting-description">Dados temporários do navegador</span>
+              <span class="setting-description"
+                >Dados temporários do navegador</span
+              >
             </div>
             <button class="action-btn" @click="clearCache">
               <Icon name="lucide:trash-2" size="16" />
@@ -283,8 +297,8 @@
         <p class="app-name">Mindle</p>
         <p class="app-version">v1.0.0</p>
         <p class="app-philosophy">
-          Um espaço calmo para organizar o que importa. Sem pressa, sem
-          pressão. Feito para quem quer clareza, não mais complexidade.
+          Um espaço calmo para organizar o que importa. Sem pressa, sem pressão.
+          Feito para quem quer clareza, não mais complexidade.
         </p>
         <a href="mailto:feedback@mindle.app" class="feedback-link">
           <Icon name="lucide:mail" size="16" />
@@ -296,23 +310,9 @@
 </template>
 
 <script setup lang="ts">
+const { preferences, fetchPreferences, debouncedSave } = usePreferences();
+const toast = useToast();
 const exporting = ref(false);
-
-const preferences = reactive({
-  focusDuration: "30",
-  autoBreak: false,
-  focusSound: true,
-  weekStart: "monday",
-  showOnlyToday: false,
-  showCompleted: true,
-  dailyReminder: false,
-  showInsights: true,
-  financeReminder: true,
-  autoArchivePaid: false,
-  theme: "light",
-  reducedMotion: false,
-  fontSize: "normal",
-});
 
 const focusDurationOptions = [
   { label: "15 minutos", value: "15" },
@@ -339,20 +339,13 @@ const fontSizeOptions = [
   { label: "Grande", value: "large" },
 ];
 
-const loadPreferences = () => {
-  const saved = localStorage.getItem("mindle-preferences");
-  if (saved) {
-    Object.assign(preferences, JSON.parse(saved));
-  }
-};
-
-const savePreferences = () => {
-  localStorage.setItem("mindle-preferences", JSON.stringify(preferences));
-};
-
-watch(preferences, () => {
-  savePreferences();
-}, { deep: true });
+watch(
+  preferences,
+  () => {
+    debouncedSave();
+  },
+  { deep: true },
+);
 
 const exportData = async () => {
   exporting.value = true;
@@ -370,7 +363,7 @@ const exportData = async () => {
       habits: habits.success ? habits.data : [],
       habitLogs: habitLogs.success ? habitLogs.data : [],
       finance: finance.success ? finance.data : [],
-      preferences,
+      preferences: preferences.value,
     };
 
     const blob = new Blob([JSON.stringify(data, null, 2)], {
@@ -382,8 +375,10 @@ const exportData = async () => {
     a.download = `mindle-export-${new Date().toISOString().split("T")[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    toast.success("Dados exportados");
   } catch (error) {
     console.error("Error exporting data:", error);
+    toast.error("Erro ao exportar dados");
   } finally {
     exporting.value = false;
   }
@@ -391,11 +386,11 @@ const exportData = async () => {
 
 const clearCache = () => {
   localStorage.clear();
-  loadPreferences();
+  toast.info("Cache limpo");
 };
 
 onMounted(() => {
-  loadPreferences();
+  fetchPreferences();
 });
 </script>
 
@@ -592,8 +587,12 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .about-section {

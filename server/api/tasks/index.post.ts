@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const userId = event.context.userId;
 
-    const { title, description, status, priority, dueDate, color } = body;
+    const { title, description, status, priority, dueDate, color, category, categoryColor } = body;
 
     if (!title) {
       return sendError(event, "Title is required", 400);
@@ -19,6 +19,8 @@ export default defineEventHandler(async (event) => {
         priority: priority || "MEDIUM",
         dueDate: dueDate ? new Date(dueDate) : undefined,
         color,
+        category: category || undefined,
+        categoryColor: categoryColor || undefined,
         userId,
       },
       include: {

@@ -14,6 +14,40 @@
         </div>
       </div>
 
+      <div class="search-section">
+        <div class="search-box">
+          <Icon name="lucide:search" />
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Buscar por título, categoria ou nota..."
+            class="search-input"
+          />
+          <button v-if="searchQuery" @click="searchQuery = ''" class="clear-btn">
+            <Icon name="lucide:x" />
+          </button>
+        </div>
+
+        <div class="date-filters">
+          <div class="date-field">
+            <label>De</label>
+            <input v-model="dateFrom" type="date" class="date-input" />
+          </div>
+          <div class="date-field">
+            <label>Até</label>
+            <input v-model="dateTo" type="date" class="date-input" />
+          </div>
+          <button
+            v-if="dateFrom || dateTo"
+            @click="dateFrom = ''; dateTo = ''"
+            class="clear-dates-btn"
+          >
+            <Icon name="lucide:x" size="14" />
+            Limpar datas
+          </button>
+        </div>
+      </div>
+
       <div class="filter-section">
         <button 
           @click="showArchived = false" 
@@ -191,11 +225,18 @@
 </template>
 
 <script setup lang="ts">
+const toast = useToast();
+
 const showAddModal = ref(false);
 const showArchived = ref(false);
 const loading = ref(false);
 const isSaving = ref(false);
 const editingEntry = ref<any>(null);
+
+const searchQuery = ref('');
+const dateFrom = ref('');
+const dateTo = ref('');
+let searchTimer: ReturnType<typeof setTimeout> | null = null;
 
 const formData = ref({
   title: '',
@@ -237,7 +278,15 @@ const totalAmount = computed(() =>
 const fetchEntries = async () => {
   loading.value = true;
   try {
-    const response = await $fetch('/api/finance');
+    const params: Record<string, string> = {};
+    if (searchQuery.value) params.search = searchQuery.value;
+    if (dateFrom.value) params.from = dateFrom.value;
+    if (dateTo.value) params.to = dateTo.value;
+
+    const queryStr = new URLSearchParams(params).toString();
+    const url = queryStr ? `/api/finance?${queryStr}` : '/api/finance';
+
+    const response = await $fetch(url);
     if (response.success) {
       entries.value = response.data;
     }
@@ -247,6 +296,15 @@ const fetchEntries = async () => {
     loading.value = false;
   }
 };
+
+const debouncedFetch = () => {
+  if (searchTimer) clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => fetchEntries(), 400);
+};
+
+watch(searchQuery, debouncedFetch);
+watch(dateFrom, () => fetchEntries());
+watch(dateTo, () => fetchEntries());
 
 const saveEntry = async () => {
   isSaving.value = true;
@@ -277,8 +335,10 @@ const saveEntry = async () => {
       }
     }
     closeModal();
+    toast.success(editingEntry.value ? 'Item atualizado' : 'Item adicionado');
   } catch (error) {
     console.error('Error saving entry:', error);
+    toast.error('Erro ao salvar item');
   } finally {
     isSaving.value = false;
   }
@@ -295,9 +355,11 @@ const markAsPaid = async (id: string) => {
       if (index !== -1) {
         entries.value[index] = response.data;
       }
+      toast.success('Marcado como pago');
     }
   } catch (error) {
     console.error('Error marking as paid:', error);
+    toast.error('Erro ao marcar como pago');
   }
 };
 
@@ -312,9 +374,11 @@ const toggleArchive = async (id: string, currentArchived: boolean) => {
       if (index !== -1) {
         entries.value[index] = response.data;
       }
+      toast.success(currentArchived ? 'Item restaurado' : 'Item arquivado');
     }
   } catch (error) {
     console.error('Error toggling archive:', error);
+    toast.error('Erro ao arquivar item');
   }
 };
 
@@ -411,6 +475,127 @@ onMounted(() => {
   font-size: 14px;
   color: var(--color-text-secondary);
   margin: 0;
+}
+
+.search-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: 12px;
+  padding: var(--spacing-xs) var(--spacing-md);
+  transition: all 0.2s ease;
+}
+
+.search-box:focus-within {
+  border-color: var(--color-primary);
+}
+
+.search-box :deep(svg) {
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  outline: none;
+  padding: var(--spacing-sm) 0;
+}
+
+.search-input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.clear-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.clear-btn:hover {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+.clear-btn :deep(svg) {
+  width: 14px;
+  height: 14px;
+}
+
+.date-filters {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.date-field label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.date-input {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--color-border);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  transition: all 0.2s ease;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.clear-dates-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.clear-dates-btn:hover {
+  background: #fef2f2;
+  color: #dc2626;
 }
 
 .filter-section {

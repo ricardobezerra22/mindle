@@ -1,16 +1,5 @@
 <template>
   <div class="tasks-page">
-    <div v-if="toast" :class="['toast', `toast-${toast.type}`]">
-      <Icon
-        :name="
-          toast.type === 'error'
-            ? 'lucide:alert-circle'
-            : 'lucide:check-circle-2'
-        "
-      />
-      <span>{{ toast.message }}</span>
-    </div>
-
     <div class="page-header">
       <div class="filters-section">
         <div class="search-box">
@@ -46,6 +35,16 @@
             <Icon name="lucide:x" />
           </button>
         </div>
+
+        <div v-if="availableCategories.length > 0" class="category-filter">
+          <Icon name="lucide:tag" />
+          <select v-model="categoryFilter" class="category-select">
+            <option value="">Todas categorias</option>
+            <option v-for="cat in availableCategories" :key="cat" :value="cat">
+              {{ cat }}
+            </option>
+          </select>
+        </div>
       </div>
 
       <UiButton @click="showCreateModal = true">
@@ -75,6 +74,8 @@
           :status="task.status"
           :priority="task.priority"
           :due-date="task.dueDate"
+          :category="task.category"
+          :category-color="task.categoryColor"
           @edit="handleEdit"
           @delete="confirmDelete"
           @complete="handleComplete"
@@ -99,6 +100,8 @@
           :status="task.status"
           :priority="task.priority"
           :due-date="task.dueDate"
+          :category="task.category"
+          :category-color="task.categoryColor"
           @edit="handleEdit"
           @delete="confirmDelete"
           @complete="handleComplete"
@@ -123,6 +126,8 @@
           :status="task.status"
           :priority="task.priority"
           :due-date="task.dueDate"
+          :category="task.category"
+          :category-color="task.categoryColor"
           @edit="handleEdit"
           @delete="confirmDelete"
           @drag-start="handleDragStart"
@@ -179,6 +184,36 @@
             <div class="form-group">
               <label for="dueDate">Data de Entrega</label>
               <input id="dueDate" v-model="newTask.dueDate" type="date" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="category">Categoria</label>
+              <input
+                id="category"
+                v-model="newTask.category"
+                type="text"
+                placeholder="ex: Trabalho, Pessoal"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="categoryColor">Cor da categoria</label>
+              <div class="color-picker-row">
+                <input
+                  id="categoryColor"
+                  v-model="newTask.categoryColor"
+                  type="color"
+                  class="color-input"
+                />
+                <input
+                  v-model="newTask.categoryColor"
+                  type="text"
+                  placeholder="#6FAF8E"
+                  class="color-text-input"
+                />
+              </div>
             </div>
           </div>
 
@@ -260,14 +295,7 @@ const {
   deleteTask,
 } = useTasks();
 
-const toast = ref<{ message: string; type: "success" | "error" } | null>(null);
-
-const showToast = (message: string, type: "success" | "error" = "success") => {
-  toast.value = { message, type };
-  setTimeout(() => {
-    toast.value = null;
-  }, 3000);
-};
+const toast = useToast();
 
 const showCreateModal = ref(false);
 const showDeleteModal = ref(false);
@@ -276,12 +304,23 @@ const draggedTaskId = ref<string | null>(null);
 
 const searchQuery = ref('');
 const dateFilter = ref('');
+const categoryFilter = ref('');
 
 const newTask = ref({
   title: "",
   description: "",
   priority: "MEDIUM" as const,
   dueDate: "",
+  category: "",
+  categoryColor: "#6FAF8E",
+});
+
+const availableCategories = computed(() => {
+  const cats = new Set<string>();
+  tasks.value.forEach(t => {
+    if (t.category) cats.add(t.category);
+  });
+  return Array.from(cats).sort();
 });
 
 const filteredTasks = computed(() => {
@@ -303,6 +342,10 @@ const filteredTasks = computed(() => {
     });
   }
 
+  if (categoryFilter.value) {
+    filtered = filtered.filter(t => t.category === categoryFilter.value);
+  }
+
   return filtered;
 });
 
@@ -315,23 +358,37 @@ const tasksByStatus = computed(() => {
 });
 
 const handleCreate = async () => {
-  await createTask({
-    title: newTask.value.title,
-    description: newTask.value.description || undefined,
-    priority: newTask.value.priority,
-    dueDate: newTask.value.dueDate
-      ? new Date(newTask.value.dueDate)
-      : undefined,
-    status: TaskStatus.NOT_STARTED,
-  });
+  try {
+    const result = await createTask({
+      title: newTask.value.title,
+      description: newTask.value.description || undefined,
+      priority: newTask.value.priority,
+      dueDate: newTask.value.dueDate
+        ? new Date(newTask.value.dueDate)
+        : undefined,
+      status: TaskStatus.NOT_STARTED,
+      category: newTask.value.category || undefined,
+      categoryColor: newTask.value.category ? newTask.value.categoryColor : undefined,
+    });
 
-  showCreateModal.value = false;
-  newTask.value = {
-    title: "",
-    description: "",
-    priority: "MEDIUM",
-    dueDate: "",
-  };
+    if (result) {
+      toast.success("Tarefa criada");
+    } else {
+      toast.error("Erro ao criar tarefa");
+    }
+  } catch (e) {
+    toast.error("Erro ao criar tarefa");
+  } finally {
+    showCreateModal.value = false;
+    newTask.value = {
+      title: "",
+      description: "",
+      priority: "MEDIUM",
+      dueDate: "",
+      category: "",
+      categoryColor: "#6FAF8E",
+    };
+  }
 };
 
 const handleEdit = async (
@@ -341,7 +398,7 @@ const handleEdit = async (
   try {
     await updateTask(id, data);
   } catch (e) {
-    showToast("Erro ao atualizar tarefa", "error");
+    toast.error("Erro ao atualizar tarefa");
   }
 };
 
@@ -355,8 +412,9 @@ const handleDelete = async () => {
     try {
       await deleteTask(taskToDelete.value);
       showDeleteModal.value = false;
+      toast.success("Tarefa excluída");
     } catch (e) {
-      showToast("Erro ao excluir tarefa", "error");
+      toast.error("Erro ao excluir tarefa");
     } finally {
       taskToDelete.value = null;
     }
@@ -375,7 +433,7 @@ const handleComplete = async (taskId: string) => {
   try {
     await updateTaskStatus(taskId, TaskStatus.DONE);
   } catch (e) {
-    showToast("Erro ao concluir tarefa", "error");
+    toast.error("Erro ao concluir tarefa");
   }
 };
 
@@ -385,7 +443,7 @@ const handleDrop = async (taskId: string, newStatus: TaskStatus) => {
     try {
       await updateTaskStatus(taskId, newStatus);
     } catch (e) {
-      showToast("Erro ao alterar status da tarefa", "error");
+      toast.error("Erro ao alterar status da tarefa");
     }
   }
 };
@@ -722,56 +780,77 @@ onMounted(() => {
   color: white !important;
 }
 
-.toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
+.category-filter {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs) var(--spacing-md);
+  transition: all 0.2s ease;
+}
+
+.category-filter:focus-within {
+  border-color: var(--color-primary);
+}
+
+.category-filter :deep(svg) {
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.category-select {
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  outline: none;
+  padding: var(--spacing-xs) 0;
+  cursor: pointer;
+}
+
+.color-picker-row {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
-  background-color: var(--color-surface);
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 2000;
-  animation: slideIn 0.3s ease;
-  min-width: 300px;
 }
 
-@keyframes slideIn {
-  from {
-    transform: translateX(400px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+.color-input {
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  padding: 2px;
+  cursor: pointer;
+  background: transparent;
 }
 
-.toast-success {
-  border-left: 4px solid #10b981;
+.color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
 }
 
-.toast-success :deep(svg) {
-  color: #10b981;
-  width: 20px;
-  height: 20px;
+.color-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
 }
 
-.toast-error {
-  border-left: 4px solid #ef4444;
-}
-
-.toast-error :deep(svg) {
-  color: #ef4444;
-  width: 20px;
-  height: 20px;
-}
-
-.toast span {
+.color-text-input {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   font-size: 14px;
+  font-family: monospace;
   color: var(--color-text-primary);
-  font-weight: 500;
+  background-color: var(--color-surface);
+  transition: border-color 0.2s ease;
+}
+
+.color-text-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
 }
 </style>

@@ -28,6 +28,8 @@ export const useTasks = () => {
     priority?: Priority
     dueDate?: Date
     color?: string
+    category?: string
+    categoryColor?: string
   }) => {
     loading.value = true
     error.value = null

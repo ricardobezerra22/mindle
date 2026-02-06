@@ -17,7 +17,6 @@
   align-items: center;
   justify-content: center;
   background: var(--color-background);
-  padding: var(--spacing-lg);
 }
 
 .auth-container {
