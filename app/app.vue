@@ -6,7 +6,7 @@ useHead({
     lang: "pt",
   },
 });
-
+import { Analytics } from "@vercel/analytics/nuxt";
 const title = "Mindle - Gestão de Tarefas e Produtividade";
 const description =
   "Sistema completo de gestão de tarefas, planner, foco e bem-estar.";
@@ -22,6 +22,7 @@ useSeoMeta({
 <template>
   <NuxtLayout>
     <NuxtPage />
+    <Analytics />
   </NuxtLayout>
   <UiToast />
 </template>
