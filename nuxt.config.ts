@@ -19,6 +19,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
     jwtSecret:
       process.env.JWT_SECRET || "mindle-secret-key-change-in-production",
+    public: {
+      googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
+    },
   },
 
   compatibilityDate: "2025-01-15",
