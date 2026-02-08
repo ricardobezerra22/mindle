@@ -2,12 +2,19 @@
   <div class="planner-page">
     <div class="planner-container">
       <div class="week-header">
-        <h1 class="page-title">Esta semana</h1>
-        <p class="date-range">{{ weekDateRange }}</p>
+        <h1 class="page-title">
+          Esta semana
+        </h1>
+        <p class="date-range">
+          {{ weekDateRange }}
+        </p>
       </div>
 
       <div class="weekly-overview-toggle">
-        <button @click="showOverview = !showOverview" class="overview-btn">
+        <button
+          class="overview-btn"
+          @click="showOverview = !showOverview"
+        >
           <Icon
             :name="showOverview ? 'lucide:chevron-up' : 'lucide:chevron-down'"
             size="18"
@@ -16,23 +23,39 @@
         </button>
       </div>
 
-      <div v-if="showOverview" class="weekly-overview">
+      <div
+        v-if="showOverview"
+        class="weekly-overview"
+      >
         <div class="overview-card">
           <h4>Tarefas planejadas</h4>
-          <p class="overview-value">{{ totalPlannedTasks }}</p>
+          <p class="overview-value">
+            {{ totalPlannedTasks }}
+          </p>
         </div>
         <div class="overview-card">
           <h4>Concluídas</h4>
-          <p class="overview-value">{{ completedTasks }}</p>
+          <p class="overview-value">
+            {{ completedTasks }}
+          </p>
         </div>
       </div>
 
-      <div v-if="loading" class="loading-state">
-        <Icon name="lucide:loader-2" class="spinning" />
+      <div
+        v-if="loading"
+        class="loading-state"
+      >
+        <Icon
+          name="lucide:loader-2"
+          class="spinning"
+        />
         <p>Carregando...</p>
       </div>
 
-      <div v-else class="days-grid">
+      <div
+        v-else
+        class="days-grid"
+      >
         <div
           v-for="day in weekDays"
           :key="day.date"
@@ -40,24 +63,32 @@
         >
           <div class="day-header">
             <div class="day-info">
-              <h2 class="day-label">{{ day.label }}</h2>
+              <h2 class="day-label">
+                {{ day.label }}
+              </h2>
               <span class="day-date">{{ day.dateFormatted }}</span>
             </div>
           </div>
 
-          <div v-if="getTasksForDay(day.date).length === 0" class="empty-day">
+          <div
+            v-if="getTasksForDay(day.date).length === 0"
+            class="empty-day"
+          >
             <p>Nada planejado ainda.</p>
           </div>
 
-          <div v-else class="tasks-list">
+          <div
+            v-else
+            class="tasks-list"
+          >
             <div
               v-for="task in getTasksForDay(day.date)"
               :key="task.id"
               :class="['task-card', `status-${task.status.toLowerCase()}`]"
             >
               <button
-                @click="toggleTaskStatus(task.id, task.status)"
                 class="task-check"
+                @click="toggleTaskStatus(task.id, task.status)"
               >
                 <Icon
                   :name="
@@ -69,7 +100,9 @@
               </button>
 
               <div class="task-content">
-                <h3 class="task-title">{{ task.title }}</h3>
+                <h3 class="task-title">
+                  {{ task.title }}
+                </h3>
                 <div class="task-meta">
                   <span
                     :class="[
@@ -163,7 +196,7 @@ const weekDateRange = computed(() => {
 const totalPlannedTasks = computed(() => {
   const weekTaskIds = new Set<string>();
   weekDays.value.forEach((day) => {
-    getTasksForDay(day.date).forEach((task) => weekTaskIds.add(task.id));
+    getTasksForDay(day.date).forEach(task => weekTaskIds.add(task.id));
   });
   return weekTaskIds.size;
 });
@@ -180,7 +213,7 @@ const completedTasks = computed(() => {
 
 const getTasksForDay = (date: string) => {
   const tasksWithDueDate = tasks.value.filter(
-    (t) => t.dueDate && t.dueDate.split("T")[0] === date,
+    t => t.dueDate && t.dueDate.split("T")[0] === date,
   );
 
   return tasksWithDueDate.sort((a, b) => {
@@ -207,7 +240,7 @@ const fetchTasks = async () => {
 const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
   if (toggleInFlight.has(taskId)) return;
 
-  const index = tasks.value.findIndex((t) => t.id === taskId);
+  const index = tasks.value.findIndex(t => t.id === taskId);
   if (index === -1) return;
 
   const current = tasks.value[index].status;
@@ -232,7 +265,7 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
 
     if (toggleVersions.get(taskId) !== version) return;
 
-    const idx = tasks.value.findIndex((t) => t.id === taskId);
+    const idx = tasks.value.findIndex(t => t.id === taskId);
     if (idx === -1) return;
     const finalStatus = tasks.value[idx].status;
 
@@ -244,7 +277,7 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
       });
 
       if (response.success && toggleVersions.get(taskId) === version) {
-        const i = tasks.value.findIndex((t) => t.id === taskId);
+        const i = tasks.value.findIndex(t => t.id === taskId);
         if (i !== -1) tasks.value[i] = response.data;
       }
     } catch (error) {

@@ -26,6 +26,7 @@ export interface Task {
   priority: Priority;
   dueDate?: Date;
   color?: string;
+  isFavorite: boolean;
   categoryId?: string;
   category?: TaskCategory;
   createdAt: Date;

@@ -1,23 +1,43 @@
 <template>
   <div class="auth-card">
-    <h2 class="auth-title">Bem-vindo de volta</h2>
-    <p class="auth-subtitle">Entre para continuar de onde parou</p>
+    <h2 class="auth-title">
+      Bem-vindo de volta
+    </h2>
+    <p class="auth-subtitle">
+      Entre para continuar de onde parou
+    </p>
 
-    <div v-if="errorMessage" class="alert alert-error">
-      <Icon name="lucide:alert-circle" size="16" />
+    <div
+      v-if="errorMessage"
+      class="alert alert-error"
+    >
+      <Icon
+        name="lucide:alert-circle"
+        size="16"
+      />
       <span>{{ errorMessage }}</span>
     </div>
 
-    <form @submit.prevent="handleLogin" class="auth-form">
+    <form
+      class="auth-form"
+      @submit.prevent="handleLogin"
+    >
       <div class="form-group">
-        <label for="email" class="form-label">Email</label>
+        <label
+          for="email"
+          class="form-label"
+        >Email</label>
         <div
           :class="[
             'input-wrapper',
             { focused: emailFocused, error: emailError },
           ]"
         >
-          <Icon name="lucide:mail" size="18" class="input-icon" />
+          <Icon
+            name="lucide:mail"
+            size="18"
+            class="input-icon"
+          />
           <input
             id="email"
             v-model="email"
@@ -31,18 +51,28 @@
             "
           />
         </div>
-        <span v-if="emailError" class="field-error">{{ emailError }}</span>
+        <span
+          v-if="emailError"
+          class="field-error"
+        >{{ emailError }}</span>
       </div>
 
       <div class="form-group">
-        <label for="password" class="form-label">Senha</label>
+        <label
+          for="password"
+          class="form-label"
+        >Senha</label>
         <div
           :class="[
             'input-wrapper',
             { focused: passwordFocused, error: passwordError },
           ]"
         >
-          <Icon name="lucide:lock" size="18" class="input-icon" />
+          <Icon
+            name="lucide:lock"
+            size="18"
+            class="input-icon"
+          />
           <input
             id="password"
             v-model="password"
@@ -58,8 +88,8 @@
           <button
             type="button"
             class="toggle-password"
-            @click="showPassword = !showPassword"
             tabindex="-1"
+            @click="showPassword = !showPassword"
           >
             <Icon
               :name="showPassword ? 'lucide:eye-off' : 'lucide:eye'"
@@ -67,22 +97,35 @@
             />
           </button>
         </div>
-        <span v-if="passwordError" class="field-error">{{
+        <span
+          v-if="passwordError"
+          class="field-error"
+        >{{
           passwordError
         }}</span>
       </div>
 
       <div class="form-row">
         <label class="checkbox-label">
-          <input type="checkbox" v-model="rememberMe" />
+          <input
+            v-model="rememberMe"
+            type="checkbox"
+          />
           <span class="checkbox-text">Lembrar de mim</span>
         </label>
-        <NuxtLink to="/auth/forgot-password" class="forgot-link">
+        <NuxtLink
+          to="/auth/forgot-password"
+          class="forgot-link"
+        >
           Esqueceu a senha?
         </NuxtLink>
       </div>
 
-      <button type="submit" class="submit-btn" :disabled="submitting || googleLoading">
+      <button
+        type="submit"
+        class="submit-btn"
+        :disabled="submitting || googleLoading"
+      >
         <Icon
           v-if="submitting"
           name="lucide:loader-2"
@@ -104,8 +147,15 @@
             @error="handleGoogleError"
           />
         </ClientOnly>
-        <div v-if="googleLoading" class="google-loading">
-          <Icon name="lucide:loader-2" size="18" class="spinning" />
+        <div
+          v-if="googleLoading"
+          class="google-loading"
+        >
+          <Icon
+            name="lucide:loader-2"
+            size="18"
+            class="spinning"
+          />
           <span>Entrando com Google...</span>
         </div>
       </div>
@@ -113,7 +163,10 @@
 
     <p class="auth-footer">
       Não tem uma conta?
-      <NuxtLink to="/auth/register" class="auth-link">Criar conta</NuxtLink>
+      <NuxtLink
+        to="/auth/register"
+        class="auth-link"
+      >Criar conta</NuxtLink>
     </p>
   </div>
 </template>

@@ -1,29 +1,57 @@
 <template>
   <div class="focus-page">
-    <div v-if="sessionComplete" class="completion-overlay">
+    <div
+      v-if="sessionComplete"
+      class="completion-overlay"
+    >
       <div class="completion-card">
         <div class="completion-icon">
           <Icon name="lucide:check-circle-2" />
         </div>
-        <h2 class="completion-title">Bom trabalho. Você apareceu.</h2>
+        <h2 class="completion-title">
+          Bom trabalho. Você apareceu.
+        </h2>
         <p class="completion-message">
           Você focou por {{ formatDuration(elapsedMinutes) }}
         </p>
         <div class="completion-actions">
-          <button @click="logSession" :disabled="isLoggingSession" class="log-btn">
-            <Icon v-if="!isLoggingSession" name="lucide:bookmark" />
-            <Icon v-else name="lucide:loader-2" class="spinning" />
+          <button
+            :disabled="isLoggingSession"
+            class="log-btn"
+            @click="logSession"
+          >
+            <Icon
+              v-if="!isLoggingSession"
+              name="lucide:bookmark"
+            />
+            <Icon
+              v-else
+              name="lucide:loader-2"
+              class="spinning"
+            />
             {{ isLoggingSession ? 'Registrando...' : 'Registrar sessão' }}
           </button>
-          <button @click="resetSession" :disabled="isLoggingSession" class="reset-btn">Iniciar outra</button>
+          <button
+            :disabled="isLoggingSession"
+            class="reset-btn"
+            @click="resetSession"
+          >
+            Iniciar outra
+          </button>
         </div>
       </div>
     </div>
 
     <div class="focus-container">
-      <div v-if="!isActive && !isPaused" class="setup-view">
+      <div
+        v-if="!isActive && !isPaused"
+        class="setup-view"
+      >
         <div class="focus-context">
-          <label for="focus-input" class="context-label">
+          <label
+            for="focus-input"
+            class="context-label"
+          >
             No que você vai focar?
           </label>
           <input
@@ -37,16 +65,18 @@
         </div>
 
         <div class="presets-section">
-          <h3 class="presets-title">Escolha seu tempo de foco</h3>
+          <h3 class="presets-title">
+            Escolha seu tempo de foco
+          </h3>
           <div class="presets-grid">
             <button
               v-for="preset in presets"
               :key="preset.value"
-              @click="selectPreset(preset.value)"
               :class="[
                 'preset-btn',
                 { active: selectedDuration === preset.value },
               ]"
+              @click="selectPreset(preset.value)"
             >
               <span class="preset-duration">{{ preset.label }}</span>
               <span class="preset-sublabel">{{ preset.sublabel }}</span>
@@ -55,13 +85,16 @@
 
           <button
             v-if="!showCustom"
-            @click="showCustom = true"
             class="custom-toggle"
+            @click="showCustom = true"
           >
             Duração personalizada
           </button>
 
-          <div v-if="showCustom" class="custom-input-wrapper">
+          <div
+            v-if="showCustom"
+            class="custom-input-wrapper"
+          >
             <input
               v-model.number="customMinutes"
               type="number"
@@ -70,21 +103,38 @@
               class="custom-input"
               placeholder="Minutos"
             />
-            <button @click="applyCustom" class="apply-custom-btn">
+            <button
+              class="apply-custom-btn"
+              @click="applyCustom"
+            >
               Aplicar
             </button>
           </div>
         </div>
       </div>
 
-      <div v-if="isActive || isPaused" class="session-view">
-        <div v-if="focusContext" class="active-context">
+      <div
+        v-if="isActive || isPaused"
+        class="session-view"
+      >
+        <div
+          v-if="focusContext"
+          class="active-context"
+        >
           {{ focusContext }}
         </div>
 
         <div class="timer-container">
-          <svg class="progress-ring" viewBox="0 0 200 200">
-            <circle class="progress-ring-bg" cx="100" cy="100" r="90" />
+          <svg
+            class="progress-ring"
+            viewBox="0 0 200 200"
+          >
+            <circle
+              class="progress-ring-bg"
+              cx="100"
+              cy="100"
+              r="90"
+            />
             <circle
               class="progress-ring-fill"
               cx="100"
@@ -98,8 +148,12 @@
           </svg>
 
           <div class="timer-display">
-            <div class="time-remaining">{{ formattedTime }}</div>
-            <div class="time-label">restante</div>
+            <div class="time-remaining">
+              {{ formattedTime }}
+            </div>
+            <div class="time-label">
+              restante
+            </div>
           </div>
         </div>
 
@@ -112,9 +166,9 @@
       <div class="controls">
         <button
           v-if="!isActive && !isPaused"
-          @click="startSession"
           :disabled="!selectedDuration"
           class="control-btn primary"
+          @click="startSession"
         >
           <Icon name="lucide:play" />
           Começar foco
@@ -122,8 +176,8 @@
 
         <button
           v-if="isActive"
-          @click="pauseSession"
           class="control-btn secondary"
+          @click="pauseSession"
         >
           <Icon name="lucide:pause" />
           Pausar
@@ -131,8 +185,8 @@
 
         <button
           v-if="isPaused"
-          @click="resumeSession"
           class="control-btn primary"
+          @click="resumeSession"
         >
           <Icon name="lucide:play" />
           Retomar
@@ -140,8 +194,8 @@
 
         <button
           v-if="isActive || isPaused"
-          @click="endSession"
           class="control-btn end"
+          @click="endSession"
         >
           <Icon name="lucide:octagon" />
           Encerrar sessão

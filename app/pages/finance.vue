@@ -9,7 +9,10 @@
             {{ pendingCount === 1 ? "item pendente" : "itens pendentes" }} ·
             {{ paidCount }} {{ paidCount === 1 ? "pago" : "pagos" }}
           </p>
-          <p v-if="totalAmount > 0" class="total-amount">
+          <p
+            v-if="totalAmount > 0"
+            class="total-amount"
+          >
             Total: {{ formatCurrency(totalAmount) }}
           </p>
         </div>
@@ -26,8 +29,8 @@
           />
           <button
             v-if="searchQuery"
-            @click="searchQuery = ''"
             class="clear-btn"
+            @click="searchQuery = ''"
           >
             <Icon name="lucide:x" />
           </button>
@@ -36,21 +39,32 @@
         <div class="date-filters">
           <div class="date-field">
             <label>De</label>
-            <input v-model="dateFrom" type="date" class="date-input" />
+            <input
+              v-model="dateFrom"
+              type="date"
+              class="date-input"
+            />
           </div>
           <div class="date-field">
             <label>Até</label>
-            <input v-model="dateTo" type="date" class="date-input" />
+            <input
+              v-model="dateTo"
+              type="date"
+              class="date-input"
+            />
           </div>
           <button
             v-if="dateFrom || dateTo"
+            class="clear-dates-btn"
             @click="
               dateFrom = '';
               dateTo = '';
             "
-            class="clear-dates-btn"
           >
-            <Icon name="lucide:x" size="14" />
+            <Icon
+              name="lucide:x"
+              size="14"
+            />
             Limpar datas
           </button>
         </div>
@@ -58,25 +72,34 @@
 
       <div class="filter-section">
         <button
-          @click="showArchived = false"
           :class="['filter-btn', { active: !showArchived }]"
+          @click="showArchived = false"
         >
           Ativos
         </button>
         <button
-          @click="showArchived = true"
           :class="['filter-btn', { active: showArchived }]"
+          @click="showArchived = true"
         >
           Arquivados
         </button>
       </div>
 
-      <div v-if="loading" class="loading-state">
-        <Icon name="lucide:loader-2" class="spinning" />
+      <div
+        v-if="loading"
+        class="loading-state"
+      >
+        <Icon
+          name="lucide:loader-2"
+          class="spinning"
+        />
         <p>Carregando...</p>
       </div>
 
-      <div v-else-if="filteredEntries.length === 0" class="empty-state">
+      <div
+        v-else-if="filteredEntries.length === 0"
+        class="empty-state"
+      >
         <Icon name="lucide:inbox" />
         <p>
           {{
@@ -87,22 +110,32 @@
         </p>
       </div>
 
-      <div v-else class="entries-list">
+      <div
+        v-else
+        class="entries-list"
+      >
         <div
           v-for="entry in filteredEntries"
           :key="entry.id"
           :class="['entry-card', `status-${entry.status.toLowerCase()}`]"
         >
           <div class="entry-header">
-            <h3 class="entry-title">{{ entry.title }}</h3>
-            <span v-if="entry.category" class="entry-category">{{
-              entry.category
-            }}</span>
+            <h3 class="entry-title">
+              {{ entry.title }}
+            </h3>
+            <span
+              v-if="entry.category"
+              class="entry-category"
+              >{{ entry.category }}</span
+            >
           </div>
 
           <div class="entry-details">
             <div class="entry-info">
-              <span v-if="entry.dueDate" class="entry-date">
+              <span
+                v-if="entry.dueDate"
+                class="entry-date"
+              >
                 <Icon name="lucide:calendar" />
                 {{ formatDate(entry.dueDate) }}
               </span>
@@ -123,13 +156,18 @@
             </div>
           </div>
 
-          <p v-if="entry.note" class="entry-note">{{ entry.note }}</p>
+          <p
+            v-if="entry.note"
+            class="entry-note"
+          >
+            {{ entry.note }}
+          </p>
 
           <div class="entry-actions">
             <button
               v-if="entry.status !== 'PAID' && !showArchived"
-              @click="markAsPaid(entry.id)"
               class="action-btn primary"
+              @click="markAsPaid(entry.id)"
             >
               <Icon name="lucide:check" />
               Marcar como pago
@@ -137,15 +175,15 @@
 
             <button
               v-if="!showArchived"
-              @click="openEditModal(entry)"
               class="action-btn secondary"
+              @click="openEditModal(entry)"
             >
               <Icon name="lucide:pencil" />
             </button>
 
             <button
-              @click="toggleArchive(entry.id, entry.archived)"
               class="action-btn secondary"
+              @click="toggleArchive(entry.id, entry.archived)"
             >
               <Icon
                 :name="
@@ -157,8 +195,14 @@
         </div>
       </div>
 
-      <button @click="showAddModal = true" class="add-btn">
-        <Icon name="lucide:plus" size="24" />
+      <button
+        class="add-btn"
+        @click="showAddModal = true"
+      >
+        <Icon
+          name="lucide:plus"
+          size="24"
+        />
         Adicionar item
       </button>
     </div>
@@ -171,12 +215,18 @@
       <div class="modal-content">
         <div class="modal-header">
           <h2>{{ editingEntry ? "Editar item" : "Novo item financeiro" }}</h2>
-          <button @click="closeModal" class="close-btn">
+          <button
+            class="close-btn"
+            @click="closeModal"
+          >
             <Icon name="lucide:x" />
           </button>
         </div>
 
-        <form @submit.prevent="saveEntry" class="entry-form">
+        <form
+          class="entry-form"
+          @submit.prevent="saveEntry"
+        >
           <div class="form-group">
             <label for="title">Título *</label>
             <input
@@ -214,12 +264,19 @@
 
           <div class="form-group">
             <label for="dueDate">Data de vencimento</label>
-            <input id="dueDate" v-model="formData.dueDate" type="date" />
+            <input
+              id="dueDate"
+              v-model="formData.dueDate"
+              type="date"
+            />
           </div>
 
           <div class="form-group">
             <label for="status">Status</label>
-            <select id="status" v-model="formData.status">
+            <select
+              id="status"
+              v-model="formData.status"
+            >
               <option value="NOT_STARTED">Não iniciado</option>
               <option value="PENDING">Pendente</option>
               <option value="PAID">Pago</option>
@@ -233,15 +290,27 @@
               v-model="formData.note"
               rows="3"
               placeholder="Adicione uma nota..."
-            ></textarea>
+            />
           </div>
 
           <div class="modal-actions">
-            <button type="button" @click="closeModal" class="btn-secondary">
+            <button
+              type="button"
+              class="btn-secondary"
+              @click="closeModal"
+            >
               Cancelar
             </button>
-            <button type="submit" :disabled="isSaving" class="btn-primary">
-              <Icon v-if="isSaving" name="lucide:loader-2" class="spinning" />
+            <button
+              type="submit"
+              :disabled="isSaving"
+              class="btn-primary"
+            >
+              <Icon
+                v-if="isSaving"
+                name="lucide:loader-2"
+                class="spinning"
+              />
               {{
                 isSaving
                   ? "Salvando..."

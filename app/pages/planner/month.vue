@@ -2,41 +2,76 @@
   <div class="planner-page">
     <div class="planner-container">
       <div class="month-header">
-        <button @click="previousMonth" class="nav-btn">
-          <Icon name="lucide:chevron-left" size="20" />
+        <button
+          class="nav-btn"
+          @click="previousMonth"
+        >
+          <Icon
+            name="lucide:chevron-left"
+            size="20"
+          />
         </button>
         <div class="month-info">
-          <h1 class="page-title">{{ currentMonthName }}</h1>
-          <p class="month-year">{{ currentYear }}</p>
+          <h1 class="page-title">
+            {{ currentMonthName }}
+          </h1>
+          <p class="month-year">
+            {{ currentYear }}
+          </p>
         </div>
-        <button @click="nextMonth" class="nav-btn">
-          <Icon name="lucide:chevron-right" size="20" />
+        <button
+          class="nav-btn"
+          @click="nextMonth"
+        >
+          <Icon
+            name="lucide:chevron-right"
+            size="20"
+          />
         </button>
       </div>
 
       <div class="monthly-overview">
         <div class="overview-card">
           <h4>Tarefas do mês</h4>
-          <p class="overview-value">{{ monthlyTasksCount }}</p>
+          <p class="overview-value">
+            {{ monthlyTasksCount }}
+          </p>
         </div>
         <div class="overview-card">
           <h4>Concluídas</h4>
-          <p class="overview-value">{{ completedTasksCount }}</p>
+          <p class="overview-value">
+            {{ completedTasksCount }}
+          </p>
         </div>
         <div class="overview-card">
           <h4>Pendentes</h4>
-          <p class="overview-value">{{ pendingTasksCount }}</p>
+          <p class="overview-value">
+            {{ pendingTasksCount }}
+          </p>
         </div>
       </div>
 
-      <div v-if="loading" class="loading-state">
-        <Icon name="lucide:loader-2" class="spinning" />
+      <div
+        v-if="loading"
+        class="loading-state"
+      >
+        <Icon
+          name="lucide:loader-2"
+          class="spinning"
+        />
         <p>Carregando...</p>
       </div>
 
-      <div v-else class="calendar-container">
+      <div
+        v-else
+        class="calendar-container"
+      >
         <div class="calendar-grid">
-          <div v-for="day in weekDays" :key="day" class="calendar-header-cell">
+          <div
+            v-for="day in weekDays"
+            :key="day"
+            class="calendar-header-cell"
+          >
             {{ day }}
           </div>
 
@@ -47,14 +82,19 @@
               'calendar-day',
               {
                 'other-month': !day.isCurrentMonth,
-                today: day.isToday,
-                weekend: day.isWeekend,
+                'today': day.isToday,
+                'weekend': day.isWeekend,
               },
             ]"
           >
-            <div class="day-number">{{ day.dayNumber }}</div>
+            <div class="day-number">
+              {{ day.dayNumber }}
+            </div>
 
-            <div v-if="day.isCurrentMonth" class="day-tasks">
+            <div
+              v-if="day.isCurrentMonth"
+              class="day-tasks"
+            >
               <div
                 v-for="task in getTasksForDay(day.date)"
                 :key="task.id"
@@ -73,7 +113,7 @@
                 <span
                   v-if="task.priority === 'HIGH'"
                   class="priority-indicator"
-                ></span>
+                />
               </div>
 
               <div
@@ -176,7 +216,7 @@ const pendingTasksCount = computed(() => {
 
 const getTasksForDay = (date: string) => {
   const tasksWithDueDate = tasks.value.filter(
-    (t) => t.dueDate && t.dueDate.split("T")[0] === date,
+    t => t.dueDate && t.dueDate.split("T")[0] === date,
   );
 
   return tasksWithDueDate.sort((a, b) => {
@@ -205,7 +245,7 @@ const fetchTasks = async () => {
 const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
   if (toggleInFlight.has(taskId)) return;
 
-  const index = tasks.value.findIndex((t) => t.id === taskId);
+  const index = tasks.value.findIndex(t => t.id === taskId);
   if (index === -1) return;
 
   const current = tasks.value[index].status;
@@ -230,7 +270,7 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
 
     if (toggleVersions.get(taskId) !== version) return;
 
-    const idx = tasks.value.findIndex((t) => t.id === taskId);
+    const idx = tasks.value.findIndex(t => t.id === taskId);
     if (idx === -1) return;
     const finalStatus = tasks.value[idx].status;
 
@@ -242,7 +282,7 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
       });
 
       if (response.success && toggleVersions.get(taskId) === version) {
-        const i = tasks.value.findIndex((t) => t.id === taskId);
+        const i = tasks.value.findIndex(t => t.id === taskId);
         if (i !== -1) tasks.value[i] = response.data;
       }
     } catch (error) {

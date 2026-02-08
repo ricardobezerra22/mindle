@@ -2,8 +2,12 @@
   <div class="dashboard">
     <section class="greeting-section">
       <div class="greeting-content">
-        <h1 class="greeting-text">{{ greetingMessage }}, {{ userName }}</h1>
-        <p class="context-line">{{ contextLine }}</p>
+        <h1 class="greeting-text">
+          {{ greetingMessage }}, {{ userName }}
+        </h1>
+        <p class="context-line">
+          {{ contextLine }}
+        </p>
       </div>
       <div class="greeting-date">
         <span class="date-day">{{ todayFormatted.day }}</span>
@@ -15,20 +19,40 @@
       <div class="col-main">
         <section class="focus-section">
           <div class="section-label">
-            <Icon name="lucide:target" size="16" />
+            <Icon
+              name="lucide:target"
+              size="16"
+            />
             <span>Foco de hoje</span>
           </div>
 
-          <div v-if="loadingTasks" class="loading-placeholder">
-            <Icon name="lucide:loader-2" size="20" class="spinning" />
+          <div
+            v-if="loadingTasks"
+            class="loading-placeholder"
+          >
+            <Icon
+              name="lucide:loader-2"
+              size="20"
+              class="spinning"
+            />
           </div>
 
-          <div v-else-if="todayTasks.length === 0" class="empty-focus">
-            <p class="empty-message">Hoje está livre.</p>
-            <p class="empty-hint">Escolha uma coisa ou descanse.</p>
+          <div
+            v-else-if="todayTasks.length === 0"
+            class="empty-focus"
+          >
+            <p class="empty-message">
+              Hoje está livre.
+            </p>
+            <p class="empty-hint">
+              Escolha uma coisa ou descanse.
+            </p>
           </div>
 
-          <div v-else class="focus-tasks">
+          <div
+            v-else
+            class="focus-tasks"
+          >
             <div
               v-for="task in todayTasks.slice(0, 5)"
               :key="task.id"
@@ -45,23 +69,38 @@
                 class="task-icon"
               />
               <span class="task-name">{{ task.title }}</span>
-              <span v-if="task.priority === 'HIGH'" class="priority-dot"></span>
+              <span
+                v-if="task.priority === 'HIGH'"
+                class="priority-dot"
+              />
             </div>
 
-            <p v-if="todayTasks.length > 5" class="more-tasks">
+            <p
+              v-if="todayTasks.length > 5"
+              class="more-tasks"
+            >
               +{{ todayTasks.length - 5 }} mais
             </p>
           </div>
 
-          <NuxtLink to="/focus" class="focus-action">
-            <Icon name="lucide:play" size="16" />
+          <NuxtLink
+            to="/focus"
+            class="focus-action"
+          >
+            <Icon
+              name="lucide:play"
+              size="16"
+            />
             Iniciar foco
           </NuxtLink>
         </section>
 
         <section class="week-view-section">
           <div class="section-label">
-            <Icon name="lucide:calendar-days" size="16" />
+            <Icon
+              name="lucide:calendar-days"
+              size="16"
+            />
             <span>Visão semanal</span>
           </div>
 
@@ -72,7 +111,7 @@
               to="/planner/week"
               :class="[
                 'week-day-cell',
-                { today: day.isToday, 'has-tasks': day.taskCount > 0 },
+                { 'today': day.isToday, 'has-tasks': day.taskCount > 0 },
               ]"
             >
               <span class="week-day-name">{{ day.label }}</span>
@@ -82,7 +121,7 @@
                   v-for="n in Math.min(day.taskCount, 3)"
                   :key="n"
                   :class="['task-dot', { done: n <= day.doneCount }]"
-                ></span>
+                />
               </div>
             </NuxtLink>
           </div>
@@ -92,13 +131,19 @@
       <div class="col-side">
         <section class="progress-section">
           <div class="section-label">
-            <Icon name="lucide:bar-chart-3" size="16" />
+            <Icon
+              name="lucide:bar-chart-3"
+              size="16"
+            />
             <span>Progresso</span>
           </div>
           <div class="progress-cards">
             <div class="progress-card">
               <div class="progress-icon">
-                <Icon name="lucide:list-checks" size="18" />
+                <Icon
+                  name="lucide:list-checks"
+                  size="18"
+                />
               </div>
               <div class="progress-info">
                 <span class="progress-value">{{ weekPlanned }}</span>
@@ -107,7 +152,10 @@
             </div>
             <div class="progress-card">
               <div class="progress-icon done">
-                <Icon name="lucide:check-check" size="18" />
+                <Icon
+                  name="lucide:check-check"
+                  size="18"
+                />
               </div>
               <div class="progress-info">
                 <span class="progress-value">{{ weekCompleted }}</span>
@@ -116,7 +164,10 @@
             </div>
             <div class="progress-card">
               <div class="progress-icon pending">
-                <Icon name="lucide:clock" size="18" />
+                <Icon
+                  name="lucide:clock"
+                  size="18"
+                />
               </div>
               <div class="progress-info">
                 <span class="progress-value">{{
@@ -127,22 +178,29 @@
             </div>
           </div>
 
-          <div v-if="weekPlanned > 0" class="completion-bar-wrap">
+          <div
+            v-if="weekPlanned > 0"
+            class="completion-bar-wrap"
+          >
             <div class="completion-bar">
               <div
                 class="completion-fill"
                 :style="{ width: completionPercent + '%' }"
-              ></div>
+              />
             </div>
-            <span class="completion-text"
-              >{{ completionPercent }}% concluído</span
-            >
+            <span class="completion-text">{{ completionPercent }}% concluído</span>
           </div>
         </section>
 
-        <section v-if="habits.length > 0" class="habits-section">
+        <section
+          v-if="habits.length > 0"
+          class="habits-section"
+        >
           <div class="section-label">
-            <Icon name="lucide:heart" size="16" />
+            <Icon
+              name="lucide:heart"
+              size="16"
+            />
             <span>Hábitos</span>
           </div>
 
@@ -150,41 +208,72 @@
             <button
               v-for="habit in habits"
               :key="habit.id"
-              @click="toggleHabit(habit.id)"
               :class="[
                 'habit-bubble',
                 { checked: isHabitCheckedToday(habit.id) },
               ]"
+              @click="toggleHabit(habit.id)"
             >
-              <Icon :name="habit.icon || 'lucide:circle'" size="22" />
+              <Icon
+                :name="habit.icon || 'lucide:circle'"
+                size="22"
+              />
             </button>
           </div>
         </section>
 
-        <section v-if="pendingFinanceCount > 0" class="finance-section">
-          <NuxtLink to="/finance" class="finance-card">
-            <Icon name="lucide:wallet" size="18" />
-            <span
-              >{{ pendingFinanceCount }}
+        <section
+          v-if="pendingFinanceCount > 0"
+          class="finance-section"
+        >
+          <NuxtLink
+            to="/finance"
+            class="finance-card"
+          >
+            <Icon
+              name="lucide:wallet"
+              size="18"
+            />
+            <span>{{ pendingFinanceCount }}
               {{
                 pendingFinanceCount === 1 ? "item precisa" : "itens precisam"
               }}
-              de atenção</span
-            >
-            <Icon name="lucide:arrow-right" size="14" />
+              de atenção</span>
+            <Icon
+              name="lucide:arrow-right"
+              size="14"
+            />
           </NuxtLink>
         </section>
 
         <section class="quick-links">
-          <NuxtLink to="/tasks" class="quick-link">
-            <Icon name="lucide:list-checks" size="18" />
+          <NuxtLink
+            to="/tasks"
+            class="quick-link"
+          >
+            <Icon
+              name="lucide:list-checks"
+              size="18"
+            />
             <span>Todas as tarefas</span>
-            <Icon name="lucide:chevron-right" size="14" />
+            <Icon
+              name="lucide:chevron-right"
+              size="14"
+            />
           </NuxtLink>
-          <NuxtLink to="/planner/week" class="quick-link">
-            <Icon name="lucide:calendar-days" size="18" />
+          <NuxtLink
+            to="/planner/week"
+            class="quick-link"
+          >
+            <Icon
+              name="lucide:calendar-days"
+              size="18"
+            />
             <span>Planner semanal</span>
-            <Icon name="lucide:chevron-right" size="14" />
+            <Icon
+              name="lucide:chevron-right"
+              size="14"
+            />
           </NuxtLink>
         </section>
       </div>
@@ -252,7 +341,7 @@ const weekDaysPreview = computed(() => {
     date.setDate(today.getDate() + i);
     const dateStr = date.toISOString().split("T")[0];
     const dayTasks = tasks.value.filter(
-      (t) => t.dueDate && t.dueDate.split("T")[0] === dateStr,
+      t => t.dueDate && t.dueDate.split("T")[0] === dateStr,
     );
 
     days.push({
@@ -261,7 +350,7 @@ const weekDaysPreview = computed(() => {
       dayNumber: date.getDate(),
       isToday: i === 0,
       taskCount: dayTasks.length,
-      doneCount: dayTasks.filter((t) => t.status === "DONE").length,
+      doneCount: dayTasks.filter(t => t.status === "DONE").length,
     });
   }
 
@@ -270,7 +359,7 @@ const weekDaysPreview = computed(() => {
 
 const todayTasks = computed(() => {
   return tasks.value
-    .filter((t) => t.dueDate && t.dueDate.split("T")[0] === todayStr.value)
+    .filter(t => t.dueDate && t.dueDate.split("T")[0] === todayStr.value)
     .sort((a, b) => {
       if (a.status === "DONE" && b.status !== "DONE") return 1;
       if (a.status !== "DONE" && b.status === "DONE") return -1;
@@ -281,7 +370,7 @@ const todayTasks = computed(() => {
 });
 
 const contextLine = computed(() => {
-  const pending = todayTasks.value.filter((t) => t.status !== "DONE").length;
+  const pending = todayTasks.value.filter(t => t.status !== "DONE").length;
   if (pending === 0 && todayTasks.value.length === 0)
     return "Nenhuma tarefa para hoje. Aproveite o momento.";
   if (pending === 0) return "Tudo concluído. Você merece descansar.";
@@ -303,7 +392,7 @@ const weekPlanned = computed(() => {
   }
 
   return tasks.value.filter(
-    (t) => t.dueDate && weekDates.has(t.dueDate.split("T")[0]),
+    t => t.dueDate && weekDates.has(t.dueDate.split("T")[0]),
   ).length;
 });
 
@@ -321,10 +410,10 @@ const weekCompleted = computed(() => {
   }
 
   return tasks.value.filter(
-    (t) =>
-      t.dueDate &&
-      weekDates.has(t.dueDate.split("T")[0]) &&
-      t.status === "DONE",
+    t =>
+      t.dueDate
+      && weekDates.has(t.dueDate.split("T")[0])
+      && t.status === "DONE",
   ).length;
 });
 
@@ -334,17 +423,17 @@ const completionPercent = computed(() => {
 });
 
 const pendingFinanceCount = computed(() => {
-  return finances.value.filter((f) => f.status !== "PAID" && !f.archived)
+  return finances.value.filter(f => f.status !== "PAID" && !f.archived)
     .length;
 });
 
 const isHabitCheckedToday = (habitId: string) => {
   const today = new Date().toDateString();
   return habitLogs.value.some(
-    (log) =>
-      log.habitId === habitId &&
-      new Date(log.date).toDateString() === today &&
-      log.done,
+    log =>
+      log.habitId === habitId
+      && new Date(log.date).toDateString() === today
+      && log.done,
   );
 };
 
@@ -398,7 +487,7 @@ const fetchFinances = async () => {
 const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
   if (toggleInFlight.has(taskId)) return;
 
-  const index = tasks.value.findIndex((t) => t.id === taskId);
+  const index = tasks.value.findIndex(t => t.id === taskId);
   if (index === -1) return;
 
   const current = tasks.value[index].status;
@@ -426,7 +515,7 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
 
     if (toggleVersions.get(taskId) !== version) return;
 
-    const idx = tasks.value.findIndex((t) => t.id === taskId);
+    const idx = tasks.value.findIndex(t => t.id === taskId);
     if (idx === -1) return;
     const finalStatus = tasks.value[idx].status;
 
@@ -438,7 +527,7 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
       });
 
       if (response.success && toggleVersions.get(taskId) === version) {
-        const i = tasks.value.findIndex((t) => t.id === taskId);
+        const i = tasks.value.findIndex(t => t.id === taskId);
         if (i !== -1) tasks.value[i] = response.data;
       }
     } catch (error) {
@@ -463,13 +552,13 @@ const toggleHabit = async (habitId: string) => {
   try {
     if (isChecked) {
       const log = habitLogs.value.find(
-        (l) =>
-          l.habitId === habitId &&
-          new Date(l.date).toDateString() === new Date().toDateString(),
+        l =>
+          l.habitId === habitId
+          && new Date(l.date).toDateString() === new Date().toDateString(),
       );
       if (log) {
         await $fetch(`/api/habits/log-${log.id}`, { method: "DELETE" });
-        habitLogs.value = habitLogs.value.filter((l) => l.id !== log.id);
+        habitLogs.value = habitLogs.value.filter(l => l.id !== log.id);
       }
     } else {
       const response = await $fetch("/api/habits/logs", {

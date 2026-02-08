@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Analytics } from "@vercel/analytics/nuxt";
+
 useHead({
   meta: [{ name: "viewport", content: "width=device-width, initial-scale=1" }],
   link: [{ rel: "icon", href: "/favicon.ico" }],
@@ -6,10 +8,9 @@ useHead({
     lang: "pt",
   },
 });
-import { Analytics } from "@vercel/analytics/nuxt";
 const title = "Mindle - Gestão de Tarefas e Produtividade";
-const description =
-  "Sistema completo de gestão de tarefas, planner, foco e bem-estar.";
+const description
+  = "Sistema completo de gestão de tarefas, planner, foco e bem-estar.";
 
 useSeoMeta({
   title,

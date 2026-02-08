@@ -1,17 +1,20 @@
 <template>
   <div
     class="task-column"
+    :class="{ 'drag-over': isDragOver }"
     @dragover.prevent="handleDragOver"
     @dragleave="handleDragLeave"
     @drop="handleDrop"
-    :class="{ 'drag-over': isDragOver }"
   >
     <div class="column-header">
       <div
         class="column-title"
         :class="['task-status-badge', `status-${status.toLowerCase()}`]"
       >
-        <Icon :name="icon" :class="`status-${status.toLowerCase()}`" />
+        <Icon
+          :name="icon"
+          :class="`status-${status.toLowerCase()}`"
+        />
         <h3>{{ title }}</h3>
         <span class="task-count">{{ taskCount }}</span>
       </div>
@@ -20,7 +23,10 @@
     <div class="column-content">
       <slot />
 
-      <div v-if="taskCount === 0" class="empty-state">
+      <div
+        v-if="taskCount === 0"
+        class="empty-state"
+      >
         <Icon name="lucide:inbox" />
         <p>Nenhuma tarefa</p>
       </div>

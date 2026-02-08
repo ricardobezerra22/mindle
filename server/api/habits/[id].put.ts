@@ -1,27 +1,27 @@
-import { prisma } from '../../utils/prisma'
+import { prisma } from "../../utils/prisma";
 
 export default defineEventHandler(async (event) => {
   try {
-    const id = getRouterParam(event, 'id')
-    
+    const id = getRouterParam(event, "id");
+
     if (!id) {
-      return sendError(event, 'ID is required', 400)
+      return sendError(event, "ID is required", 400);
     }
 
-    const body = await readBody(event)
-    const updateData: any = {}
+    const body = await readBody(event);
+    const updateData: any = {};
 
-    if (body.title !== undefined) updateData.title = body.title
-    if (body.icon !== undefined) updateData.icon = body.icon || null
+    if (body.title !== undefined) updateData.title = body.title;
+    if (body.icon !== undefined) updateData.icon = body.icon || null;
 
     const habit = await prisma.habit.update({
       where: { id },
-      data: updateData
-    })
+      data: updateData,
+    });
 
-    return sendSuccess(event, habit)
+    return sendSuccess(event, habit);
   } catch (error) {
-    console.error('Error updating habit:', error)
-    return sendError(event, 'Failed to update habit', 500)
+    console.error("Error updating habit:", error);
+    return sendError(event, "Failed to update habit", 500);
   }
-})
+});

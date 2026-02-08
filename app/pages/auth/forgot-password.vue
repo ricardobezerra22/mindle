@@ -1,21 +1,44 @@
 <template>
   <div class="auth-card">
     <div v-if="!sent">
-      <h2 class="auth-title">Recuperar senha</h2>
+      <h2 class="auth-title">
+        Recuperar senha
+      </h2>
       <p class="auth-subtitle">
         Informe seu email e enviaremos instruções para redefinir sua senha
       </p>
 
-      <div v-if="errorMessage" class="alert alert-error">
-        <Icon name="lucide:alert-circle" size="16" />
+      <div
+        v-if="errorMessage"
+        class="alert alert-error"
+      >
+        <Icon
+          name="lucide:alert-circle"
+          size="16"
+        />
         <span>{{ errorMessage }}</span>
       </div>
 
-      <form @submit.prevent="handleSubmit" class="auth-form">
+      <form
+        class="auth-form"
+        @submit.prevent="handleSubmit"
+      >
         <div class="form-group">
-          <label for="email" class="form-label">Email</label>
-          <div :class="['input-wrapper', { focused: emailFocused, error: emailError }]">
-            <Icon name="lucide:mail" size="18" class="input-icon" />
+          <label
+            for="email"
+            class="form-label"
+          >Email</label>
+          <div
+            :class="[
+              'input-wrapper',
+              { focused: emailFocused, error: emailError },
+            ]"
+          >
+            <Icon
+              name="lucide:mail"
+              size="18"
+              class="input-icon"
+            />
             <input
               id="email"
               v-model="email"
@@ -23,13 +46,23 @@
               placeholder="seu@email.com"
               autocomplete="email"
               @focus="emailFocused = true"
-              @blur="emailFocused = false; validateEmail()"
+              @blur="
+                emailFocused = false;
+                validateEmail();
+              "
             />
           </div>
-          <span v-if="emailError" class="field-error">{{ emailError }}</span>
+          <span
+            v-if="emailError"
+            class="field-error"
+          >{{ emailError }}</span>
         </div>
 
-        <button type="submit" class="submit-btn" :disabled="submitting">
+        <button
+          type="submit"
+          class="submit-btn"
+          :disabled="submitting"
+        >
           <Icon
             v-if="submitting"
             name="lucide:loader-2"
@@ -41,11 +74,19 @@
       </form>
     </div>
 
-    <div v-else class="success-state">
+    <div
+      v-else
+      class="success-state"
+    >
       <div class="success-icon">
-        <Icon name="lucide:mail-check" size="32" />
+        <Icon
+          name="lucide:mail-check"
+          size="32"
+        />
       </div>
-      <h2 class="auth-title">Email enviado</h2>
+      <h2 class="auth-title">
+        Email enviado
+      </h2>
       <p class="auth-subtitle">
         Se existe uma conta com esse email, você receberá instruções para
         redefinir sua senha em breve.
@@ -53,8 +94,14 @@
     </div>
 
     <p class="auth-footer">
-      <NuxtLink to="/auth/login" class="auth-link">
-        <Icon name="lucide:arrow-left" size="14" />
+      <NuxtLink
+        to="/auth/login"
+        class="auth-link"
+      >
+        <Icon
+          name="lucide:arrow-left"
+          size="14"
+        />
         Voltar para login
       </NuxtLink>
     </p>
@@ -90,7 +137,7 @@ const handleSubmit = async () => {
 
   submitting.value = true;
   try {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 1500));
     sent.value = true;
   } catch {
     errorMessage.value = "Erro de conexão. Tente novamente.";
@@ -242,8 +289,12 @@ const handleSubmit = async () => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .success-state {

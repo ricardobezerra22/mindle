@@ -7,113 +7,179 @@
           <button
             v-for="mood in moodOptions"
             :key="mood.value"
-            @click="selectMood(mood.value)"
             :class="['mood-btn', { selected: todayMood === mood.value }]"
+            @click="selectMood(mood.value)"
           >
             <Icon :name="mood.icon" />
             <span>{{ mood.label }}</span>
           </button>
         </div>
-        <p v-if="todayMood" class="mood-feedback">Obrigado por compartilhar.</p>
+        <p
+          v-if="todayMood"
+          class="mood-feedback"
+        >
+          Obrigado por compartilhar.
+        </p>
       </div>
 
       <div class="habits-section">
         <div class="section-header">
           <h2 class="section-title">Hábitos</h2>
-          <button @click="showAddModal = true" class="add-habit-btn">
-            <Icon name="lucide:plus" size="16" />
-            Adicionar
+          <button
+            class="add-habit-btn"
+            @click="showAddModal = true"
+          >
+            <Icon
+              name="lucide:plus"
+              size="16"
+            />Adicionar
           </button>
         </div>
 
-        <div v-if="loading" class="loading-state">
-          <Icon name="lucide:loader-2" class="spinning" />
+        <div
+          v-if="loading"
+          class="loading-state"
+        >
+          <Icon
+            name="lucide:loader-2"
+            class="spinning"
+          />
           <p>Carregando...</p>
         </div>
 
-        <div v-else-if="habits.length === 0" class="empty-state">
+        <div
+          v-else-if="habits.length === 0"
+          class="empty-state"
+        >
           <Icon name="lucide:heart" />
           <p>Nenhum hábito ainda</p>
           <p class="empty-hint">Comece adicionando algo pequeno</p>
         </div>
 
-        <div v-else class="habits-list">
+        <div
+          v-else
+          class="habits-list"
+        >
           <div
             v-for="habit in habits"
             :key="habit.id"
             :class="['habit-card', { checked: isHabitCheckedToday(habit.id) }]"
           >
             <button
-              @click="toggleHabit(habit.id)"
               class="habit-check"
+              @click="toggleHabit(habit.id)"
             >
               <Icon
-                :name="isHabitCheckedToday(habit.id) ? 'lucide:check-circle-2' : 'lucide:circle'"
+                :name="
+                  isHabitCheckedToday(habit.id)
+                    ? 'lucide:check-circle-2'
+                    : 'lucide:circle'
+                "
               />
             </button>
 
             <div class="habit-content">
               <div class="habit-header">
-                <Icon v-if="habit.icon" :name="habit.icon" class="habit-icon" />
+                <Icon
+                  v-if="habit.icon"
+                  :name="habit.icon"
+                  class="habit-icon"
+                />
                 <h3 class="habit-title">{{ habit.title }}</h3>
               </div>
             </div>
 
-            <button @click="openEditModal(habit)" class="habit-action">
-              <Icon name="lucide:more-horizontal" size="18" />
+            <button
+              class="habit-action"
+              @click="openEditModal(habit)"
+            >
+              <Icon
+                name="lucide:more-horizontal"
+                size="18"
+              />
             </button>
           </div>
         </div>
 
-        <div v-if="showEncouragement" class="encouragement-message">
+        <div
+          v-if="showEncouragement"
+          class="encouragement-message"
+        >
           <p>{{ encouragementText }}</p>
         </div>
       </div>
 
       <div class="insights-section">
-        <button @click="showInsights = !showInsights" class="insights-toggle">
-          <Icon :name="showInsights ? 'lucide:chevron-up' : 'lucide:chevron-down'" />
-          Insights
+        <button
+          class="insights-toggle"
+          @click="showInsights = !showInsights"
+        >
+          <Icon
+            :name="showInsights ? 'lucide:chevron-up' : 'lucide:chevron-down'"
+          />Insights
         </button>
 
-        <div v-if="showInsights" class="insights-content">
+        <div
+          v-if="showInsights"
+          class="insights-content"
+        >
           <div class="insight-card">
             <h4>Dias com check-in</h4>
-            <p class="insight-value">{{ checkedInDays }} {{ checkedInDays === 1 ? 'dia' : 'dias' }}</p>
+            <p class="insight-value">
+              {{ checkedInDays }} {{ checkedInDays === 1 ? "dia" : "dias" }}
+            </p>
           </div>
 
           <div class="insight-card">
             <h4>Hábito mais frequente</h4>
-            <p class="insight-value">{{ mostFrequentHabit || 'Nenhum ainda' }}</p>
+            <p class="insight-value">
+              {{ mostFrequentHabit || "Nenhum ainda" }}
+            </p>
           </div>
         </div>
       </div>
 
       <div class="wellbeing-section">
         <h2 class="section-title">Bem-estar</h2>
-        
+
         <div class="breathing-tool">
-          <button @click="toggleBreathing" class="breathing-btn">
-            <div :class="['breathing-bubble', { active: isBreathing }]"></div>
-            <span>{{ isBreathing ? 'Pausar' : 'Respirar' }}</span>
+          <button
+            class="breathing-btn"
+            @click="toggleBreathing"
+          >
+            <div :class="['breathing-bubble', { active: isBreathing }]" />
+            <span>{{ isBreathing ? "Pausar" : "Respirar" }}</span>
           </button>
-          <p v-if="isBreathing" class="breathing-instruction">
+          <p
+            v-if="isBreathing"
+            class="breathing-instruction"
+          >
             {{ breathingPhase }}
           </p>
         </div>
       </div>
     </div>
 
-    <div v-if="showAddModal || editingHabit" class="modal-overlay" @click.self="closeModal">
+    <div
+      v-if="showAddModal || editingHabit"
+      class="modal-overlay"
+      @click.self="closeModal"
+    >
       <div class="modal-content">
         <div class="modal-header">
-          <h2>{{ editingHabit ? 'Editar hábito' : 'Novo hábito' }}</h2>
-          <button @click="closeModal" class="close-btn">
+          <h2>{{ editingHabit ? "Editar hábito" : "Novo hábito" }}</h2>
+          <button
+            class="close-btn"
+            @click="closeModal"
+          >
             <Icon name="lucide:x" />
           </button>
         </div>
 
-        <form @submit.prevent="saveHabit" class="habit-form">
+        <form
+          class="habit-form"
+          @submit.prevent="saveHabit"
+        >
           <div class="form-group">
             <label for="title">Nome do hábito *</label>
             <input
@@ -132,32 +198,61 @@
                 v-for="icon in iconOptions"
                 :key="icon.value"
                 type="button"
+                :class="[
+                  'icon-option',
+                  { selected: formData.icon === icon.value },
+                ]"
                 @click="formData.icon = icon.value"
-                :class="['icon-option', { selected: formData.icon === icon.value }]"
               >
-                <Icon :name="icon.value" size="20" />
+                <Icon
+                  :name="icon.value"
+                  size="20"
+                />
               </button>
             </div>
           </div>
 
-          <div v-if="editingHabit" class="form-group">
+          <div
+            v-if="editingHabit"
+            class="form-group"
+          >
             <button
               type="button"
-              @click="deleteHabit"
               class="delete-btn"
+              @click="deleteHabit"
             >
-              <Icon name="lucide:trash-2" size="16" />
-              Excluir hábito
+              <Icon
+                name="lucide:trash-2"
+                size="16"
+              />Excluir hábito
             </button>
           </div>
 
           <div class="modal-actions">
-            <button type="button" @click="closeModal" class="btn-secondary">
+            <button
+              type="button"
+              class="btn-secondary"
+              @click="closeModal"
+            >
               Cancelar
             </button>
-            <button type="submit" :disabled="isSaving" class="btn-primary">
-              <Icon v-if="isSaving" name="lucide:loader-2" class="spinning" />
-              {{ isSaving ? 'Salvando...' : editingHabit ? 'Atualizar' : 'Adicionar' }}
+            <button
+              type="submit"
+              :disabled="isSaving"
+              class="btn-primary"
+            >
+              <Icon
+                v-if="isSaving"
+                name="lucide:loader-2"
+                class="spinning"
+              />
+              {{
+                isSaving
+                  ? "Salvando..."
+                  : editingHabit
+                  ? "Atualizar"
+                  : "Adicionar"
+              }}
             </button>
           </div>
         </form>
@@ -173,13 +268,13 @@ const isSaving = ref(false);
 const editingHabit = ref<any>(null);
 const showInsights = ref(false);
 const isBreathing = ref(false);
-const breathingPhase = ref('Inspire...');
+const breathingPhase = ref("Inspire...");
 const showEncouragement = ref(false);
-const encouragementText = ref('');
+const encouragementText = ref("");
 
 const formData = ref({
-  title: '',
-  icon: ''
+  title: "",
+  icon: "",
 });
 
 const habits = ref<any[]>([]);
@@ -187,47 +282,47 @@ const habitLogs = ref<any[]>([]);
 const todayMood = ref<string | null>(null);
 
 const moodOptions = [
-  { value: 'calm', label: 'Calmo', icon: 'lucide:smile' },
-  { value: 'okay', label: 'Ok', icon: 'lucide:meh' },
-  { value: 'tired', label: 'Cansado', icon: 'lucide:cloud' },
-  { value: 'overwhelmed', label: 'Sobrecarregado', icon: 'lucide:frown' }
+  { value: "calm", label: "Calmo", icon: "lucide:smile" },
+  { value: "okay", label: "Ok", icon: "lucide:meh" },
+  { value: "tired", label: "Cansado", icon: "lucide:cloud" },
+  { value: "overwhelmed", label: "Sobrecarregado", icon: "lucide:frown" },
 ];
 
 const iconOptions = [
-  { value: 'lucide:droplet' },
-  { value: 'lucide:dumbbell' },
-  { value: 'lucide:book-open' },
-  { value: 'lucide:moon' },
-  { value: 'lucide:sun' },
-  { value: 'lucide:heart' },
-  { value: 'lucide:coffee' },
-  { value: 'lucide:apple' },
-  { value: 'lucide:bike' },
-  { value: 'lucide:music' },
-  { value: 'lucide:pen-tool' },
-  { value: 'lucide:smile' }
+  { value: "lucide:droplet" },
+  { value: "lucide:dumbbell" },
+  { value: "lucide:book-open" },
+  { value: "lucide:moon" },
+  { value: "lucide:sun" },
+  { value: "lucide:heart" },
+  { value: "lucide:coffee" },
+  { value: "lucide:apple" },
+  { value: "lucide:bike" },
+  { value: "lucide:music" },
+  { value: "lucide:pen-tool" },
+  { value: "lucide:smile" },
 ];
 
 const encouragementMessages = [
-  'Bom trabalho por aparecer.',
-  'Isso conta.',
-  'Você está fazendo o suficiente.',
-  'Pequenos passos importam.',
-  'Você está presente. Isso é o que importa.'
+  "Bom trabalho por aparecer.",
+  "Isso conta.",
+  "Você está fazendo o suficiente.",
+  "Pequenos passos importam.",
+  "Você está presente. Isso é o que importa.",
 ];
 
 const checkedInDays = computed(() => {
   const uniqueDates = new Set(
-    habitLogs.value.map(log => new Date(log.date).toDateString())
+    habitLogs.value.map((log) => new Date(log.date).toDateString()),
   );
   return uniqueDates.size;
 });
 
 const mostFrequentHabit = computed(() => {
   if (habitLogs.value.length === 0) return null;
-  
+
   const habitCounts: Record<string, number> = {};
-  habitLogs.value.forEach(log => {
+  habitLogs.value.forEach((log) => {
     if (log.done) {
       habitCounts[log.habitId] = (habitCounts[log.habitId] || 0) + 1;
     }
@@ -235,31 +330,32 @@ const mostFrequentHabit = computed(() => {
 
   const maxCount = Math.max(...Object.values(habitCounts));
   const mostFrequentId = Object.keys(habitCounts).find(
-    id => habitCounts[id] === maxCount
+    (id) => habitCounts[id] === maxCount,
   );
 
-  const habit = habits.value.find(h => h.id === mostFrequentId);
+  const habit = habits.value.find((h) => h.id === mostFrequentId);
   return habit?.title || null;
 });
 
 const isHabitCheckedToday = (habitId: string) => {
   const today = new Date().toDateString();
   return habitLogs.value.some(
-    log => log.habitId === habitId && 
-           new Date(log.date).toDateString() === today &&
-           log.done
+    (log) =>
+      log.habitId === habitId &&
+      new Date(log.date).toDateString() === today &&
+      log.done,
   );
 };
 
 const fetchHabits = async () => {
   loading.value = true;
   try {
-    const response = await $fetch('/api/habits');
+    const response = await $fetch("/api/habits");
     if (response.success) {
       habits.value = response.data;
     }
   } catch (error) {
-    console.error('Error fetching habits:', error);
+    console.error("Error fetching habits:", error);
   } finally {
     loading.value = false;
   }
@@ -267,35 +363,35 @@ const fetchHabits = async () => {
 
 const fetchHabitLogs = async () => {
   try {
-    const response = await $fetch('/api/habits/logs');
+    const response = await $fetch("/api/habits/logs");
     if (response.success) {
       habitLogs.value = response.data;
     }
   } catch (error) {
-    console.error('Error fetching habit logs:', error);
+    console.error("Error fetching habit logs:", error);
   }
 };
 
 const fetchTodayMood = async () => {
   try {
-    const response = await $fetch('/api/habits/mood-today');
+    const response = await $fetch("/api/habits/mood-today");
     if (response.success && response.data) {
       todayMood.value = response.data.mood;
     }
   } catch (error) {
-    console.error('Error fetching mood:', error);
+    console.error("Error fetching mood:", error);
   }
 };
 
 const selectMood = async (mood: string) => {
   todayMood.value = mood;
   try {
-    await $fetch('/api/habits/mood', {
-      method: 'POST',
-      body: { mood }
+    await $fetch("/api/habits/mood", {
+      method: "POST",
+      body: { mood },
     });
   } catch (error) {
-    console.error('Error saving mood:', error);
+    console.error("Error saving mood:", error);
   }
 };
 
@@ -306,23 +402,24 @@ const toggleHabit = async (habitId: string) => {
   try {
     if (isChecked) {
       const log = habitLogs.value.find(
-        l => l.habitId === habitId && 
-             new Date(l.date).toDateString() === new Date().toDateString()
+        (l) =>
+          l.habitId === habitId &&
+          new Date(l.date).toDateString() === new Date().toDateString(),
       );
       if (log) {
         await $fetch(`/api/habits/log-${log.id}`, {
-          method: 'DELETE'
+          method: "DELETE",
         });
-        habitLogs.value = habitLogs.value.filter(l => l.id !== log.id);
+        habitLogs.value = habitLogs.value.filter((l) => l.id !== log.id);
       }
     } else {
-      const response = await $fetch('/api/habits/logs', {
-        method: 'POST',
+      const response = await $fetch("/api/habits/logs", {
+        method: "POST",
         body: {
           habitId,
           date: today,
-          done: true
-        }
+          done: true,
+        },
       });
       if (response.success) {
         habitLogs.value.push(response.data);
@@ -330,14 +427,15 @@ const toggleHabit = async (habitId: string) => {
       }
     }
   } catch (error) {
-    console.error('Error toggling habit:', error);
+    console.error("Error toggling habit:", error);
   }
 };
 
 const showEncouragementMessage = () => {
-  encouragementText.value = encouragementMessages[
-    Math.floor(Math.random() * encouragementMessages.length)
-  ];
+  encouragementText.value =
+    encouragementMessages[
+      Math.floor(Math.random() * encouragementMessages.length)
+    ];
   showEncouragement.value = true;
   setTimeout(() => {
     showEncouragement.value = false;
@@ -349,19 +447,21 @@ const saveHabit = async () => {
   try {
     if (editingHabit.value) {
       const response = await $fetch(`/api/habits/${editingHabit.value.id}`, {
-        method: 'PUT',
-        body: formData.value
+        method: "PUT",
+        body: formData.value,
       });
       if (response.success) {
-        const index = habits.value.findIndex(h => h.id === editingHabit.value.id);
+        const index = habits.value.findIndex(
+          (h) => h.id === editingHabit.value.id,
+        );
         if (index !== -1) {
           habits.value[index] = response.data;
         }
       }
     } else {
-      const response = await $fetch('/api/habits', {
-        method: 'POST',
-        body: formData.value
+      const response = await $fetch("/api/habits", {
+        method: "POST",
+        body: formData.value,
       });
       if (response.success) {
         habits.value.push(response.data);
@@ -369,7 +469,7 @@ const saveHabit = async () => {
     }
     closeModal();
   } catch (error) {
-    console.error('Error saving habit:', error);
+    console.error("Error saving habit:", error);
   } finally {
     isSaving.value = false;
   }
@@ -377,15 +477,15 @@ const saveHabit = async () => {
 
 const deleteHabit = async () => {
   if (!editingHabit.value) return;
-  
+
   try {
     await $fetch(`/api/habits/${editingHabit.value.id}`, {
-      method: 'DELETE'
+      method: "DELETE",
     });
-    habits.value = habits.value.filter(h => h.id !== editingHabit.value.id);
+    habits.value = habits.value.filter((h) => h.id !== editingHabit.value.id);
     closeModal();
   } catch (error) {
-    console.error('Error deleting habit:', error);
+    console.error("Error deleting habit:", error);
   }
 };
 
@@ -393,7 +493,7 @@ const openEditModal = (habit: any) => {
   editingHabit.value = habit;
   formData.value = {
     title: habit.title,
-    icon: habit.icon || ''
+    icon: habit.icon || "",
   };
 };
 
@@ -401,8 +501,8 @@ const closeModal = () => {
   showAddModal.value = false;
   editingHabit.value = null;
   formData.value = {
-    title: '',
-    icon: ''
+    title: "",
+    icon: "",
   };
 };
 
@@ -410,12 +510,12 @@ let breathingInterval: NodeJS.Timeout | null = null;
 
 const toggleBreathing = () => {
   isBreathing.value = !isBreathing.value;
-  
+
   if (isBreathing.value) {
     let phase = 0;
-    const phases = ['Inspire...', 'Segure...', 'Expire...', 'Segure...'];
+    const phases = ["Inspire...", "Segure...", "Expire...", "Segure..."];
     breathingPhase.value = phases[0];
-    
+
     breathingInterval = setInterval(() => {
       phase = (phase + 1) % phases.length;
       breathingPhase.value = phases[phase];
@@ -502,7 +602,7 @@ onUnmounted(() => {
 
 .mood-btn.selected {
   border-color: var(--color-primary);
-  background: #E8F3ED;
+  background: #e8f3ed;
 }
 
 .mood-btn.selected :deep(svg),
@@ -573,8 +673,13 @@ onUnmounted(() => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .habits-list {
@@ -596,7 +701,7 @@ onUnmounted(() => {
 
 .habit-card.checked {
   border-color: var(--color-primary);
-  background: #F7FBF9;
+  background: #f7fbf9;
 }
 
 .habit-check {
@@ -655,14 +760,14 @@ onUnmounted(() => {
 }
 
 .habit-action:hover {
-  background: #F0F4F3;
+  background: #f0f4f3;
   color: var(--color-primary);
 }
 
 .encouragement-message {
   margin-top: var(--spacing-md);
   padding: var(--spacing-md);
-  background: #E8F3ED;
+  background: #e8f3ed;
   border-radius: 8px;
   text-align: center;
   animation: fadeIn 0.3s ease;
@@ -676,8 +781,15 @@ onUnmounted(() => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .insights-section {
@@ -767,10 +879,26 @@ onUnmounted(() => {
 }
 
 @keyframes breathe {
-  0%, 100% { transform: scale(1); opacity: 0.3; }
-  25% { transform: scale(1.5); opacity: 0.6; }
-  50% { transform: scale(1); opacity: 0.3; }
-  75% { transform: scale(1.5); opacity: 0.6; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+
+  25% {
+    transform: scale(1.5);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+
+  75% {
+    transform: scale(1.5);
+    opacity: 0.6;
+  }
 }
 
 .breathing-btn span {
@@ -840,7 +968,7 @@ onUnmounted(() => {
 }
 
 .close-btn:hover {
-  background: #F0F4F3;
+  background: #f0f4f3;
   color: var(--color-text-primary);
 }
 
@@ -906,7 +1034,7 @@ onUnmounted(() => {
 
 .icon-option.selected {
   border-color: var(--color-primary);
-  background: #E8F3ED;
+  background: #e8f3ed;
 }
 
 .icon-option :deep(svg) {
@@ -920,9 +1048,9 @@ onUnmounted(() => {
 .delete-btn {
   width: 100%;
   padding: var(--spacing-md);
-  border: 2px solid #FFE5E5;
+  border: 2px solid #ffe5e5;
   background: transparent;
-  color: #D32F2F;
+  color: #d32f2f;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
@@ -935,7 +1063,7 @@ onUnmounted(() => {
 }
 
 .delete-btn:hover {
-  background: #FFE5E5;
+  background: #ffe5e5;
 }
 
 .modal-actions {
@@ -967,7 +1095,7 @@ onUnmounted(() => {
 }
 
 .btn-secondary:hover {
-  background: #F0F4F3;
+  background: #f0f4f3;
   border-color: var(--color-primary);
   color: var(--color-primary);
 }

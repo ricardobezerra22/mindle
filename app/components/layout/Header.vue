@@ -2,9 +2,6 @@
   <header class="header">
     <div class="header-content">
       <div class="header-title">
-        <button class="menu-toggle" @click="drawer.toggle()">
-          <Icon name="lucide:arrow-right-from-line" />
-        </button>
         <slot name="title">
           <h1>{{ title }}</h1>
         </slot>
@@ -18,8 +15,6 @@
 </template>
 
 <script setup lang="ts">
-import { useDrawerStore } from "../../stores/useDrawerStore";
-
 interface Props {
   title?: string;
 }
@@ -27,8 +22,6 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   title: "",
 });
-
-const drawer = useDrawerStore();
 </script>
 
 <style scoped>

@@ -1,27 +1,27 @@
-import { prisma } from '../../utils/prisma'
+import { prisma } from "../../utils/prisma";
 
 export default defineEventHandler(async (event) => {
   try {
-    const userId = event.context.userId
-    
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    const userId = event.context.userId;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     const mood = await prisma.dailyMood.findFirst({
       where: {
         userId,
         date: {
-          gte: today
-        }
+          gte: today,
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
-    })
+        createdAt: "desc",
+      },
+    });
 
-    return sendSuccess(event, mood)
+    return sendSuccess(event, mood);
   } catch (error) {
-    console.error('Error fetching today mood:', error)
-    return sendError(event, 'Failed to fetch today mood', 500)
+    console.error("Error fetching today mood:", error);
+    return sendError(event, "Failed to fetch today mood", 500);
   }
-})
+});

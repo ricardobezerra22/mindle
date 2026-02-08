@@ -2,7 +2,9 @@
   <div class="settings-page">
     <div class="settings-container">
       <div class="settings-header">
-        <h1 class="page-title">Preferências</h1>
+        <h1 class="page-title">
+          Preferências
+        </h1>
         <p class="page-subtitle">
           Ajuste como o Mindle funciona para você. Tudo salva automaticamente.
         </p>
@@ -11,10 +13,17 @@
       <div class="settings-grid">
         <section class="settings-section">
           <div class="section-header">
-            <Icon name="lucide:target" size="20" />
+            <Icon
+              name="lucide:target"
+              size="20"
+            />
             <div>
-              <h2 class="section-title">Foco</h2>
-              <p class="section-hint">Sessões de concentração</p>
+              <h2 class="section-title">
+                Foco
+              </h2>
+              <p class="section-hint">
+                Sessões de concentração
+              </p>
             </div>
           </div>
 
@@ -23,7 +32,10 @@
               <span class="setting-label">Duração padrão</span>
               <span class="setting-description">Tempo de cada sessão</span>
             </div>
-            <select v-model="preferences.focusDuration" class="setting-select">
+            <select
+              v-model="preferences.focusDuration"
+              class="setting-select"
+            >
               <option
                 v-for="opt in focusDurationOptions"
                 :key="opt.value"
@@ -43,7 +55,7 @@
               :class="['toggle', { active: preferences.autoBreak }]"
               @click="preferences.autoBreak = !preferences.autoBreak"
             >
-              <span class="toggle-thumb"></span>
+              <span class="toggle-thumb" />
             </button>
           </div>
 
@@ -56,17 +68,24 @@
               :class="['toggle', { active: preferences.focusSound }]"
               @click="preferences.focusSound = !preferences.focusSound"
             >
-              <span class="toggle-thumb"></span>
+              <span class="toggle-thumb" />
             </button>
           </div>
         </section>
 
         <section class="settings-section">
           <div class="section-header">
-            <Icon name="lucide:calendar-days" size="20" />
+            <Icon
+              name="lucide:calendar-days"
+              size="20"
+            />
             <div>
-              <h2 class="section-title">Planejamento</h2>
-              <p class="section-hint">Organização da semana</p>
+              <h2 class="section-title">
+                Planejamento
+              </h2>
+              <p class="section-hint">
+                Organização da semana
+              </p>
             </div>
           </div>
 
@@ -75,7 +94,10 @@
               <span class="setting-label">Início da semana</span>
               <span class="setting-description">Qual dia começa</span>
             </div>
-            <select v-model="preferences.weekStart" class="setting-select">
+            <select
+              v-model="preferences.weekStart"
+              class="setting-select"
+            >
               <option
                 v-for="opt in weekStartOptions"
                 :key="opt.value"
@@ -95,32 +117,37 @@
               :class="['toggle', { active: preferences.showOnlyToday }]"
               @click="preferences.showOnlyToday = !preferences.showOnlyToday"
             >
-              <span class="toggle-thumb"></span>
+              <span class="toggle-thumb" />
             </button>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
               <span class="setting-label">Mostrar concluídas</span>
-              <span class="setting-description"
-                >Exibir tarefas finalizadas</span
-              >
+              <span class="setting-description">Exibir tarefas finalizadas</span>
             </div>
             <button
               :class="['toggle', { active: preferences.showCompleted }]"
               @click="preferences.showCompleted = !preferences.showCompleted"
             >
-              <span class="toggle-thumb"></span>
+              <span class="toggle-thumb" />
             </button>
           </div>
         </section>
 
         <section class="settings-section">
           <div class="section-header">
-            <Icon name="lucide:heart" size="20" />
+            <Icon
+              name="lucide:heart"
+              size="20"
+            />
             <div>
-              <h2 class="section-title">Hábitos e bem-estar</h2>
-              <p class="section-hint">Cuide de você, no seu ritmo</p>
+              <h2 class="section-title">
+                Hábitos e bem-estar
+              </h2>
+              <p class="section-hint">
+                Cuide de você, no seu ritmo
+              </p>
             </div>
           </div>
 
@@ -133,7 +160,7 @@
               :class="['toggle', { active: preferences.dailyReminder }]"
               @click="preferences.dailyReminder = !preferences.dailyReminder"
             >
-              <span class="toggle-thumb"></span>
+              <span class="toggle-thumb" />
             </button>
           </div>
 
@@ -146,26 +173,31 @@
               :class="['toggle', { active: preferences.showInsights }]"
               @click="preferences.showInsights = !preferences.showInsights"
             >
-              <span class="toggle-thumb"></span>
+              <span class="toggle-thumb" />
             </button>
           </div>
         </section>
 
         <section class="settings-section">
           <div class="section-header">
-            <Icon name="lucide:wallet" size="20" />
+            <Icon
+              name="lucide:wallet"
+              size="20"
+            />
             <div>
-              <h2 class="section-title">Finanças</h2>
-              <p class="section-hint">Controle sem pressão</p>
+              <h2 class="section-title">
+                Finanças
+              </h2>
+              <p class="section-hint">
+                Controle sem pressão
+              </p>
             </div>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
               <span class="setting-label">Lembrete no dashboard</span>
-              <span class="setting-description"
-                >Itens pendentes na tela inicial</span
-              >
+              <span class="setting-description">Itens pendentes na tela inicial</span>
             </div>
             <button
               :class="['toggle', { active: preferences.financeReminder }]"
@@ -173,16 +205,14 @@
                 preferences.financeReminder = !preferences.financeReminder
               "
             >
-              <span class="toggle-thumb"></span>
+              <span class="toggle-thumb" />
             </button>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
               <span class="setting-label">Arquivar pagos</span>
-              <span class="setting-description"
-                >Mover pagos automaticamente</span
-              >
+              <span class="setting-description">Mover pagos automaticamente</span>
             </div>
             <button
               :class="['toggle', { active: preferences.autoArchivePaid }]"
@@ -190,17 +220,24 @@
                 preferences.autoArchivePaid = !preferences.autoArchivePaid
               "
             >
-              <span class="toggle-thumb"></span>
+              <span class="toggle-thumb" />
             </button>
           </div>
         </section>
 
         <section class="settings-section">
           <div class="section-header">
-            <Icon name="lucide:sun" size="20" />
+            <Icon
+              name="lucide:sun"
+              size="20"
+            />
             <div>
-              <h2 class="section-title">Visual e conforto</h2>
-              <p class="section-hint">Aparência da interface</p>
+              <h2 class="section-title">
+                Visual e conforto
+              </h2>
+              <p class="section-hint">
+                Aparência da interface
+              </p>
             </div>
           </div>
 
@@ -209,7 +246,10 @@
               <span class="setting-label">Tema</span>
               <span class="setting-description">Modo de exibição</span>
             </div>
-            <select v-model="preferences.theme" class="setting-select">
+            <select
+              v-model="preferences.theme"
+              class="setting-select"
+            >
               <option
                 v-for="opt in themeOptions"
                 :key="opt.value"
@@ -229,7 +269,7 @@
               :class="['toggle', { active: preferences.reducedMotion }]"
               @click="preferences.reducedMotion = !preferences.reducedMotion"
             >
-              <span class="toggle-thumb"></span>
+              <span class="toggle-thumb" />
             </button>
           </div>
 
@@ -238,7 +278,10 @@
               <span class="setting-label">Tamanho do texto</span>
               <span class="setting-description">Ajuste para leitura</span>
             </div>
-            <select v-model="preferences.fontSize" class="setting-select">
+            <select
+              v-model="preferences.fontSize"
+              class="setting-select"
+            >
               <option
                 v-for="opt in fontSizeOptions"
                 :key="opt.value"
@@ -252,10 +295,17 @@
 
         <section class="settings-section">
           <div class="section-header">
-            <Icon name="lucide:shield" size="20" />
+            <Icon
+              name="lucide:shield"
+              size="20"
+            />
             <div>
-              <h2 class="section-title">Dados e segurança</h2>
-              <p class="section-hint">Seus dados, seu controle</p>
+              <h2 class="section-title">
+                Dados e segurança
+              </h2>
+              <p class="section-hint">
+                Seus dados, seu controle
+              </p>
             </div>
           </div>
 
@@ -266,8 +316,8 @@
             </div>
             <button
               class="action-btn"
-              @click="exportData"
               :disabled="exporting"
+              @click="exportData"
             >
               <Icon
                 :name="exporting ? 'lucide:loader-2' : 'lucide:download'"
@@ -281,12 +331,16 @@
           <div class="setting-row">
             <div class="setting-info">
               <span class="setting-label">Limpar cache local</span>
-              <span class="setting-description"
-                >Dados temporários do navegador</span
-              >
+              <span class="setting-description">Dados temporários do navegador</span>
             </div>
-            <button class="action-btn" @click="clearCache">
-              <Icon name="lucide:trash-2" size="16" />
+            <button
+              class="action-btn"
+              @click="clearCache"
+            >
+              <Icon
+                name="lucide:trash-2"
+                size="16"
+              />
               Limpar
             </button>
           </div>
@@ -294,14 +348,24 @@
       </div>
 
       <section class="about-section">
-        <p class="app-name">Mindle</p>
-        <p class="app-version">v1.0.0</p>
+        <p class="app-name">
+          Mindle
+        </p>
+        <p class="app-version">
+          v1.0.0
+        </p>
         <p class="app-philosophy">
           Um espaço calmo para organizar o que importa. Sem pressa, sem pressão.
           Feito para quem quer clareza, não mais complexidade.
         </p>
-        <a href="mailto:feedback@mindle.app" class="feedback-link">
-          <Icon name="lucide:mail" size="16" />
+        <a
+          href="mailto:feedback@mindle.app"
+          class="feedback-link"
+        >
+          <Icon
+            name="lucide:mail"
+            size="16"
+          />
           Enviar feedback
         </a>
       </section>

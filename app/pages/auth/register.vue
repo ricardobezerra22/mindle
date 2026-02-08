@@ -1,20 +1,40 @@
 <template>
   <div class="auth-card">
-    <h2 class="auth-title">Criar sua conta</h2>
-    <p class="auth-subtitle">Comece a organizar o que importa</p>
+    <h2 class="auth-title">
+      Criar sua conta
+    </h2>
+    <p class="auth-subtitle">
+      Comece a organizar o que importa
+    </p>
 
-    <div v-if="errorMessage" class="alert alert-error">
-      <Icon name="lucide:alert-circle" size="16" />
+    <div
+      v-if="errorMessage"
+      class="alert alert-error"
+    >
+      <Icon
+        name="lucide:alert-circle"
+        size="16"
+      />
       <span>{{ errorMessage }}</span>
     </div>
 
-    <form @submit.prevent="handleRegister" class="auth-form">
+    <form
+      class="auth-form"
+      @submit.prevent="handleRegister"
+    >
       <div class="form-group">
-        <label for="name" class="form-label">Nome</label>
+        <label
+          for="name"
+          class="form-label"
+        >Nome</label>
         <div
           :class="['input-wrapper', { focused: nameFocused, error: nameError }]"
         >
-          <Icon name="lucide:user" size="18" class="input-icon" />
+          <Icon
+            name="lucide:user"
+            size="18"
+            class="input-icon"
+          />
           <input
             id="name"
             v-model="name"
@@ -28,18 +48,28 @@
             "
           />
         </div>
-        <span v-if="nameError" class="field-error">{{ nameError }}</span>
+        <span
+          v-if="nameError"
+          class="field-error"
+        >{{ nameError }}</span>
       </div>
 
       <div class="form-group">
-        <label for="email" class="form-label">Email</label>
+        <label
+          for="email"
+          class="form-label"
+        >Email</label>
         <div
           :class="[
             'input-wrapper',
             { focused: emailFocused, error: emailError },
           ]"
         >
-          <Icon name="lucide:mail" size="18" class="input-icon" />
+          <Icon
+            name="lucide:mail"
+            size="18"
+            class="input-icon"
+          />
           <input
             id="email"
             v-model="email"
@@ -53,18 +83,28 @@
             "
           />
         </div>
-        <span v-if="emailError" class="field-error">{{ emailError }}</span>
+        <span
+          v-if="emailError"
+          class="field-error"
+        >{{ emailError }}</span>
       </div>
 
       <div class="form-group">
-        <label for="password" class="form-label">Senha</label>
+        <label
+          for="password"
+          class="form-label"
+        >Senha</label>
         <div
           :class="[
             'input-wrapper',
             { focused: passwordFocused, error: passwordError },
           ]"
         >
-          <Icon name="lucide:lock" size="18" class="input-icon" />
+          <Icon
+            name="lucide:lock"
+            size="18"
+            class="input-icon"
+          />
           <input
             id="password"
             v-model="password"
@@ -81,8 +121,8 @@
           <button
             type="button"
             class="toggle-password"
-            @click="showPassword = !showPassword"
             tabindex="-1"
+            @click="showPassword = !showPassword"
           >
             <Icon
               :name="showPassword ? 'lucide:eye-off' : 'lucide:eye'"
@@ -90,15 +130,21 @@
             />
           </button>
         </div>
-        <span v-if="passwordError" class="field-error">{{
+        <span
+          v-if="passwordError"
+          class="field-error"
+        >{{
           passwordError
         }}</span>
-        <div v-if="password && !passwordError" class="strength-bar">
+        <div
+          v-if="password && !passwordError"
+          class="strength-bar"
+        >
           <div
             class="strength-fill"
             :style="{ width: strengthPercent + '%' }"
             :class="strengthClass"
-          ></div>
+          />
         </div>
         <span
           v-if="password && !passwordError"
@@ -109,12 +155,21 @@
       </div>
 
       <label class="checkbox-label">
-        <input type="checkbox" v-model="acceptTerms" />
+        <input
+          v-model="acceptTerms"
+          type="checkbox"
+        />
         <span class="checkbox-text">
           Concordo com os
-          <a href="#" class="terms-link">Termos de Uso</a>
+          <a
+            href="#"
+            class="terms-link"
+          >Termos de Uso</a>
           e
-          <a href="#" class="terms-link">Política de Privacidade</a>
+          <a
+            href="#"
+            class="terms-link"
+          >Política de Privacidade</a>
         </span>
       </label>
 
@@ -150,8 +205,15 @@
             @error="handleGoogleError"
           />
         </ClientOnly>
-        <div v-if="googleLoading" class="google-loading">
-          <Icon name="lucide:loader-2" size="18" class="spinning" />
+        <div
+          v-if="googleLoading"
+          class="google-loading"
+        >
+          <Icon
+            name="lucide:loader-2"
+            size="18"
+            class="spinning"
+          />
           <span>Criando conta com Google...</span>
         </div>
       </div>
@@ -159,7 +221,10 @@
 
     <p class="auth-footer">
       Já tem uma conta?
-      <NuxtLink to="/auth/login" class="auth-link">Entrar</NuxtLink>
+      <NuxtLink
+        to="/auth/login"
+        class="auth-link"
+      >Entrar</NuxtLink>
     </p>
   </div>
 </template>

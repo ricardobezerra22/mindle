@@ -1,23 +1,32 @@
 <template>
   <button
-    :class="['btn', `btn-${variant}`, { 'btn-disabled': disabled }]"
+    :class="[
+      'btn',
+      `btn-${variant}`,
+      { 'btn-disabled': disabled },
+      { 'btn-loading': loading },
+    ]"
     :disabled="disabled"
+    :loading="loading"
     @click="handleClick"
   >
     <slot />
   </button>
 </template>
 
-<script setup lang="ts">import { withDefaults } from 'vue';
+<script setup lang="ts">
+import { withDefaults } from "vue";
 
 interface Props {
   variant?: "primary" | "secondary" | "ghost";
   disabled?: boolean;
+  loading?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {
   variant: "primary",
   disabled: false,
+  loading: false,
 });
 
 const emit = defineEmits<{
@@ -78,5 +87,10 @@ const handleClick = (event: MouseEvent) => {
 .btn-disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn-loading {
+  opacity: 0.7;
+  cursor: wait;
 }
 </style>

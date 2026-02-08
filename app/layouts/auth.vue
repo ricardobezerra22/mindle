@@ -2,8 +2,12 @@
   <div class="auth-layout">
     <div class="auth-container">
       <div class="auth-brand">
-        <h1 class="brand-name">Mindle</h1>
-        <p class="brand-tagline">Clareza, foco e calma.</p>
+        <h1 class="brand-name">
+          Mindle
+        </h1>
+        <p class="brand-tagline">
+          Clareza, foco e calma.
+        </p>
       </div>
       <slot />
     </div>

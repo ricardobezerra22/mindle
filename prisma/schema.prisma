@@ -61,6 +61,7 @@ model Task {
   priority    Priority   @default(MEDIUM)
   dueDate     DateTime?
   color       String?
+  isFavorite  Boolean    @default(false)
   createdAt   DateTime   @default(now())
 
   categoryId String?       @db.ObjectId

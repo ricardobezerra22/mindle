@@ -12,48 +12,74 @@
           />
           <button
             v-if="searchQuery"
-            @click="searchQuery = ''"
             class="clear-search"
+            @click="searchQuery = ''"
           >
             <Icon name="lucide:x" />
           </button>
         </div>
 
         <div class="date-filter">
-          <Icon name="lucide:calendar" />
           <input
             v-model="dateFilter"
             type="date"
             class="date-input"
             placeholder="Filtrar por data"
           />
-          <button v-if="dateFilter" @click="dateFilter = ''" class="clear-date">
+          <!-- <Icon name="lucide:calendar" /> -->
+          <button
+            v-if="dateFilter"
+            class="clear-date"
+            @click="dateFilter = ''"
+          >
             <Icon name="lucide:x" />
           </button>
         </div>
 
-        <div v-if="categories.length > 0" class="category-filter">
+        <div
+          v-if="categories.length > 0"
+          class="category-filter"
+        >
           <Icon name="lucide:tag" />
-          <select v-model="categoryFilter" class="category-select">
-            <option value="">Todas categorias</option>
-            <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+          <select
+            v-model="categoryFilter"
+            class="category-select"
+          >
+            <option value="">
+              Todas categorias
+            </option>
+            <option
+              v-for="cat in categories"
+              :key="cat.id"
+              :value="cat.id"
+            >
               {{ cat.name }}
             </option>
           </select>
         </div>
 
+        <label class="priority-filter">
+          <input
+            v-model="favoriteFilter"
+            type="checkbox"
+            class="priority-checkbox"
+          />
+          <Icon name="lucide:star" />
+          <span>Prioridade</span>
+        </label>
+
         <div class="view-toggle">
           <button
             :class="['toggle-btn', { active: viewMode === 'kanban' }]"
-            @click="viewMode = 'kanban'"
             title="Kanban"
+            @click="viewMode = 'kanban'"
           >
             <Icon name="lucide:columns-3" />
           </button>
           <button
             :class="['toggle-btn', { active: viewMode === 'categories' }]"
-            @click="viewMode = 'categories'"
             title="Por Categoria"
+            @click="viewMode = 'categories'"
           >
             <Icon name="lucide:folder-tree" />
           </button>
@@ -66,12 +92,18 @@
       </UiButton>
     </div>
 
-    <div v-if="loading" class="loading-state">
+    <div
+      v-if="loading"
+      class="loading-state"
+    >
       <p>Carregando tarefas...</p>
     </div>
 
     <template v-else>
-      <div v-if="viewMode === 'kanban'" class="kanban-board">
+      <div
+        v-if="viewMode === 'kanban'"
+        class="kanban-board"
+      >
         <TasksTaskColumn
           title="Não Iniciado"
           status="NOT_STARTED"
@@ -112,12 +144,13 @@
               >
                 <TasksTaskItem
                   v-for="task in group.tasks"
-                  :key="task.id"
                   :id="task.id"
+                  :key="task.id"
                   :title="task.title"
                   :description="task.description"
                   :status="task.status"
                   :priority="task.priority"
+                  :is-favorite="task.isFavorite"
                   :due-date="task.dueDate"
                   :category-name="task.category?.name"
                   :category-color="task.category?.color"
@@ -125,6 +158,7 @@
                   @edit="handleEdit"
                   @delete="confirmDelete"
                   @complete="handleComplete"
+                  @toggle-favorite="handleToggleFavorite"
                   @drag-start="handleDragStart"
                   @drag-end="handleDragEnd"
                   @add-sub-task="handleAddSubTask"
@@ -175,12 +209,13 @@
               >
                 <TasksTaskItem
                   v-for="task in group.tasks"
-                  :key="task.id"
                   :id="task.id"
+                  :key="task.id"
                   :title="task.title"
                   :description="task.description"
                   :status="task.status"
                   :priority="task.priority"
+                  :is-favorite="task.isFavorite"
                   :due-date="task.dueDate"
                   :category-name="task.category?.name"
                   :category-color="task.category?.color"
@@ -188,6 +223,7 @@
                   @edit="handleEdit"
                   @delete="confirmDelete"
                   @complete="handleComplete"
+                  @toggle-favorite="handleToggleFavorite"
                   @drag-start="handleDragStart"
                   @drag-end="handleDragEnd"
                   @add-sub-task="handleAddSubTask"
@@ -205,7 +241,10 @@
           icon="lucide:check-circle-2"
           @drop="handleDrop"
         >
-          <template v-for="group in statusCategoryGroups.DONE" :key="group.id">
+          <template
+            v-for="group in statusCategoryGroups.DONE"
+            :key="group.id"
+          >
             <div class="column-category-group">
               <button
                 class="column-category-header"
@@ -235,18 +274,20 @@
               >
                 <TasksTaskItem
                   v-for="task in group.tasks"
-                  :key="task.id"
                   :id="task.id"
+                  :key="task.id"
                   :title="task.title"
                   :description="task.description"
                   :status="task.status"
                   :priority="task.priority"
+                  :is-favorite="task.isFavorite"
                   :due-date="task.dueDate"
                   :category-name="task.category?.name"
                   :category-color="task.category?.color"
                   :sub-tasks="task.subTasks"
                   @edit="handleEdit"
                   @delete="confirmDelete"
+                  @toggle-favorite="handleToggleFavorite"
                   @drag-start="handleDragStart"
                   @drag-end="handleDragEnd"
                   @add-sub-task="handleAddSubTask"
@@ -258,7 +299,10 @@
         </TasksTaskColumn>
       </div>
 
-      <div v-else class="category-tree-view">
+      <div
+        v-else
+        class="category-tree-view"
+      >
         <div
           v-for="group in tasksByCategory"
           :key="group.id"
@@ -296,12 +340,13 @@
           >
             <TasksTaskItem
               v-for="task in group.tasks"
-              :key="task.id"
               :id="task.id"
+              :key="task.id"
               :title="task.title"
               :description="task.description"
               :status="task.status"
               :priority="task.priority"
+              :is-favorite="task.isFavorite"
               :due-date="task.dueDate"
               :category-name="task.category?.name"
               :category-color="task.category?.color"
@@ -309,6 +354,7 @@
               @edit="handleEdit"
               @delete="confirmDelete"
               @complete="handleComplete"
+              @toggle-favorite="handleToggleFavorite"
               @drag-start="handleDragStart"
               @drag-end="handleDragEnd"
               @add-sub-task="handleAddSubTask"
@@ -317,7 +363,10 @@
           </div>
         </div>
 
-        <div v-if="uncategorizedTasks.length > 0" class="category-accordion">
+        <div
+          v-if="uncategorizedTasks.length > 0"
+          class="category-accordion"
+        >
           <button
             class="category-accordion-header"
             :style="{
@@ -352,17 +401,19 @@
           >
             <TasksTaskItem
               v-for="task in uncategorizedTasks"
-              :key="task.id"
               :id="task.id"
+              :key="task.id"
               :title="task.title"
               :description="task.description"
               :status="task.status"
               :priority="task.priority"
+              :is-favorite="task.isFavorite"
               :due-date="task.dueDate"
               :sub-tasks="task.subTasks"
               @edit="handleEdit"
               @delete="confirmDelete"
               @complete="handleComplete"
+              @toggle-favorite="handleToggleFavorite"
               @drag-start="handleDragStart"
               @drag-end="handleDragEnd"
               @add-sub-task="handleAddSubTask"
@@ -381,12 +432,18 @@
       <div class="modal-content">
         <div class="modal-header">
           <h2>Nova Tarefa</h2>
-          <button @click="showCreateModal = false" class="close-btn">
+          <button
+            class="close-btn"
+            @click="showCreateModal = false"
+          >
             <Icon name="lucide:x" />
           </button>
         </div>
 
-        <form @submit.prevent="handleCreate" class="task-form">
+        <form
+          class="task-form"
+          @submit.prevent="handleCreate"
+        >
           <div class="form-group">
             <label for="title">Título *</label>
             <input
@@ -411,16 +468,29 @@
           <div class="form-row">
             <div class="form-group">
               <label for="priority">Prioridade</label>
-              <select id="priority" v-model="newTask.priority">
-                <option value="LOW">Baixa</option>
-                <option value="MEDIUM">Média</option>
-                <option value="HIGH">Alta</option>
+              <select
+                id="priority"
+                v-model="newTask.priority"
+              >
+                <option value="LOW">
+                  Baixa
+                </option>
+                <option value="MEDIUM">
+                  Média
+                </option>
+                <option value="HIGH">
+                  Alta
+                </option>
               </select>
             </div>
 
             <div class="form-group">
               <label for="dueDate">Data de Entrega</label>
-              <input id="dueDate" v-model="newTask.dueDate" type="date" />
+              <input
+                id="dueDate"
+                v-model="newTask.dueDate"
+                type="date"
+              />
             </div>
           </div>
 
@@ -474,7 +544,7 @@
                   :class="[
                     'category-option',
                     {
-                      active: idx === highlightedIndex,
+                      'active': idx === highlightedIndex,
                       'create-new': cat.id === '__create__',
                     },
                   ]"
@@ -482,10 +552,7 @@
                 >
                   <template v-if="cat.id === '__create__'">
                     <Icon name="lucide:plus-circle" />
-                    <span
-                      >Criar "<strong>{{ categorySearch.trim() }}</strong
-                      >"</span
-                    >
+                    <span>Criar "<strong>{{ categorySearch.trim() }}</strong>"</span>
                   </template>
                   <template v-else>
                     <span
@@ -570,8 +637,8 @@
               <button
                 type="button"
                 class="subtask-add-btn"
-                @click="addSubTaskToForm"
                 :disabled="!newSubTaskInput.trim()"
+                @click="addSubTaskToForm"
               >
                 <Icon name="lucide:plus" />
               </button>
@@ -586,7 +653,11 @@
             >
               Cancelar
             </UiButton>
-            <UiButton type="submit" :disabled="!newTask.title">
+            <UiButton
+              :loading="loading"
+              type="submit"
+              :disabled="!newTask.title || !selectedCategory"
+            >
               Criar Tarefa
             </UiButton>
           </div>
@@ -602,7 +673,10 @@
       <div class="modal-content delete-modal">
         <div class="modal-header">
           <h2>Confirmar Exclusão</h2>
-          <button @click="showDeleteModal = false" class="close-btn">
+          <button
+            class="close-btn"
+            @click="showDeleteModal = false"
+          >
             <Icon name="lucide:x" />
           </button>
         </div>
@@ -611,19 +685,23 @@
           <div class="delete-icon">
             <Icon name="lucide:alert-triangle" />
           </div>
-          <h3 class="delete-title">Excluir Tarefa</h3>
+          <h3 class="delete-title">
+            Excluir Tarefa
+          </h3>
           <p class="delete-message">
             Tem certeza que deseja excluir esta tarefa?
           </p>
-          <p class="delete-warning">Esta ação não pode ser desfeita.</p>
+          <p class="delete-warning">
+            Esta ação não pode ser desfeita.
+          </p>
         </div>
 
         <div class="modal-actions delete-actions">
           <UiButton
             type="button"
             variant="secondary"
-            @click="showDeleteModal = false"
             class="action-button"
+            @click="showDeleteModal = false"
           >
             Cancelar
           </UiButton>
@@ -656,22 +734,23 @@ const {
   createTask,
   updateTask,
   updateTaskStatus,
+  toggleFavorite,
   deleteTask,
   addSubTask,
   toggleSubTask,
 } = useTasks();
 
 const toast = useToast();
-
+const inputDate = useTemplateRef("inputDate");
 const showCreateModal = ref(false);
 const showDeleteModal = ref(false);
 const taskToDelete = ref<string | null>(null);
 const draggedTaskId = ref<string | null>(null);
 const viewMode = ref<"kanban" | "categories">("kanban");
-
 const searchQuery = ref("");
 const dateFilter = ref("");
 const categoryFilter = ref("");
+const favoriteFilter = ref(false);
 
 const categorySearch = ref("");
 const showCategoryDropdown = ref(false);
@@ -695,17 +774,17 @@ const newTask = ref({
 const filteredCategories = computed(() => {
   if (!categorySearch.value.trim()) return categories.value;
   const q = categorySearch.value.toLowerCase();
-  return categories.value.filter((c) => c.name.toLowerCase().includes(q));
+  return categories.value.filter(c => c.name.toLowerCase().includes(q));
 });
 
 const exactCategoryMatch = computed(() => {
   const q = categorySearch.value.trim().toLowerCase();
-  return categories.value.some((c) => c.name.toLowerCase() === q);
+  return categories.value.some(c => c.name.toLowerCase() === q);
 });
 
 const dropdownItems = computed(() => {
-  const items: { id: string; name: string; color: string }[] =
-    filteredCategories.value.map((c) => ({
+  const items: { id: string; name: string; color: string }[]
+    = filteredCategories.value.map(c => ({
       id: c.id,
       name: c.name,
       color: c.color,
@@ -726,9 +805,9 @@ const filteredTasks = computed(() => {
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
     filtered = filtered.filter(
-      (t) =>
-        t.title.toLowerCase().includes(query) ||
-        (t.description && t.description.toLowerCase().includes(query)),
+      t =>
+        t.title.toLowerCase().includes(query)
+        || (t.description && t.description.toLowerCase().includes(query)),
     );
   }
 
@@ -741,7 +820,11 @@ const filteredTasks = computed(() => {
   }
 
   if (categoryFilter.value) {
-    filtered = filtered.filter((t) => t.categoryId === categoryFilter.value);
+    filtered = filtered.filter(t => t.categoryId === categoryFilter.value);
+  }
+
+  if (favoriteFilter.value) {
+    filtered = filtered.filter(t => t.isFavorite);
   }
 
   return filtered;
@@ -750,12 +833,12 @@ const filteredTasks = computed(() => {
 const tasksByStatus = computed(() => {
   return {
     NOT_STARTED: filteredTasks.value.filter(
-      (t) => t.status === TaskStatus.NOT_STARTED,
+      t => t.status === TaskStatus.NOT_STARTED,
     ),
     IN_PROGRESS: filteredTasks.value.filter(
-      (t) => t.status === TaskStatus.IN_PROGRESS,
+      t => t.status === TaskStatus.IN_PROGRESS,
     ),
-    DONE: filteredTasks.value.filter((t) => t.status === TaskStatus.DONE),
+    DONE: filteredTasks.value.filter(t => t.status === TaskStatus.DONE),
   };
 });
 
@@ -804,11 +887,11 @@ const statusCategoryGroups = computed(() => {
 });
 
 const tasksByCategory = computed(() => {
-  const groups: { id: string; name: string; color: string; tasks: Task[] }[] =
-    [];
+  const groups: { id: string; name: string; color: string; tasks: Task[] }[]
+    = [];
 
   for (const cat of categories.value) {
-    const catTasks = filteredTasks.value.filter((t) => t.categoryId === cat.id);
+    const catTasks = filteredTasks.value.filter(t => t.categoryId === cat.id);
     if (catTasks.length > 0) {
       groups.push({
         id: cat.id,
@@ -823,7 +906,7 @@ const tasksByCategory = computed(() => {
 });
 
 const uncategorizedTasks = computed(() => {
-  return filteredTasks.value.filter((t) => !t.categoryId);
+  return filteredTasks.value.filter(t => !t.categoryId);
 });
 
 const toggleCategoryAccordion = (id: string) => {
@@ -872,8 +955,8 @@ const onCategoryKeydown = (e: KeyboardEvent) => {
     highlightedIndex.value = (highlightedIndex.value + 1) % items.length;
   } else if (e.key === "ArrowUp") {
     e.preventDefault();
-    highlightedIndex.value =
-      highlightedIndex.value <= 0
+    highlightedIndex.value
+      = highlightedIndex.value <= 0
         ? items.length - 1
         : highlightedIndex.value - 1;
   } else if (e.key === "Enter") {
@@ -895,7 +978,7 @@ const onDropdownSelect = (idx: number) => {
     showCategoryDropdown.value = false;
     highlightedIndex.value = -1;
   } else {
-    const cat = categories.value.find((c) => c.id === item.id);
+    const cat = categories.value.find(c => c.id === item.id);
     if (cat) selectCategory(cat);
   }
 };
@@ -905,7 +988,7 @@ const handleCreateCategory = async () => {
   if (!name || creatingCategory.value) return;
 
   const colorExists = categories.value.some(
-    (c) => c.color.toUpperCase() === newCategoryColor.value.toUpperCase(),
+    c => c.color.toUpperCase() === newCategoryColor.value.toUpperCase(),
   );
   if (colorExists) {
     toast.error({ title: "Já existe uma categoria com essa cor" });
@@ -1032,8 +1115,16 @@ const handleComplete = async (taskId: string) => {
   }
 };
 
+const handleToggleFavorite = async (id: string) => {
+  try {
+    await toggleFavorite(id);
+  } catch (e) {
+    toast.error({ title: "Erro ao atualizar prioridade" });
+  }
+};
+
 const handleDrop = async (taskId: string, newStatus: TaskStatus) => {
-  const task = tasks.value.find((t) => t.id === taskId);
+  const task = tasks.value.find(t => t.id === taskId);
   if (task && task.status !== newStatus) {
     try {
       await updateTaskStatus(taskId, newStatus);
@@ -1113,15 +1204,25 @@ onMounted(() => {
   height: 18px;
   color: var(--color-text-secondary);
   flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
+/*
+Source - https://stackoverflow.com/a/76844695
+Posted by thegigabyte
+Retrieved 2026-02-08, License - CC BY-SA 4.0
+*/
 
 .search-input,
 .date-input {
+  position: relative;
   flex: 1;
   border: none;
   background: transparent;
   font-size: 14px;
   color: var(--color-text-primary);
+
   outline: none;
   padding: var(--spacing-xs) 0;
 }
@@ -1157,6 +1258,92 @@ onMounted(() => {
 .clear-date :deep(svg) {
   width: 14px;
   height: 14px;
+}
+
+.category-filter {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs) var(--spacing-md);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.category-filter :deep(svg) {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.category-select {
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  outline: none;
+  cursor: pointer;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  padding-right: var(--spacing-lg);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7c7a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+  min-width: 120px;
+}
+
+.category-select:focus {
+  color: var(--color-primary);
+}
+
+.category-filter:focus-within {
+  border-color: var(--color-primary);
+}
+
+.priority-filter {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs) var(--spacing-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.priority-filter:hover {
+  border-color: var(--color-text-secondary);
+}
+
+.priority-filter:has(.priority-checkbox:checked) {
+  border-color: #eab308;
+  background: #fefce8;
+  color: #a16207;
+}
+
+.priority-filter :deep(svg) {
+  width: 16px;
+  height: 16px;
+  color: #9ca3af;
+  transition: color 0.2s ease;
+}
+
+.priority-filter:has(.priority-checkbox:checked) :deep(svg) {
+  color: #eab308;
+}
+
+.priority-checkbox {
+  display: none;
 }
 
 .view-toggle {
@@ -1907,37 +2094,5 @@ onMounted(() => {
 :deep(.delete-button:hover) {
   background-color: #b91c1c !important;
   color: white !important;
-}
-
-.category-filter {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  background: var(--color-surface);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-xs) var(--spacing-md);
-  transition: all 0.2s ease;
-}
-
-.category-filter:focus-within {
-  border-color: var(--color-primary);
-}
-
-.category-filter :deep(svg) {
-  width: 18px;
-  height: 18px;
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-}
-
-.category-select {
-  border: none;
-  background: transparent;
-  font-size: 14px;
-  color: var(--color-text-primary);
-  outline: none;
-  padding: var(--spacing-xs) 0;
-  cursor: pointer;
 }
 </style>

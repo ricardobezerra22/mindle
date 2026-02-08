@@ -9,11 +9,15 @@
       <div
         v-if="status !== 'DONE'"
         class="task-checkbox"
-        @click.stop="handleComplete"
         :class="{ completing: isCompleting }"
+        @click.stop="handleComplete"
       >
         <div class="checkbox-inner">
-          <Icon v-if="isCompleting" name="lucide:check" class="check-icon" />
+          <Icon
+            v-if="isCompleting"
+            name="lucide:check"
+            class="check-icon"
+          />
         </div>
       </div>
 
@@ -26,7 +30,12 @@
           placeholder="Título da tarefa"
           @click.stop
         />
-        <h4 v-else class="task-title">{{ title }}</h4>
+        <h4
+          v-else
+          class="task-title"
+        >
+          {{ title }}
+        </h4>
 
         <textarea
           v-if="editMode"
@@ -36,12 +45,18 @@
           rows="2"
           @click.stop
         />
-        <p v-else-if="description" class="task-description">
+        <p
+          v-else-if="description"
+          class="task-description"
+        >
           {{ description }}
         </p>
 
         <div class="task-meta">
-          <div v-if="editMode" class="edit-date-wrapper">
+          <div
+            v-if="editMode"
+            class="edit-date-wrapper"
+          >
             <Icon name="lucide:calendar" />
             <input
               v-model="editData.dueDate"
@@ -50,7 +65,10 @@
               @click.stop
             />
           </div>
-          <span v-else-if="dueDate" class="task-date">
+          <span
+            v-else-if="dueDate"
+            class="task-date"
+          >
             <Icon name="lucide:calendar" />
             {{ formatDate(dueDate) }}
           </span>
@@ -68,7 +86,10 @@
           </span>
         </div>
 
-        <div v-if="subTasks && subTasks.length > 0" class="subtasks-section">
+        <div
+          v-if="subTasks && subTasks.length > 0"
+          class="subtasks-section"
+        >
           <button
             class="subtasks-toggle"
             @click.stop="showSubTasks = !showSubTasks"
@@ -76,7 +97,10 @@
             <Icon :name="showSubTasks ? 'lucide:chevron-down' : 'lucide:chevron-right'" />
             <span>{{ completedSubTasks }}/{{ subTasks.length }} subtarefas</span>
           </button>
-          <div v-if="showSubTasks" class="subtasks-list">
+          <div
+            v-if="showSubTasks"
+            class="subtasks-list"
+          >
             <div
               v-for="st in subTasks"
               :key="st.id"
@@ -84,15 +108,25 @@
               @click.stop="$emit('toggleSubTask', st.id, !st.done)"
             >
               <div :class="['subtask-check', { done: st.done }]">
-                <Icon v-if="st.done" name="lucide:check" />
+                <Icon
+                  v-if="st.done"
+                  name="lucide:check"
+                />
               </div>
               <span :class="['subtask-title', { done: st.done }]">{{ st.title }}</span>
             </div>
           </div>
         </div>
 
-        <div v-if="showSubTasks || (!subTasks?.length && !editMode)" class="add-subtask-row">
-          <div v-if="addingSubTask" class="add-subtask-input-row" @click.stop>
+        <div
+          v-if="showSubTasks || (!subTasks?.length && !editMode)"
+          class="add-subtask-row"
+        >
+          <div
+            v-if="addingSubTask"
+            class="add-subtask-input-row"
+            @click.stop
+          >
             <input
               v-model="newSubTaskTitle"
               type="text"
@@ -101,10 +135,18 @@
               @keyup.enter="handleAddSubTask"
               @keyup.escape="addingSubTask = false"
             />
-            <button class="action-btn save" @click.stop="handleAddSubTask" title="Adicionar">
+            <button
+              class="action-btn save"
+              title="Adicionar"
+              @click.stop="handleAddSubTask"
+            >
               <Icon name="lucide:plus" />
             </button>
-            <button class="action-btn cancel" @click.stop="addingSubTask = false" title="Cancelar">
+            <button
+              class="action-btn cancel"
+              title="Cancelar"
+              @click.stop="addingSubTask = false"
+            >
               <Icon name="lucide:x" />
             </button>
           </div>
@@ -119,36 +161,53 @@
         </div>
       </div>
 
+      <button
+        v-if="isFavorite && !editMode"
+        class="favorite-indicator"
+        title="Remover prioridade"
+        @click.stop="$emit('toggleFavorite', id)"
+      >
+        <Icon name="lucide:star" />
+      </button>
+
       <div class="task-actions">
         <button
+          v-if="!isFavorite && !editMode"
+          class="action-btn favorite-btn"
+          title="Marcar prioridade"
+          @click.stop="$emit('toggleFavorite', id)"
+        >
+          <Icon name="lucide:star" />
+        </button>
+        <button
           v-if="!editMode"
-          @click.stop="toggleEditMode"
           class="action-btn"
           title="Editar"
+          @click.stop="toggleEditMode"
         >
           <Icon name="lucide:pencil" />
         </button>
         <button
           v-if="editMode"
-          @click.stop="saveEdit"
           class="action-btn save"
           title="Salvar"
+          @click.stop="saveEdit"
         >
           <Icon name="lucide:check" />
         </button>
         <button
           v-if="editMode"
-          @click.stop="cancelEdit"
           class="action-btn cancel"
           title="Cancelar"
+          @click.stop="cancelEdit"
         >
           <Icon name="lucide:x" />
         </button>
         <button
           v-if="!editMode"
-          @click.stop="$emit('delete', id)"
           class="action-btn delete"
           title="Excluir"
+          @click.stop="$emit('delete', id)"
         >
           <Icon name="lucide:trash-2" />
         </button>
@@ -166,6 +225,7 @@ interface Props {
   description?: string;
   status: TaskStatus;
   priority: Priority;
+  isFavorite: boolean;
   dueDate?: Date;
   categoryName?: string;
   categoryColor?: string;
@@ -181,6 +241,7 @@ const emit = defineEmits<{
   ];
   delete: [id: string];
   complete: [id: string];
+  toggleFavorite: [id: string];
   dragStart: [id: string];
   dragEnd: [];
   addSubTask: [taskId: string, title: string];
@@ -738,6 +799,49 @@ const formatDateForInput = (date: Date) => {
 .action-btn.delete:hover {
   background-color: #fee2e2;
   color: #dc2626;
+}
+
+.favorite-indicator {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: #eab308;
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
+.favorite-indicator :deep(svg) {
+  width: 18px;
+  height: 18px;
+  fill: #eab308;
+  filter: drop-shadow(0 1px 2px rgba(234, 179, 8, 0.3));
+}
+
+.favorite-indicator:hover {
+  color: #ca8a04;
+  transform: scale(1.15);
+}
+
+.task-item:hover .favorite-indicator {
+  right: calc(var(--spacing-sm) + 68px);
+}
+
+.action-btn.favorite-btn {
+  color: #9ca3af;
+}
+
+.action-btn.favorite-btn:hover {
+  color: #eab308;
+  background-color: #fefce8;
 }
 
 .action-btn :deep(svg) {

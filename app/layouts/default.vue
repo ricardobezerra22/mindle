@@ -33,15 +33,19 @@ const pageTitle = computed(() => {
 <style scoped>
 .layout-default {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   background-color: var(--color-background);
+  overflow: hidden;
 }
 
 .layout-main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  min-width: 0;
 }
 
 .layout-content {
