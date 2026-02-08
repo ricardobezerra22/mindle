@@ -10,6 +10,14 @@ export enum Priority {
   HIGH = "HIGH",
 }
 
+export interface TaskCategory {
+  id: string;
+  name: string;
+  color: string;
+  createdAt: Date;
+  userId: string;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -18,8 +26,8 @@ export interface Task {
   priority: Priority;
   dueDate?: Date;
   color?: string;
-  category?: string;
-  categoryColor?: string;
+  categoryId?: string;
+  category?: TaskCategory;
   createdAt: Date;
   userId: string;
   subTasks?: SubTask[];

@@ -58,6 +58,27 @@ export const useAuth = () => {
     return response;
   };
 
+  const googleLogin = async (credential: string) => {
+    try {
+      const response = await $fetch("/api/auth/google-login", {
+        method: "POST",
+        body: { credential },
+      });
+
+      if (response.success) {
+        user.value = response.data;
+      }
+
+      return response;
+    } catch (err: any) {
+      const data = err?.data;
+      if (data && data.error) {
+        return { success: false, error: data.error };
+      }
+      return { success: false, error: "Erro ao fazer login com Google" };
+    }
+  };
+
   const logout = async () => {
     await $fetch("/api/auth/logout", { method: "POST" });
     user.value = null;
@@ -73,6 +94,7 @@ export const useAuth = () => {
     fetchUser,
     login,
     register,
+    googleLogin,
     logout,
   };
 };

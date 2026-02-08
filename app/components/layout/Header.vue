@@ -2,6 +2,9 @@
   <header class="header">
     <div class="header-content">
       <div class="header-title">
+        <button class="menu-toggle" @click="drawer.toggle()">
+          <Icon name="lucide:arrow-right-from-line" />
+        </button>
         <slot name="title">
           <h1>{{ title }}</h1>
         </slot>
@@ -15,6 +18,8 @@
 </template>
 
 <script setup lang="ts">
+import { useDrawerStore } from "../../stores/useDrawerStore";
+
 interface Props {
   title?: string;
 }
@@ -22,6 +27,8 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   title: "",
 });
+
+const drawer = useDrawerStore();
 </script>
 
 <style scoped>
@@ -34,7 +41,7 @@ withDefaults(defineProps<Props>(), {
   top: 0;
   z-index: 100;
   width: 100%;
-  padding: 38px;
+  padding: 20px;
 }
 
 .header-content {
@@ -43,6 +50,35 @@ withDefaults(defineProps<Props>(), {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.menu-toggle {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.menu-toggle:hover {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+}
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .header-title h1 {

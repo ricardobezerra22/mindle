@@ -1,25 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+@import "tailwindcss";
+@import "@nuxt/ui";
 
 :root {
-  --color-primary: #6FAF8E;
-  --color-primary-dark: #4E8A6D;
-  --color-background: #F7FAF9;
-  --color-surface: #FFFFFF;
-  --color-text-primary: #1F2D2B;
-  --color-text-secondary: #6B7C7A;
-  --color-border: #E3ECE9;
-  
+  --color-primary: #6faf8e;
+  --color-primary-dark: #4e8a6d;
+  --color-background: #f7faf9;
+  --color-surface: #ffffff;
+  --color-text-primary: #1f2d2b;
+  --color-text-secondary: #6b7c7a;
+  --color-border: #e3ece9;
+
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
-  
+
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
 }
-    
+
 * {
   margin: 0;
   padding: 0;
@@ -27,7 +29,7 @@
 }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: var(--color-text-primary);
@@ -35,7 +37,12 @@ body {
   line-height: 1.5;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 600;
   line-height: 1.2;
 }

@@ -7,8 +7,8 @@ export default defineEventHandler(async (event) => {
 
     const where: any = { userId }
 
-    if (query.category) {
-      where.category = String(query.category)
+    if (query.categoryId) {
+      where.categoryId = String(query.categoryId)
     }
 
     if (query.from || query.to) {
@@ -28,6 +28,7 @@ export default defineEventHandler(async (event) => {
     const tasks = await prisma.task.findMany({
       where,
       include: {
+        category: true,
         subTasks: true
       },
       orderBy: {

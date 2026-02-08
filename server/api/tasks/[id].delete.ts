@@ -8,6 +8,14 @@ export default defineEventHandler(async (event) => {
       return sendError(event, 'Task ID is required', 400)
     }
     
+    await prisma.subTask.deleteMany({
+      where: { taskId: id }
+    })
+
+    await prisma.plannerEntry.deleteMany({
+      where: { taskId: id }
+    })
+
     await prisma.task.delete({
       where: { id }
     })

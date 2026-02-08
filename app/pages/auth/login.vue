@@ -11,7 +11,12 @@
     <form @submit.prevent="handleLogin" class="auth-form">
       <div class="form-group">
         <label for="email" class="form-label">Email</label>
-        <div :class="['input-wrapper', { focused: emailFocused, error: emailError }]">
+        <div
+          :class="[
+            'input-wrapper',
+            { focused: emailFocused, error: emailError },
+          ]"
+        >
           <Icon name="lucide:mail" size="18" class="input-icon" />
           <input
             id="email"
@@ -20,7 +25,10 @@
             placeholder="seu@email.com"
             autocomplete="email"
             @focus="emailFocused = true"
-            @blur="emailFocused = false; validateEmail()"
+            @blur="
+              emailFocused = false;
+              validateEmail();
+            "
           />
         </div>
         <span v-if="emailError" class="field-error">{{ emailError }}</span>
@@ -28,7 +36,12 @@
 
       <div class="form-group">
         <label for="password" class="form-label">Senha</label>
-        <div :class="['input-wrapper', { focused: passwordFocused, error: passwordError }]">
+        <div
+          :class="[
+            'input-wrapper',
+            { focused: passwordFocused, error: passwordError },
+          ]"
+        >
           <Icon name="lucide:lock" size="18" class="input-icon" />
           <input
             id="password"
@@ -37,7 +50,10 @@
             placeholder="••••••••"
             autocomplete="current-password"
             @focus="passwordFocused = true"
-            @blur="passwordFocused = false; validatePassword()"
+            @blur="
+              passwordFocused = false;
+              validatePassword();
+            "
           />
           <button
             type="button"
@@ -45,10 +61,15 @@
             @click="showPassword = !showPassword"
             tabindex="-1"
           >
-            <Icon :name="showPassword ? 'lucide:eye-off' : 'lucide:eye'" size="18" />
+            <Icon
+              :name="showPassword ? 'lucide:eye-off' : 'lucide:eye'"
+              size="18"
+            />
           </button>
         </div>
-        <span v-if="passwordError" class="field-error">{{ passwordError }}</span>
+        <span v-if="passwordError" class="field-error">{{
+          passwordError
+        }}</span>
       </div>
 
       <div class="form-row">
@@ -61,11 +82,7 @@
         </NuxtLink>
       </div>
 
-      <button
-        type="submit"
-        class="submit-btn"
-        :disabled="submitting"
-      >
+      <button type="submit" class="submit-btn" :disabled="submitting || googleLoading">
         <Icon
           v-if="submitting"
           name="lucide:loader-2"
@@ -74,6 +91,24 @@
         />
         {{ submitting ? "Entrando..." : "Entrar" }}
       </button>
+
+      <div class="divider">
+        <span>ou</span>
+      </div>
+
+      <div class="google-btn-wrapper">
+        <ClientOnly>
+          <GoogleLoginButton
+            :options="{ theme: 'outline', size: 'medium', text: 'signin_with', shape: 'rectangular', width: 200 }"
+            @success="handleGoogleSuccess"
+            @error="handleGoogleError"
+          />
+        </ClientOnly>
+        <div v-if="googleLoading" class="google-loading">
+          <Icon name="lucide:loader-2" size="18" class="spinning" />
+          <span>Entrando com Google...</span>
+        </div>
+      </div>
     </form>
 
     <p class="auth-footer">
@@ -86,13 +121,14 @@
 <script setup lang="ts">
 definePageMeta({ layout: "auth" });
 
-const { login } = useAuth();
+const { login, googleLogin } = useAuth();
 
 const email = ref("");
 const password = ref("");
 const showPassword = ref(false);
 const rememberMe = ref(false);
 const submitting = ref(false);
+const googleLoading = ref(false);
 const errorMessage = ref("");
 
 const emailFocused = ref(false);
@@ -141,6 +177,26 @@ const handleLogin = async () => {
   } finally {
     submitting.value = false;
   }
+};
+const handleGoogleSuccess = async (e: { credential: string; claims: any }) => {
+  errorMessage.value = "";
+  googleLoading.value = true;
+  try {
+    const response = await googleLogin(e.credential);
+    if (response.success) {
+      navigateTo("/");
+    } else {
+      errorMessage.value = response.error || "Erro ao fazer login com Google";
+    }
+  } catch {
+    errorMessage.value = "Erro de conexão. Tente novamente.";
+  } finally {
+    googleLoading.value = false;
+  }
+};
+
+const handleGoogleError = () => {
+  errorMessage.value = "Erro ao autenticar com Google. Tente novamente.";
 };
 </script>
 
@@ -337,8 +393,47 @@ const handleLogin = async () => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.divider span {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.google-btn-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.google-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 13px;
+  color: var(--color-text-secondary);
 }
 
 .auth-footer {

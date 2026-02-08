@@ -11,8 +11,12 @@ export default defineEventHandler(async (event) => {
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || !user.password) {
+    if (!user) {
       return sendError(event, "Email ou senha incorretos", 401);
+    }
+
+    if (!user.password) {
+      return sendError(event, "Esta conta usa login com Google. Use o botão do Google para entrar.", 401);
     }
 
     const valid = await comparePassword(password, user.password);

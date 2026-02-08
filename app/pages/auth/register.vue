@@ -11,7 +11,9 @@
     <form @submit.prevent="handleRegister" class="auth-form">
       <div class="form-group">
         <label for="name" class="form-label">Nome</label>
-        <div :class="['input-wrapper', { focused: nameFocused, error: nameError }]">
+        <div
+          :class="['input-wrapper', { focused: nameFocused, error: nameError }]"
+        >
           <Icon name="lucide:user" size="18" class="input-icon" />
           <input
             id="name"
@@ -20,7 +22,10 @@
             placeholder="Seu nome"
             autocomplete="name"
             @focus="nameFocused = true"
-            @blur="nameFocused = false; validateName()"
+            @blur="
+              nameFocused = false;
+              validateName();
+            "
           />
         </div>
         <span v-if="nameError" class="field-error">{{ nameError }}</span>
@@ -28,7 +33,12 @@
 
       <div class="form-group">
         <label for="email" class="form-label">Email</label>
-        <div :class="['input-wrapper', { focused: emailFocused, error: emailError }]">
+        <div
+          :class="[
+            'input-wrapper',
+            { focused: emailFocused, error: emailError },
+          ]"
+        >
           <Icon name="lucide:mail" size="18" class="input-icon" />
           <input
             id="email"
@@ -37,7 +47,10 @@
             placeholder="seu@email.com"
             autocomplete="email"
             @focus="emailFocused = true"
-            @blur="emailFocused = false; validateEmail()"
+            @blur="
+              emailFocused = false;
+              validateEmail();
+            "
           />
         </div>
         <span v-if="emailError" class="field-error">{{ emailError }}</span>
@@ -45,7 +58,12 @@
 
       <div class="form-group">
         <label for="password" class="form-label">Senha</label>
-        <div :class="['input-wrapper', { focused: passwordFocused, error: passwordError }]">
+        <div
+          :class="[
+            'input-wrapper',
+            { focused: passwordFocused, error: passwordError },
+          ]"
+        >
           <Icon name="lucide:lock" size="18" class="input-icon" />
           <input
             id="password"
@@ -54,7 +72,10 @@
             placeholder="Mínimo 6 caracteres"
             autocomplete="new-password"
             @focus="passwordFocused = true"
-            @blur="passwordFocused = false; validatePassword()"
+            @blur="
+              passwordFocused = false;
+              validatePassword();
+            "
             @input="updateStrength"
           />
           <button
@@ -63,10 +84,15 @@
             @click="showPassword = !showPassword"
             tabindex="-1"
           >
-            <Icon :name="showPassword ? 'lucide:eye-off' : 'lucide:eye'" size="18" />
+            <Icon
+              :name="showPassword ? 'lucide:eye-off' : 'lucide:eye'"
+              size="18"
+            />
           </button>
         </div>
-        <span v-if="passwordError" class="field-error">{{ passwordError }}</span>
+        <span v-if="passwordError" class="field-error">{{
+          passwordError
+        }}</span>
         <div v-if="password && !passwordError" class="strength-bar">
           <div
             class="strength-fill"
@@ -74,7 +100,10 @@
             :class="strengthClass"
           ></div>
         </div>
-        <span v-if="password && !passwordError" :class="['strength-text', strengthClass]">
+        <span
+          v-if="password && !passwordError"
+          :class="['strength-text', strengthClass]"
+        >
           {{ strengthLabel }}
         </span>
       </div>
@@ -92,7 +121,7 @@
       <button
         type="submit"
         class="submit-btn"
-        :disabled="submitting || !acceptTerms"
+        :disabled="submitting || !acceptTerms || googleLoading"
       >
         <Icon
           v-if="submitting"
@@ -102,6 +131,30 @@
         />
         {{ submitting ? "Criando conta..." : "Criar conta" }}
       </button>
+
+      <div class="divider">
+        <span>ou</span>
+      </div>
+
+      <div class="google-btn-wrapper">
+        <ClientOnly>
+          <GoogleLoginButton
+            :options="{
+              theme: 'outline',
+              size: 'medium',
+              text: 'signup_with',
+              shape: 'rectangular',
+              width: 200,
+            }"
+            @success="handleGoogleSuccess"
+            @error="handleGoogleError"
+          />
+        </ClientOnly>
+        <div v-if="googleLoading" class="google-loading">
+          <Icon name="lucide:loader-2" size="18" class="spinning" />
+          <span>Criando conta com Google...</span>
+        </div>
+      </div>
     </form>
 
     <p class="auth-footer">
@@ -114,7 +167,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: "auth" });
 
-const { register } = useAuth();
+const { register, googleLogin } = useAuth();
 
 const name = ref("");
 const email = ref("");
@@ -122,6 +175,7 @@ const password = ref("");
 const showPassword = ref(false);
 const acceptTerms = ref(false);
 const submitting = ref(false);
+const googleLoading = ref(false);
 const errorMessage = ref("");
 
 const nameFocused = ref(false);
@@ -217,6 +271,27 @@ const handleRegister = async () => {
   } finally {
     submitting.value = false;
   }
+};
+
+const handleGoogleSuccess = async (e: { credential: string; claims: any }) => {
+  errorMessage.value = "";
+  googleLoading.value = true;
+  try {
+    const response = await googleLogin(e.credential);
+    if (response.success) {
+      navigateTo("/");
+    } else {
+      errorMessage.value = response.error || "Erro ao criar conta com Google";
+    }
+  } catch {
+    errorMessage.value = "Erro de conexão. Tente novamente.";
+  } finally {
+    googleLoading.value = false;
+  }
+};
+
+const handleGoogleError = () => {
+  errorMessage.value = "Erro ao autenticar com Google. Tente novamente.";
 };
 </script>
 
@@ -355,23 +430,41 @@ const handleRegister = async () => {
 .strength-fill {
   height: 100%;
   border-radius: 2px;
-  transition: width 0.3s ease, background 0.3s ease;
+  transition:
+    width 0.3s ease,
+    background 0.3s ease;
 }
 
-.strength-fill.weak { background: #dc2626; }
-.strength-fill.fair { background: #f59e0b; }
-.strength-fill.good { background: #3b82f6; }
-.strength-fill.strong { background: #16a34a; }
+.strength-fill.weak {
+  background: #dc2626;
+}
+.strength-fill.fair {
+  background: #f59e0b;
+}
+.strength-fill.good {
+  background: #3b82f6;
+}
+.strength-fill.strong {
+  background: #16a34a;
+}
 
 .strength-text {
   font-size: 11px;
   margin-top: 2px;
 }
 
-.strength-text.weak { color: #dc2626; }
-.strength-text.fair { color: #f59e0b; }
-.strength-text.good { color: #3b82f6; }
-.strength-text.strong { color: #16a34a; }
+.strength-text.weak {
+  color: #dc2626;
+}
+.strength-text.fair {
+  color: #f59e0b;
+}
+.strength-text.good {
+  color: #3b82f6;
+}
+.strength-text.strong {
+  color: #16a34a;
+}
 
 .checkbox-label {
   display: flex;
@@ -437,8 +530,47 @@ const handleRegister = async () => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.divider span {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.google-btn-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.google-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 13px;
+  color: var(--color-text-secondary);
 }
 
 .auth-footer {

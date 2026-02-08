@@ -1,7 +1,8 @@
-import type { Task, TaskStatus, Priority } from '~/types'
+import type { Task, TaskCategory, SubTask, TaskStatus, Priority } from '~/types'
 
 export const useTasks = () => {
   const tasks = ref<Task[]>([])
+  const categories = ref<TaskCategory[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
 
@@ -21,6 +22,36 @@ export const useTasks = () => {
     }
   }
 
+  const fetchCategories = async () => {
+    try {
+      const response = await $fetch<{ success: boolean; data: TaskCategory[] }>('/api/task-categories')
+      if (response.success) {
+        categories.value = response.data
+      }
+    } catch (e) {
+      console.error('Failed to fetch categories:', e)
+    }
+  }
+
+  const createCategory = async (name: string, color: string) => {
+    try {
+      const response = await $fetch<{ success: boolean; data: TaskCategory }>('/api/task-categories', {
+        method: 'POST',
+        body: { name, color }
+      })
+      if (response.success) {
+        const exists = categories.value.find(c => c.id === response.data.id)
+        if (!exists) {
+          categories.value.push(response.data)
+        }
+        return response.data
+      }
+    } catch (e: any) {
+      const message = e?.data?.error || 'Erro ao criar categoria'
+      throw new Error(message)
+    }
+  }
+
   const createTask = async (taskData: {
     title: string
     description?: string
@@ -28,8 +59,8 @@ export const useTasks = () => {
     priority?: Priority
     dueDate?: Date
     color?: string
-    category?: string
-    categoryColor?: string
+    categoryId?: string
+    subTasks?: { title: string }[]
   }) => {
     loading.value = true
     error.value = null
@@ -100,14 +131,59 @@ export const useTasks = () => {
     return updateTask(id, { status })
   }
 
+  const addSubTask = async (taskId: string, title: string) => {
+    try {
+      const response = await $fetch<{ success: boolean; data: SubTask }>('/api/subtasks', {
+        method: 'POST',
+        body: { title, taskId }
+      })
+      if (response.success) {
+        const task = tasks.value.find(t => t.id === taskId)
+        if (task) {
+          if (!task.subTasks) task.subTasks = []
+          task.subTasks.push(response.data)
+        }
+        return response.data
+      }
+    } catch (e) {
+      console.error('Failed to add subtask:', e)
+    }
+  }
+
+  const toggleSubTask = async (subTaskId: string, done: boolean) => {
+    try {
+      const response = await $fetch<{ success: boolean; data: SubTask }>(`/api/subtasks/${subTaskId}`, {
+        method: 'PATCH',
+        body: { done }
+      })
+      if (response.success) {
+        for (const task of tasks.value) {
+          const st = task.subTasks?.find(s => s.id === subTaskId)
+          if (st) {
+            st.done = done
+            break
+          }
+        }
+        return response.data
+      }
+    } catch (e) {
+      console.error('Failed to toggle subtask:', e)
+    }
+  }
+
   return {
     tasks,
+    categories,
     loading,
     error,
     fetchTasks,
+    fetchCategories,
+    createCategory,
     createTask,
     updateTask,
     deleteTask,
-    updateTaskStatus
+    updateTaskStatus,
+    addSubTask,
+    toggleSubTask
   }
 }

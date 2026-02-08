@@ -1,76 +1,132 @@
 <template>
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <h2 class="sidebar-logo">Mindle</h2>
-    </div>
-
-    <nav class="sidebar-nav">
-      <NuxtLink to="/" class="nav-item" active-class="active">
-        <Icon name="lucide:layout-dashboard" />
-        <span>Dashboard</span>
-      </NuxtLink>
-
-      <NuxtLink to="/tasks" class="nav-item" active-class="active">
-        <Icon name="lucide:list-checks" />
-        <span>Tarefas</span>
-      </NuxtLink>
-
-      <div class="nav-group">
-        <span class="nav-group-title">Planner</span>
-        <NuxtLink to="/planner/week" class="nav-item" active-class="active">
-          <Icon name="lucide:calendar-days" />
-          <span>Semanal</span>
-        </NuxtLink>
-        <NuxtLink to="/planner/month" class="nav-item" active-class="active">
-          <Icon name="lucide:calendar" />
-          <span>Mensal</span>
-        </NuxtLink>
-      </div>
-
-      <NuxtLink to="/focus" class="nav-item" active-class="active">
-        <Icon name="lucide:target" />
-        <span>Foco</span>
-      </NuxtLink>
-
-      <NuxtLink to="/habits" class="nav-item" active-class="active">
-        <Icon name="lucide:heart" />
-        <span>Hábitos</span>
-      </NuxtLink>
-
-      <NuxtLink to="/finance" class="nav-item" active-class="active">
-        <Icon name="lucide:wallet" />
-        <span>Finanças</span>
-      </NuxtLink>
-
-      <NuxtLink to="/settings" class="nav-item" active-class="active">
-        <Icon name="lucide:settings" />
-        <span>Configurações</span>
-      </NuxtLink>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div class="user-info">
-        <div class="user-avatar">
-          {{ userInitial }}
+  <UDrawer
+    v-model:open="drawer.isOpen"
+    direction="left"
+    :handle="false"
+    :should-scale-background="false"
+  >
+    <template #content>
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-brand">
+            <Icon name="lucide:brain" class="brand-icon" />
+            <span class="brand-text">Mindle</span>
+          </div>
+          <button class="drawer-toggle" @click="drawer.close()">
+            <Icon name="lucide:arrow-left-from-line" />
+          </button>
         </div>
-        <div class="user-details">
-          <span class="user-name">{{ userName }}</span>
-          <span class="user-email">{{ userEmail }}</span>
+
+        <nav class="sidebar-nav">
+          <NuxtLink
+            to="/"
+            class="nav-item"
+            active-class="active"
+            @click="drawer.close()"
+          >
+            <Icon name="lucide:layout-dashboard" />
+            <span>Dashboard</span>
+          </NuxtLink>
+
+          <NuxtLink
+            to="/tasks"
+            class="nav-item"
+            active-class="active"
+            @click="drawer.close()"
+          >
+            <Icon name="lucide:list-checks" />
+            <span>Tarefas</span>
+          </NuxtLink>
+
+          <div class="nav-group">
+            <span class="nav-group-title">Planner</span>
+            <NuxtLink
+              to="/planner/week"
+              class="nav-item"
+              active-class="active"
+              @click="drawer.close()"
+            >
+              <Icon name="lucide:calendar-days" />
+              <span>Semanal</span>
+            </NuxtLink>
+            <NuxtLink
+              to="/planner/month"
+              class="nav-item"
+              active-class="active"
+              @click="drawer.close()"
+            >
+              <Icon name="lucide:calendar" />
+              <span>Mensal</span>
+            </NuxtLink>
+          </div>
+
+          <NuxtLink
+            to="/focus"
+            class="nav-item"
+            active-class="active"
+            @click="drawer.close()"
+          >
+            <Icon name="lucide:target" />
+            <span>Foco</span>
+          </NuxtLink>
+
+          <NuxtLink
+            to="/habits"
+            class="nav-item"
+            active-class="active"
+            @click="drawer.close()"
+          >
+            <Icon name="lucide:heart" />
+            <span>Hábitos</span>
+          </NuxtLink>
+
+          <NuxtLink
+            to="/finance"
+            class="nav-item"
+            active-class="active"
+            @click="drawer.close()"
+          >
+            <Icon name="lucide:wallet" />
+            <span>Finanças</span>
+          </NuxtLink>
+
+          <NuxtLink
+            to="/settings"
+            class="nav-item"
+            active-class="active"
+            @click="drawer.close()"
+          >
+            <Icon name="lucide:settings" />
+            <span>Configurações</span>
+          </NuxtLink>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="user-info">
+            <div class="user-avatar">
+              {{ userInitial }}
+            </div>
+            <div class="user-details">
+              <span class="user-name">{{ userName }}</span>
+              <span class="user-email">{{ userEmail }}</span>
+            </div>
+          </div>
+          <button class="logout-btn" @click="handleLogout">
+            <Icon name="lucide:log-out" size="18" />
+          </button>
         </div>
       </div>
-      <button class="logout-btn" @click="handleLogout">
-        <Icon name="lucide:log-out" size="18" />
-      </button>
-    </div>
-  </aside>
+    </template>
+  </UDrawer>
 </template>
 
 <script setup lang="ts">
 import { useAuth } from "../../composables/useAuth";
-// import { useToast } from "../../composables/useToast";
+import { useDrawerStore } from "../../stores/useDrawerStore";
 
 const { user, logout } = useAuth();
 const toast = useToast();
+const drawer = useDrawerStore();
 
 const userName = computed(() => user.value?.name || "Usuário");
 const userEmail = computed(() => user.value?.email || "");
@@ -80,33 +136,65 @@ const userInitial = computed(() =>
 
 const handleLogout = async () => {
   toast.info({ title: "Saindo..." });
+  drawer.close();
   await logout();
 };
 </script>
 
 <style scoped>
 .sidebar {
-  width: 240px;
+  width: 280px;
   height: 100vh;
-  background-color: var(--color-surface);
-  border-right: 1px solid var(--color-border);
+  height: 100dvh;
   display: flex;
   flex-direction: column;
-  position: fixed;
-  left: 0;
-  top: 0;
+  background-color: var(--color-surface);
 }
 
 .sidebar-header {
   padding: var(--spacing-lg);
   border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
 }
 
-.sidebar-logo {
-  font-size: 24px;
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.brand-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.brand-text {
+  font-size: 22px;
   font-weight: 600;
   color: var(--color-primary);
-  margin: 0;
+}
+
+.drawer-toggle {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.drawer-toggle:hover {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
 }
 
 .sidebar-nav {

@@ -39,7 +39,6 @@ const pageTitle = computed(() => {
 
 .layout-main {
   flex: 1;
-  margin-left: 240px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;

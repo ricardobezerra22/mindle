@@ -1,7 +1,21 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ["@nuxt/eslint", "@nuxt/ui", "nuxt-toast"],
-
+  modules: [
+    "@nuxt/eslint",
+    "@nuxt/ui",
+    "nuxt-toast",
+    "@pinia/nuxt",
+    "nuxt-google-auth",
+  ],
+  pinia: {
+    storesDirs: ["./app/stores/**", "./app/stores/**"],
+  },
+  googleAuth: {
+    clientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
+    autoLoadScript: true,
+    promptOneTap: true,
+    enableServerVerify: true,
+  },
   devtools: {
     enabled: true,
 

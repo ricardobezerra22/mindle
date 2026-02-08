@@ -20,9 +20,11 @@ useSeoMeta({
 </script>
 
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-    <Analytics />
-  </NuxtLayout>
+  <div data-vaul-drawer-wrapper>
+    <NuxtLayout>
+      <NuxtPage />
+      <Analytics />
+    </NuxtLayout>
+  </div>
   <UiToast />
 </template>
