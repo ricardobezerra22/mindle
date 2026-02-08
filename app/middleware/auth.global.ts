@@ -1,7 +1,7 @@
 export default defineNuxtRouteMiddleware(async (to) => {
   const { user, loading, fetchUser } = useAuth();
 
-  if (loading.value && !user.value) {
+  if (loading.value) {
     await fetchUser();
   }
 

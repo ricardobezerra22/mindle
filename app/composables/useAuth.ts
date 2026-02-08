@@ -4,14 +4,15 @@ interface User {
   email: string | null;
 }
 
-const user = ref<User | null>(null);
-const loading = ref(true);
-
 export const useAuth = () => {
+  const user = useState<User | null>("auth-user", () => null);
+  const loading = useState<boolean>("auth-loading", () => true);
+
   const fetchUser = async () => {
     loading.value = true;
     try {
-      const response = await $fetch("/api/auth/me");
+      const headers = import.meta.server ? useRequestHeaders(["cookie"]) : {};
+      const response = await $fetch("/api/auth/me", { headers });
       if (response.success) {
         user.value = response.data;
       } else {
