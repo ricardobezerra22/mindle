@@ -63,7 +63,7 @@ export default defineEventHandler(async (event) => {
       );
     }
 
-    const token = generateToken(user.id);
+    const token = await generateToken(user.id);
 
     setCookie(event, "auth-token", token, {
       httpOnly: true,

@@ -1,9 +1,11 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import { SignJWT, jwtVerify } from "jose";
 import type { H3Event } from "h3";
 
-const JWT_SECRET = process.env.JWT_SECRET || "mindle-secret-key-change-in-production";
-const JWT_EXPIRES_IN = "7d";
+const getSecret = () => {
+  const secret = process.env.JWT_SECRET || "mindle-secret-key-change-in-production";
+  return new TextEncoder().encode(secret);
+};
 
 export const hashPassword = async (password: string): Promise<string> => {
   return bcrypt.hash(password, 12);
@@ -16,28 +18,33 @@ export const comparePassword = async (
   return bcrypt.compare(password, hash);
 };
 
-export const generateToken = (userId: string): string => {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+export const generateToken = async (userId: string): Promise<string> => {
+  return new SignJWT({ userId })
+    .setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime("7d")
+    .setIssuedAt()
+    .sign(getSecret());
 };
 
-export const verifyToken = (token: string): { userId: string } | null => {
+export const verifyToken = async (token: string): Promise<{ userId: string } | null> => {
   try {
-    return jwt.verify(token, JWT_SECRET) as { userId: string };
+    const { payload } = await jwtVerify(token, getSecret());
+    return payload as { userId: string };
   } catch {
     return null;
   }
 };
 
-export const getAuthUser = (event: H3Event): string | null => {
+export const getAuthUser = async (event: H3Event): Promise<string | null> => {
   const token = getCookie(event, "auth-token");
   if (!token) return null;
 
-  const payload = verifyToken(token);
+  const payload = await verifyToken(token);
   return payload?.userId || null;
 };
 
-export const requireAuth = (event: H3Event): string => {
-  const userId = getAuthUser(event);
+export const requireAuth = async (event: H3Event): Promise<string> => {
+  const userId = await getAuthUser(event);
   if (!userId) {
     throw createError({
       statusCode: 401,

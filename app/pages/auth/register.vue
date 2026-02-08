@@ -1,11 +1,7 @@
 <template>
   <div class="auth-card">
-    <h2 class="auth-title">
-      Criar sua conta
-    </h2>
-    <p class="auth-subtitle">
-      Comece a organizar o que importa
-    </p>
+    <h2 class="auth-title">Criar sua conta</h2>
+    <p class="auth-subtitle">Comece a organizar o que importa</p>
 
     <div
       v-if="errorMessage"
@@ -26,7 +22,8 @@
         <label
           for="name"
           class="form-label"
-        >Nome</label>
+          >Nome</label
+        >
         <div
           :class="['input-wrapper', { focused: nameFocused, error: nameError }]"
         >
@@ -51,14 +48,16 @@
         <span
           v-if="nameError"
           class="field-error"
-        >{{ nameError }}</span>
+          >{{ nameError }}</span
+        >
       </div>
 
       <div class="form-group">
         <label
           for="email"
           class="form-label"
-        >Email</label>
+          >Email</label
+        >
         <div
           :class="[
             'input-wrapper',
@@ -86,14 +85,16 @@
         <span
           v-if="emailError"
           class="field-error"
-        >{{ emailError }}</span>
+          >{{ emailError }}</span
+        >
       </div>
 
       <div class="form-group">
         <label
           for="password"
           class="form-label"
-        >Senha</label>
+          >Senha</label
+        >
         <div
           :class="[
             'input-wrapper',
@@ -133,9 +134,8 @@
         <span
           v-if="passwordError"
           class="field-error"
-        >{{
-          passwordError
-        }}</span>
+          >{{ passwordError }}</span
+        >
         <div
           v-if="password && !passwordError"
           class="strength-bar"
@@ -164,12 +164,14 @@
           <a
             href="#"
             class="terms-link"
-          >Termos de Uso</a>
+            >Termos de Uso</a
+          >
           e
           <a
             href="#"
             class="terms-link"
-          >Política de Privacidade</a>
+            >Política de Privacidade</a
+          >
         </span>
       </label>
 
@@ -195,10 +197,10 @@
         <ClientOnly>
           <GoogleLoginButton
             :options="{
-              theme: 'outline',
-              size: 'medium',
+              theme: 'filled_blue',
+              size: 'large',
               text: 'signup_with',
-              shape: 'rectangular',
+              shape: 'pill',
               width: 200,
             }"
             @success="handleGoogleSuccess"
@@ -224,7 +226,8 @@
       <NuxtLink
         to="/auth/login"
         class="auth-link"
-      >Entrar</NuxtLink>
+        >Entrar</NuxtLink
+      >
     </p>
   </div>
 </template>
@@ -402,7 +405,7 @@ const handleGoogleError = () => {
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
 }
 
 .form-group {
@@ -628,6 +631,7 @@ const handleGoogleError = () => {
   flex-direction: column;
   align-items: center;
   gap: var(--spacing-sm);
+  min-height: 100%;
 }
 
 .google-loading {

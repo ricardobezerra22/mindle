@@ -3,7 +3,7 @@ import { getAuthUser } from "../../utils/auth";
 
 export default defineEventHandler(async (event) => {
   try {
-    const userId = getAuthUser(event);
+    const userId = await getAuthUser(event);
     if (!userId) {
       return sendError(event, "Não autorizado", 401);
     }

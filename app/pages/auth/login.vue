@@ -1,11 +1,7 @@
 <template>
   <div class="auth-card">
-    <h2 class="auth-title">
-      Bem-vindo de volta
-    </h2>
-    <p class="auth-subtitle">
-      Entre para continuar de onde parou
-    </p>
+    <h2 class="auth-title">Bem-vindo de volta</h2>
+    <p class="auth-subtitle">Entre para continuar de onde parou</p>
 
     <div
       v-if="errorMessage"
@@ -26,7 +22,8 @@
         <label
           for="email"
           class="form-label"
-        >Email</label>
+          >Email</label
+        >
         <div
           :class="[
             'input-wrapper',
@@ -54,14 +51,16 @@
         <span
           v-if="emailError"
           class="field-error"
-        >{{ emailError }}</span>
+          >{{ emailError }}</span
+        >
       </div>
 
       <div class="form-group">
         <label
           for="password"
           class="form-label"
-        >Senha</label>
+          >Senha</label
+        >
         <div
           :class="[
             'input-wrapper',
@@ -100,9 +99,8 @@
         <span
           v-if="passwordError"
           class="field-error"
-        >{{
-          passwordError
-        }}</span>
+          >{{ passwordError }}</span
+        >
       </div>
 
       <div class="form-row">
@@ -142,7 +140,13 @@
       <div class="google-btn-wrapper">
         <ClientOnly>
           <GoogleLoginButton
-            :options="{ theme: 'outline', size: 'medium', text: 'signin_with', shape: 'rectangular', width: 200 }"
+            :options="{
+              theme: 'filled_blue',
+              size: 'large',
+              text: 'continue_with',
+              shape: 'pill',
+              width: 200,
+            }"
             @success="handleGoogleSuccess"
             @error="handleGoogleError"
           />
@@ -166,7 +170,8 @@
       <NuxtLink
         to="/auth/register"
         class="auth-link"
-      >Criar conta</NuxtLink>
+        >Criar conta</NuxtLink
+      >
     </p>
   </div>
 </template>
@@ -478,7 +483,8 @@ const handleGoogleError = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-lg);
+  min-height: 100%;
 }
 
 .google-loading {

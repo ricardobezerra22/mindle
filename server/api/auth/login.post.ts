@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
       return sendError(event, "Sua conta está inativa. Entre em contato com o administrador para ser ativado.", 403);
     }
 
-    const token = generateToken(user.id);
+    const token = await generateToken(user.id);
 
     setCookie(event, "auth-token", token, {
       httpOnly: true,
