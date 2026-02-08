@@ -26,6 +26,8 @@ useSeoMeta({
       <NuxtPage />
       <Analytics />
     </NuxtLayout>
+    <ClientOnly>
+      <UiToast />
+    </ClientOnly>
   </div>
-  <UiToast />
 </template>
