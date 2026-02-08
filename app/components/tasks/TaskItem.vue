@@ -379,7 +379,7 @@ const formatDateForInput = (date: Date) => {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm);
   transition: all 0.2s ease;
   cursor: grab;
   position: relative;
@@ -396,13 +396,13 @@ const formatDateForInput = (date: Date) => {
 
 .task-wrapper {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
   align-items: flex-start;
 }
 
 .task-checkbox {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border: 2px solid var(--color-border);
   border-radius: 50%;
   cursor: pointer;
@@ -411,7 +411,6 @@ const formatDateForInput = (date: Date) => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-right: var(--spacing-sm);
   background-color: var(--color-surface);
 }
 
@@ -427,15 +426,9 @@ const formatDateForInput = (date: Date) => {
 }
 
 @keyframes checkboxPulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
 .checkbox-inner {
@@ -454,14 +447,8 @@ const formatDateForInput = (date: Date) => {
 }
 
 @keyframes checkAppear {
-  0% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+  0% { opacity: 0; transform: scale(0); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 .task-status-badge {
@@ -488,22 +475,24 @@ const formatDateForInput = (date: Date) => {
 .task-content {
   flex: 1;
   min-width: 0;
-  padding-right: 80px;
+  overflow: hidden;
 }
 
 .task-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-xs) 0;
+  margin: 0 0 2px 0;
+  word-break: break-word;
 }
 
 .task-description {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--color-text-secondary);
-  margin: 0 0 var(--spacing-sm) 0;
+  margin: 0 0 var(--spacing-xs) 0;
   line-height: 1.4;
   white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .edit-input {
@@ -556,7 +545,7 @@ const formatDateForInput = (date: Date) => {
 
 .task-meta {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: 6px;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -565,19 +554,19 @@ const formatDateForInput = (date: Date) => {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--color-text-secondary);
 }
 
 .task-date :deep(svg) {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
 }
 
 .task-priority {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
-  padding: 2px 8px;
+  padding: 2px 6px;
   border-radius: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -599,9 +588,9 @@ const formatDateForInput = (date: Date) => {
 }
 
 .category-badge {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
-  padding: 2px 8px;
+  padding: 2px 6px;
   border-radius: 12px;
   border: 1px solid var(--color-border);
   background: var(--color-background);
@@ -609,7 +598,7 @@ const formatDateForInput = (date: Date) => {
 }
 
 .subtasks-section {
-  margin-top: var(--spacing-sm);
+  margin-top: var(--spacing-xs);
 }
 
 .subtasks-toggle {
@@ -733,30 +722,31 @@ const formatDateForInput = (date: Date) => {
 }
 
 .task-actions {
-  position: absolute;
-  top: var(--spacing-sm);
-  right: var(--spacing-sm);
   display: flex;
-  gap: var(--spacing-xs);
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  gap: 2px;
+  flex-shrink: 0;
   background-color: var(--color-surface);
   border-radius: var(--radius-sm);
   padding: 2px;
 }
 
-.task-item:hover .task-actions {
-  opacity: 1;
+.action-btn {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
 }
 
-@media (max-width: 768px) {
-  .task-actions {
-    opacity: 1;
-  }
-
-  .task-content {
-    padding-right: 60px;
-  }
+.action-btn:hover {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
 }
 
 .action-btn.save {
@@ -777,36 +767,19 @@ const formatDateForInput = (date: Date) => {
   color: #92400e;
 }
 
-.action-btn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background-color: transparent;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  color: var(--color-text-secondary);
-  transition: all 0.2s ease;
-}
-
-.action-btn:hover {
-  background-color: var(--color-background);
-  color: var(--color-text-primary);
-}
-
 .action-btn.delete:hover {
   background-color: #fee2e2;
   color: #dc2626;
 }
 
+.action-btn :deep(svg) {
+  width: 15px;
+  height: 15px;
+}
+
 .favorite-indicator {
-  position: absolute;
-  top: var(--spacing-sm);
-  right: var(--spacing-sm);
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -816,12 +789,12 @@ const formatDateForInput = (date: Date) => {
   cursor: pointer;
   color: #eab308;
   transition: all 0.2s ease;
-  z-index: 1;
+  flex-shrink: 0;
 }
 
 .favorite-indicator :deep(svg) {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   fill: #eab308;
   filter: drop-shadow(0 1px 2px rgba(234, 179, 8, 0.3));
 }
@@ -829,10 +802,6 @@ const formatDateForInput = (date: Date) => {
 .favorite-indicator:hover {
   color: #ca8a04;
   transform: scale(1.15);
-}
-
-.task-item:hover .favorite-indicator {
-  right: calc(var(--spacing-sm) + 68px);
 }
 
 .action-btn.favorite-btn {
@@ -844,8 +813,72 @@ const formatDateForInput = (date: Date) => {
   background-color: #fefce8;
 }
 
-.action-btn :deep(svg) {
-  width: 16px;
-  height: 16px;
+@media (min-width: 768px) {
+  .task-item {
+    padding: var(--spacing-md);
+  }
+
+  .task-wrapper {
+    gap: var(--spacing-sm);
+  }
+
+  .task-checkbox {
+    width: 24px;
+    height: 24px;
+    margin-right: var(--spacing-xs);
+  }
+
+  .task-title {
+    font-size: 14px;
+    margin: 0 0 var(--spacing-xs) 0;
+  }
+
+  .task-description {
+    font-size: 13px;
+    margin: 0 0 var(--spacing-sm) 0;
+  }
+
+  .task-meta {
+    gap: var(--spacing-sm);
+  }
+
+  .task-date {
+    font-size: 12px;
+  }
+
+  .task-date :deep(svg) {
+    width: 14px;
+    height: 14px;
+  }
+
+  .task-priority {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+
+  .category-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+
+  .action-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .action-btn :deep(svg) {
+    width: 16px;
+    height: 16px;
+  }
+
+  .favorite-indicator {
+    width: 28px;
+    height: 28px;
+  }
+
+  .favorite-indicator :deep(svg) {
+    width: 18px;
+    height: 18px;
+  }
 }
 </style>

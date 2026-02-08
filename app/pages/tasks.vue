@@ -39,23 +39,63 @@
         <div
           v-if="categories.length > 0"
           class="category-filter"
+          @click="showFilterDropdown = !showFilterDropdown"
         >
-          <Icon name="lucide:tag" />
-          <select
-            v-model="categoryFilter"
-            class="category-select"
+          <span
+            v-if="selectedFilterCategory"
+            class="filter-cat-dot"
+            :style="{ backgroundColor: selectedFilterCategory.color }"
+          />
+          <Icon
+            v-else
+            name="lucide:tag"
+          />
+          <span class="filter-label">
+            {{
+              selectedFilterCategory
+                ? selectedFilterCategory.name
+                : "Todas categorias"
+            }}
+          </span>
+          <Icon
+            name="lucide:chevron-down"
+            class="filter-chevron"
+            :class="{ open: showFilterDropdown }"
+          />
+
+          <div
+            v-if="showFilterDropdown"
+            class="filter-dropdown"
+            @click.stop
           >
-            <option value="">
-              Todas categorias
-            </option>
-            <option
+            <div
+              class="filter-option"
+              :class="{ active: categoryFilter === '' }"
+              @click="
+                categoryFilter = '';
+                showFilterDropdown = false;
+              "
+            >
+              <Icon name="lucide:layers" />
+              <span>Todas categorias</span>
+            </div>
+            <div
               v-for="cat in categories"
               :key="cat.id"
-              :value="cat.id"
+              class="filter-option"
+              :class="{ active: categoryFilter === cat.id }"
+              @click="
+                categoryFilter = cat.id;
+                showFilterDropdown = false;
+              "
             >
-              {{ cat.name }}
-            </option>
-          </select>
+              <span
+                class="filter-cat-dot"
+                :style="{ backgroundColor: cat.color }"
+              />
+              <span>{{ cat.name }}</span>
+            </div>
+          </div>
         </div>
 
         <label class="priority-filter">
@@ -472,15 +512,9 @@
                 id="priority"
                 v-model="newTask.priority"
               >
-                <option value="LOW">
-                  Baixa
-                </option>
-                <option value="MEDIUM">
-                  Média
-                </option>
-                <option value="HIGH">
-                  Alta
-                </option>
+                <option value="LOW">Baixa</option>
+                <option value="MEDIUM">Média</option>
+                <option value="HIGH">Alta</option>
               </select>
             </div>
 
@@ -544,7 +578,7 @@
                   :class="[
                     'category-option',
                     {
-                      'active': idx === highlightedIndex,
+                      active: idx === highlightedIndex,
                       'create-new': cat.id === '__create__',
                     },
                   ]"
@@ -552,7 +586,10 @@
                 >
                   <template v-if="cat.id === '__create__'">
                     <Icon name="lucide:plus-circle" />
-                    <span>Criar "<strong>{{ categorySearch.trim() }}</strong>"</span>
+                    <span
+                      >Criar "<strong>{{ categorySearch.trim() }}</strong
+                      >"</span
+                    >
                   </template>
                   <template v-else>
                     <span
@@ -685,15 +722,11 @@
           <div class="delete-icon">
             <Icon name="lucide:alert-triangle" />
           </div>
-          <h3 class="delete-title">
-            Excluir Tarefa
-          </h3>
+          <h3 class="delete-title">Excluir Tarefa</h3>
           <p class="delete-message">
             Tem certeza que deseja excluir esta tarefa?
           </p>
-          <p class="delete-warning">
-            Esta ação não pode ser desfeita.
-          </p>
+          <p class="delete-warning">Esta ação não pode ser desfeita.</p>
         </div>
 
         <div class="modal-actions delete-actions">
@@ -751,6 +784,12 @@ const searchQuery = ref("");
 const dateFilter = ref("");
 const categoryFilter = ref("");
 const favoriteFilter = ref(false);
+const showFilterDropdown = ref(false);
+
+const selectedFilterCategory = computed(() => {
+  if (!categoryFilter.value) return null;
+  return categories.value.find((c) => c.id === categoryFilter.value) || null;
+});
 
 const categorySearch = ref("");
 const showCategoryDropdown = ref(false);
@@ -774,17 +813,17 @@ const newTask = ref({
 const filteredCategories = computed(() => {
   if (!categorySearch.value.trim()) return categories.value;
   const q = categorySearch.value.toLowerCase();
-  return categories.value.filter(c => c.name.toLowerCase().includes(q));
+  return categories.value.filter((c) => c.name.toLowerCase().includes(q));
 });
 
 const exactCategoryMatch = computed(() => {
   const q = categorySearch.value.trim().toLowerCase();
-  return categories.value.some(c => c.name.toLowerCase() === q);
+  return categories.value.some((c) => c.name.toLowerCase() === q);
 });
 
 const dropdownItems = computed(() => {
-  const items: { id: string; name: string; color: string }[]
-    = filteredCategories.value.map(c => ({
+  const items: { id: string; name: string; color: string }[] =
+    filteredCategories.value.map((c) => ({
       id: c.id,
       name: c.name,
       color: c.color,
@@ -805,9 +844,9 @@ const filteredTasks = computed(() => {
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
     filtered = filtered.filter(
-      t =>
-        t.title.toLowerCase().includes(query)
-        || (t.description && t.description.toLowerCase().includes(query)),
+      (t) =>
+        t.title.toLowerCase().includes(query) ||
+        (t.description && t.description.toLowerCase().includes(query)),
     );
   }
 
@@ -820,11 +859,11 @@ const filteredTasks = computed(() => {
   }
 
   if (categoryFilter.value) {
-    filtered = filtered.filter(t => t.categoryId === categoryFilter.value);
+    filtered = filtered.filter((t) => t.categoryId === categoryFilter.value);
   }
 
   if (favoriteFilter.value) {
-    filtered = filtered.filter(t => t.isFavorite);
+    filtered = filtered.filter((t) => t.isFavorite);
   }
 
   return filtered;
@@ -833,12 +872,12 @@ const filteredTasks = computed(() => {
 const tasksByStatus = computed(() => {
   return {
     NOT_STARTED: filteredTasks.value.filter(
-      t => t.status === TaskStatus.NOT_STARTED,
+      (t) => t.status === TaskStatus.NOT_STARTED,
     ),
     IN_PROGRESS: filteredTasks.value.filter(
-      t => t.status === TaskStatus.IN_PROGRESS,
+      (t) => t.status === TaskStatus.IN_PROGRESS,
     ),
-    DONE: filteredTasks.value.filter(t => t.status === TaskStatus.DONE),
+    DONE: filteredTasks.value.filter((t) => t.status === TaskStatus.DONE),
   };
 });
 
@@ -887,11 +926,11 @@ const statusCategoryGroups = computed(() => {
 });
 
 const tasksByCategory = computed(() => {
-  const groups: { id: string; name: string; color: string; tasks: Task[] }[]
-    = [];
+  const groups: { id: string; name: string; color: string; tasks: Task[] }[] =
+    [];
 
   for (const cat of categories.value) {
-    const catTasks = filteredTasks.value.filter(t => t.categoryId === cat.id);
+    const catTasks = filteredTasks.value.filter((t) => t.categoryId === cat.id);
     if (catTasks.length > 0) {
       groups.push({
         id: cat.id,
@@ -906,7 +945,7 @@ const tasksByCategory = computed(() => {
 });
 
 const uncategorizedTasks = computed(() => {
-  return filteredTasks.value.filter(t => !t.categoryId);
+  return filteredTasks.value.filter((t) => !t.categoryId);
 });
 
 const toggleCategoryAccordion = (id: string) => {
@@ -955,8 +994,8 @@ const onCategoryKeydown = (e: KeyboardEvent) => {
     highlightedIndex.value = (highlightedIndex.value + 1) % items.length;
   } else if (e.key === "ArrowUp") {
     e.preventDefault();
-    highlightedIndex.value
-      = highlightedIndex.value <= 0
+    highlightedIndex.value =
+      highlightedIndex.value <= 0
         ? items.length - 1
         : highlightedIndex.value - 1;
   } else if (e.key === "Enter") {
@@ -978,7 +1017,7 @@ const onDropdownSelect = (idx: number) => {
     showCategoryDropdown.value = false;
     highlightedIndex.value = -1;
   } else {
-    const cat = categories.value.find(c => c.id === item.id);
+    const cat = categories.value.find((c) => c.id === item.id);
     if (cat) selectCategory(cat);
   }
 };
@@ -988,7 +1027,7 @@ const handleCreateCategory = async () => {
   if (!name || creatingCategory.value) return;
 
   const colorExists = categories.value.some(
-    c => c.color.toUpperCase() === newCategoryColor.value.toUpperCase(),
+    (c) => c.color.toUpperCase() === newCategoryColor.value.toUpperCase(),
   );
   if (colorExists) {
     toast.error({ title: "Já existe uma categoria com essa cor" });
@@ -1124,7 +1163,7 @@ const handleToggleFavorite = async (id: string) => {
 };
 
 const handleDrop = async (taskId: string, newStatus: TaskStatus) => {
-  const task = tasks.value.find(t => t.id === taskId);
+  const task = tasks.value.find((t) => t.id === taskId);
   if (task && task.status !== newStatus) {
     try {
       await updateTaskStatus(taskId, newStatus);
@@ -1150,9 +1189,21 @@ const handleToggleSubTask = async (subTaskId: string, done: boolean) => {
   }
 };
 
+const closeFilterDropdown = (e: MouseEvent) => {
+  const target = e.target as HTMLElement;
+  if (!target.closest(".category-filter")) {
+    showFilterDropdown.value = false;
+  }
+};
+
 onMounted(() => {
   fetchTasks();
   fetchCategories();
+  document.addEventListener("click", closeFilterDropdown);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("click", closeFilterDropdown);
 });
 </script>
 
@@ -1165,19 +1216,15 @@ onMounted(() => {
 
 .page-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
 }
 
 .filters-section {
   display: flex;
-  gap: var(--spacing-md);
-  flex: 1;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
+  gap: var(--spacing-sm);
 }
 
 .search-box,
@@ -1188,9 +1235,9 @@ onMounted(() => {
   background: var(--color-surface);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: var(--spacing-xs) var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
   transition: all 0.2s ease;
-  min-width: 250px;
+  width: 100%;
 }
 
 .search-box:focus-within,
@@ -1204,27 +1251,20 @@ onMounted(() => {
   height: 18px;
   color: var(--color-text-secondary);
   flex-shrink: 0;
-  position: relative;
   display: flex;
   align-items: center;
 }
-/*
-Source - https://stackoverflow.com/a/76844695
-Posted by thegigabyte
-Retrieved 2026-02-08, License - CC BY-SA 4.0
-*/
 
 .search-input,
 .date-input {
-  position: relative;
   flex: 1;
   border: none;
   background: transparent;
   font-size: 14px;
   color: var(--color-text-primary);
-
   outline: none;
   padding: var(--spacing-xs) 0;
+  min-width: 0;
 }
 
 .search-input::placeholder {
@@ -1267,9 +1307,10 @@ Retrieved 2026-02-08, License - CC BY-SA 4.0
   background: var(--color-surface);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: var(--spacing-xs) var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
   transition: all 0.2s ease;
   position: relative;
+  width: 100%;
 }
 
 .category-filter :deep(svg) {
@@ -1279,30 +1320,81 @@ Retrieved 2026-02-08, License - CC BY-SA 4.0
   flex-shrink: 0;
 }
 
-.category-select {
-  border: none;
-  background: transparent;
+.filter-label {
+  flex: 1;
   font-size: 14px;
   color: var(--color-text-primary);
-  outline: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.filter-cat-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.filter-chevron {
+  transition: transform 0.2s ease;
+}
+
+.filter-chevron.open {
+  transform: rotate(180deg);
+}
+
+.filter-chevron :deep(svg) {
+  width: 14px;
+  height: 14px;
+}
+
+.filter-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 20;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  padding-right: var(--spacing-lg);
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7c7a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 4px center;
-  min-width: 120px;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  transition: background-color 0.15s ease;
 }
 
-.category-select:focus {
-  color: var(--color-primary);
+.filter-option:hover {
+  background-color: var(--color-background);
 }
 
-.category-filter:focus-within {
-  border-color: var(--color-primary);
+.filter-option.active {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.filter-option.active :deep(svg) {
+  color: white;
+}
+
+.filter-option :deep(svg) {
+  width: 15px;
+  height: 15px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
 }
 
 .priority-filter {
@@ -1312,13 +1404,14 @@ Retrieved 2026-02-08, License - CC BY-SA 4.0
   background: var(--color-surface);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: var(--spacing-xs) var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
   font-size: 14px;
   color: var(--color-text-secondary);
   white-space: nowrap;
+  width: 100%;
 }
 
 .priority-filter:hover {
@@ -1352,6 +1445,9 @@ Retrieved 2026-02-08, License - CC BY-SA 4.0
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
   overflow: hidden;
+  @media (max-width: 768px) {
+    justify-content: space-between;
+  }
 }
 
 .toggle-btn {
@@ -1365,6 +1461,9 @@ Retrieved 2026-02-08, License - CC BY-SA 4.0
   cursor: pointer;
   color: var(--color-text-secondary);
   transition: all 0.2s ease;
+    @media (max-width: 768px) {
+      width: 50%;
+    }
 }
 
 .toggle-btn.active {
@@ -1391,16 +1490,14 @@ Retrieved 2026-02-08, License - CC BY-SA 4.0
 }
 
 .kanban-board {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
   flex: 1;
-  overflow-x: auto;
 }
 
 .column-category-group {
   border-radius: var(--radius-md);
-  overflow: hidden;
   border: 1px solid var(--color-border);
 }
 
@@ -1426,8 +1523,6 @@ Retrieved 2026-02-08, License - CC BY-SA 4.0
 .column-category-header :deep(svg) {
   width: 14px;
   height: 14px;
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
 }
 
 .column-cat-dot {
@@ -1509,7 +1604,6 @@ Retrieved 2026-02-08, License - CC BY-SA 4.0
 .category-header-left :deep(svg) {
   width: 16px;
   height: 16px;
-  color: var(--color-text-secondary);
 }
 
 .category-color-dot {
@@ -2080,9 +2174,46 @@ Retrieved 2026-02-08, License - CC BY-SA 4.0
   height: 16px;
 }
 
-@media (max-width: 1024px) {
+@media (min-width: 640px) {
+  .page-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .filters-section {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+  }
+
+  .search-box,
+  .date-filter {
+    width: auto;
+    min-width: 200px;
+    padding: var(--spacing-xs) var(--spacing-md);
+  }
+
+  .category-filter {
+    width: auto;
+    padding: var(--spacing-xs) var(--spacing-md);
+  }
+
+  .priority-filter {
+    width: auto;
+    padding: var(--spacing-xs) var(--spacing-md);
+  }
+}
+
+@media (min-width: 1024px) {
   .kanban-board {
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
   }
 }
 
