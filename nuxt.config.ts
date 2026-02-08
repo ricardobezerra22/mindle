@@ -7,15 +7,6 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "nuxt-google-auth",
   ],
-  pinia: {
-    storesDirs: ["./app/stores/**", "./app/stores/**"],
-  },
-  googleAuth: {
-    clientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
-    autoLoadScript: true,
-    promptOneTap: true,
-    enableServerVerify: true,
-  },
   devtools: {
     enabled: true,
 
@@ -35,9 +26,21 @@ export default defineNuxtConfig({
   eslint: {
     config: {
       stylistic: {
-        commaDangle: "never",
+        semi: true,
+        quotes: "double",
+        commaDangle: "always-multiline",
         braceStyle: "1tbs",
+        indent: 2,
       },
     },
+  },
+  googleAuth: {
+    clientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
+    autoLoadScript: true,
+    promptOneTap: true,
+    enableServerVerify: true,
+  },
+  pinia: {
+    storesDirs: ["./app/stores/**", "./app/stores/**"],
   },
 });
