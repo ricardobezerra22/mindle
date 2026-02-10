@@ -754,7 +754,7 @@
 
 <script setup lang="ts">
 import { TaskStatus } from "~/types";
-import type { Task, TaskCategory } from "~/types";
+import type { Task, TaskCategory, Groups } from "~/types";
 
 const {
   tasks,
@@ -926,8 +926,7 @@ const statusCategoryGroups = computed(() => {
 });
 
 const tasksByCategory = computed(() => {
-  const groups: { id: string; name: string; color: string; tasks: Task[] }[] =
-    [];
+  const groups: Groups[] = [];
 
   for (const cat of categories.value) {
     const catTasks = filteredTasks.value.filter((t) => t.categoryId === cat.id);
@@ -958,8 +957,8 @@ const toggleCategoryAccordion = (id: string) => {
   expandedCategories.value = set;
 };
 
-const selectCategory = (cat: TaskCategory) => {
-  selectedCategory.value = cat;
+const selectCategory = (category: TaskCategory) => {
+  selectedCategory.value = category;
   categorySearch.value = "";
   showCategoryDropdown.value = false;
   showNewCategoryForm.value = false;
@@ -1182,6 +1181,8 @@ const handleAddSubTask = async (taskId: string, title: string) => {
 };
 
 const handleToggleSubTask = async (subTaskId: string, done: boolean) => {
+  console.log("subtaskID", subTaskId);
+  console.log("done", done);
   try {
     await toggleSubTask(subTaskId, done);
   } catch (e) {
@@ -1461,9 +1462,9 @@ onUnmounted(() => {
   cursor: pointer;
   color: var(--color-text-secondary);
   transition: all 0.2s ease;
-    @media (max-width: 768px) {
-      width: 50%;
-    }
+  @media (max-width: 768px) {
+    width: 50%;
+  }
 }
 
 .toggle-btn.active {

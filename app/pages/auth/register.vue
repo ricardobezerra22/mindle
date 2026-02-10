@@ -195,29 +195,23 @@
 
       <div class="google-btn-wrapper">
         <ClientOnly>
-          <GoogleLoginButton
-            :options="{
-              theme: 'filled_blue',
-              size: 'large',
-              text: 'signup_with',
-              shape: 'pill',
-              width: 200,
-            }"
-            @success="handleGoogleSuccess"
-            @error="handleGoogleError"
+          <div
+            v-if="!googleLoading"
+            ref="googleButtonContainer"
+            class="google-button-container"
           />
+          <div
+            v-if="googleLoading"
+            class="google-loading"
+          >
+            <Icon
+              name="lucide:loader-2"
+              size="18"
+              class="spinning"
+            />
+            <span>Criando conta com Google...</span>
+          </div>
         </ClientOnly>
-        <div
-          v-if="googleLoading"
-          class="google-loading"
-        >
-          <Icon
-            name="lucide:loader-2"
-            size="18"
-            class="spinning"
-          />
-          <span>Criando conta com Google...</span>
-        </div>
       </div>
     </form>
 
@@ -233,9 +227,13 @@
 </template>
 
 <script setup lang="ts">
+import { useGoogleAuth } from "@/composables/useGoogleAuth";
+
 definePageMeta({ layout: "auth" });
 
 const { register, googleLogin } = useAuth();
+const { googleReady, googleButtonContainer, initializeGoogleButton } =
+  useGoogleAuth();
 
 const name = ref("");
 const email = ref("");
@@ -361,6 +359,16 @@ const handleGoogleSuccess = async (e: { credential: string; claims: any }) => {
 const handleGoogleError = () => {
   errorMessage.value = "Erro ao autenticar com Google. Tente novamente.";
 };
+
+onMounted(() => {
+  initializeGoogleButton(googleButtonContainer, handleGoogleSuccess, {
+    text: "signup_with",
+    theme: "filled_blue",
+    size: "large",
+    shape: "pill",
+    width: 200,
+  });
+});
 </script>
 
 <style scoped lang="css">

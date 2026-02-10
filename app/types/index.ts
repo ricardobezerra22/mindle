@@ -17,7 +17,12 @@ export interface TaskCategory {
   createdAt: Date;
   userId: string;
 }
-
+export interface Groups {
+  id: string;
+  name: string;
+  color: string;
+  tasks: Task[];
+}
 export interface Task {
   id: string;
   title: string;
