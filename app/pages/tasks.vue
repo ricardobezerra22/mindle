@@ -927,7 +927,6 @@ const statusCategoryGroups = computed(() => {
 
 const tasksByCategory = computed(() => {
   const groups: Groups[] = [];
-
   for (const cat of categories.value) {
     const catTasks = filteredTasks.value.filter((t) => t.categoryId === cat.id);
     if (catTasks.length > 0) {
@@ -1148,7 +1147,7 @@ const handleDragEnd = () => {
 const handleComplete = async (taskId: string) => {
   try {
     await updateTaskStatus(taskId, TaskStatus.DONE);
-  } catch (e) {
+  } catch {
     toast.error({ title: "Erro ao concluir tarefa" });
   }
 };
@@ -1179,13 +1178,38 @@ const handleAddSubTask = async (taskId: string, title: string) => {
     toast.error({ title: "Erro ao adicionar subtarefa" });
   }
 };
+function shouldMoveToInProgress(done: boolean, task?: Task): task is Task {
+  if (!done) return false;
+  if (!task) return false;
+
+  return ![TaskStatus.DONE, TaskStatus.IN_PROGRESS].includes(task.status);
+}
 
 const handleToggleSubTask = async (subTaskId: string, done: boolean) => {
-  console.log("subtaskID", subTaskId);
-  console.log("done", done);
+  const desiredTask = tasks.value.find((task) =>
+    task.subTasks?.find((st) => st.id === subTaskId),
+  );
+  if (!desiredTask) return;
+
+  const subTask = desiredTask.subTasks?.find((st) => st.id === subTaskId);
+  if (!subTask) return;
+
+  const previousDone = subTask.done;
+  const previousStatus = desiredTask.status;
+
+  subTask.done = done;
+  if (shouldMoveToInProgress(done, desiredTask)) {
+    desiredTask.status = TaskStatus.IN_PROGRESS;
+  }
+
   try {
     await toggleSubTask(subTaskId, done);
-  } catch (e) {
+    if (previousStatus !== desiredTask.status) {
+      await updateTaskStatus(desiredTask.id, TaskStatus.IN_PROGRESS);
+    }
+  } catch {
+    subTask.done = previousDone;
+    desiredTask.status = previousStatus;
     toast.error({ title: "Erro ao atualizar subtarefa" });
   }
 };
@@ -1565,7 +1589,9 @@ onUnmounted(() => {
 }
 
 .category-tree-view {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
   flex-direction: column;
   gap: var(--spacing-md);
   flex: 1;
@@ -1575,6 +1601,7 @@ onUnmounted(() => {
   border-radius: var(--radius-md);
   overflow: hidden;
   border: 1px solid var(--color-border);
+  height: min-content;
 }
 
 .category-accordion-header {

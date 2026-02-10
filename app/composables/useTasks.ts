@@ -111,7 +111,11 @@ export const useTasks = () => {
         body: updates,
       });
       if (response.success) {
-        tasks.value[index] = response.data;
+        const currentSubTasks = tasks.value[index].subTasks;
+        tasks.value[index] = {
+          ...response.data,
+          subTasks: currentSubTasks ?? response.data.subTasks,
+        };
         return response.data;
       } else {
         tasks.value[index] = previousTask;
