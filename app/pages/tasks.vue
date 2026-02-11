@@ -2,128 +2,18 @@
   <div class="tasks-page">
     <div class="page-header">
       <div class="filters-section">
-        <div class="search-box">
-          <Icon name="lucide:search" />
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Buscar tarefa por nome..."
-            class="search-input"
-          />
-          <button
-            v-if="searchQuery"
-            class="clear-search"
-            @click="searchQuery = ''"
-          >
-            <Icon name="lucide:x" />
-          </button>
-        </div>
-
-        <div class="date-filter">
-          <input
-            v-model="dateFilter"
-            type="date"
-            class="date-input"
-            placeholder="Filtrar por data"
-          />
-          <!-- <Icon name="lucide:calendar" /> -->
-          <button
-            v-if="dateFilter"
-            class="clear-date"
-            @click="dateFilter = ''"
-          >
-            <Icon name="lucide:x" />
-          </button>
-        </div>
-
-        <div
-          v-if="categories.length > 0"
-          class="category-filter"
-          @click="showFilterDropdown = !showFilterDropdown"
-        >
-          <span
-            v-if="selectedFilterCategory"
-            class="filter-cat-dot"
-            :style="{ backgroundColor: selectedFilterCategory.color }"
-          />
-          <Icon
-            v-else
-            name="lucide:tag"
-          />
-          <span class="filter-label">
-            {{
-              selectedFilterCategory
-                ? selectedFilterCategory.name
-                : "Todas categorias"
-            }}
-          </span>
-          <Icon
-            name="lucide:chevron-down"
-            class="filter-chevron"
-            :class="{ open: showFilterDropdown }"
-          />
-
-          <div
-            v-if="showFilterDropdown"
-            class="filter-dropdown"
-            @click.stop
-          >
-            <div
-              class="filter-option"
-              :class="{ active: categoryFilter === '' }"
-              @click="
-                categoryFilter = '';
-                showFilterDropdown = false;
-              "
-            >
-              <Icon name="lucide:layers" />
-              <span>Todas categorias</span>
-            </div>
-            <div
-              v-for="cat in categories"
-              :key="cat.id"
-              class="filter-option"
-              :class="{ active: categoryFilter === cat.id }"
-              @click="
-                categoryFilter = cat.id;
-                showFilterDropdown = false;
-              "
-            >
-              <span
-                class="filter-cat-dot"
-                :style="{ backgroundColor: cat.color }"
-              />
-              <span>{{ cat.name }}</span>
-            </div>
-          </div>
-        </div>
-
-        <label class="priority-filter">
-          <input
-            v-model="favoriteFilter"
-            type="checkbox"
-            class="priority-checkbox"
-          />
-          <Icon name="lucide:star" />
-          <span>Prioridade</span>
-        </label>
-
-        <div class="view-toggle">
-          <button
-            :class="['toggle-btn', { active: viewMode === 'kanban' }]"
-            title="Kanban"
-            @click="viewMode = 'kanban'"
-          >
-            <Icon name="lucide:columns-3" />
-          </button>
-          <button
-            :class="['toggle-btn', { active: viewMode === 'categories' }]"
-            title="Por Categoria"
-            @click="viewMode = 'categories'"
-          >
-            <Icon name="lucide:folder-tree" />
-          </button>
-        </div>
+        <TasksTaskSearchBox v-model="searchQuery" />
+        <TasksTaskDateFilter v-model="dateFilter" />
+        <TasksTaskCategoryFilter
+          v-model="categoryFilter"
+          :categories="categories"
+        />
+        <TasksTaskPriorityFilter v-model="favoriteFilter" />
+        <TasksTaskViewToggle
+          v-model="viewMode"
+          :has-expanded-items="expandedCategories.size > 0"
+          @reset-view="resetView"
+        />
       </div>
 
       <UiButton @click="openCreateModal">
@@ -192,13 +82,18 @@
                   :priority="task.priority"
                   :is-favorite="task.isFavorite"
                   :due-date="task.dueDate"
+                  :category-id="task.categoryId"
                   :category-name="task.category?.name"
                   :category-color="task.category?.color"
+                  :available-categories="categories"
                   :sub-tasks="task.subTasks"
                   @edit="handleEdit"
                   @delete="confirmDelete"
                   @complete="handleComplete"
                   @toggle-favorite="handleToggleFavorite"
+                  @update-priority="handleUpdatePriority"
+                  @update-category="handleUpdateCategory"
+                  @update-status="handleUpdateStatus"
                   @drag-start="handleDragStart"
                   @drag-end="handleDragEnd"
                   @add-sub-task="handleAddSubTask"
@@ -257,13 +152,18 @@
                   :priority="task.priority"
                   :is-favorite="task.isFavorite"
                   :due-date="task.dueDate"
+                  :category-id="task.categoryId"
                   :category-name="task.category?.name"
                   :category-color="task.category?.color"
+                  :available-categories="categories"
                   :sub-tasks="task.subTasks"
                   @edit="handleEdit"
                   @delete="confirmDelete"
                   @complete="handleComplete"
                   @toggle-favorite="handleToggleFavorite"
+                  @update-priority="handleUpdatePriority"
+                  @update-category="handleUpdateCategory"
+                  @update-status="handleUpdateStatus"
                   @drag-start="handleDragStart"
                   @drag-end="handleDragEnd"
                   @add-sub-task="handleAddSubTask"
@@ -322,12 +222,17 @@
                   :priority="task.priority"
                   :is-favorite="task.isFavorite"
                   :due-date="task.dueDate"
+                  :category-id="task.categoryId"
                   :category-name="task.category?.name"
                   :category-color="task.category?.color"
+                  :available-categories="categories"
                   :sub-tasks="task.subTasks"
                   @edit="handleEdit"
                   @delete="confirmDelete"
                   @toggle-favorite="handleToggleFavorite"
+                  @update-priority="handleUpdatePriority"
+                  @update-category="handleUpdateCategory"
+                  @update-status="handleUpdateStatus"
                   @drag-start="handleDragStart"
                   @drag-end="handleDragEnd"
                   @add-sub-task="handleAddSubTask"
@@ -388,13 +293,18 @@
               :priority="task.priority"
               :is-favorite="task.isFavorite"
               :due-date="task.dueDate"
+              :category-id="task.categoryId"
               :category-name="task.category?.name"
               :category-color="task.category?.color"
+              :available-categories="categories"
               :sub-tasks="task.subTasks"
               @edit="handleEdit"
               @delete="confirmDelete"
               @complete="handleComplete"
               @toggle-favorite="handleToggleFavorite"
+              @update-priority="handleUpdatePriority"
+              @update-category="handleUpdateCategory"
+              @update-status="handleUpdateStatus"
               @drag-start="handleDragStart"
               @drag-end="handleDragEnd"
               @add-sub-task="handleAddSubTask"
@@ -449,11 +359,15 @@
               :priority="task.priority"
               :is-favorite="task.isFavorite"
               :due-date="task.dueDate"
+              :available-categories="categories"
               :sub-tasks="task.subTasks"
               @edit="handleEdit"
               @delete="confirmDelete"
               @complete="handleComplete"
               @toggle-favorite="handleToggleFavorite"
+              @update-priority="handleUpdatePriority"
+              @update-category="handleUpdateCategory"
+              @update-status="handleUpdateStatus"
               @drag-start="handleDragStart"
               @drag-end="handleDragEnd"
               @add-sub-task="handleAddSubTask"
@@ -753,7 +667,7 @@
 </template>
 
 <script setup lang="ts">
-import { TaskStatus } from "~/types";
+import { TaskStatus, Priority } from "~/types";
 import type { Task, TaskCategory, Groups } from "~/types";
 
 const {
@@ -784,12 +698,6 @@ const searchQuery = ref("");
 const dateFilter = ref("");
 const categoryFilter = ref("");
 const favoriteFilter = ref(false);
-const showFilterDropdown = ref(false);
-
-const selectedFilterCategory = computed(() => {
-  if (!categoryFilter.value) return null;
-  return categories.value.find((c) => c.id === categoryFilter.value) || null;
-});
 
 const categorySearch = ref("");
 const showCategoryDropdown = ref(false);
@@ -955,6 +863,30 @@ const toggleCategoryAccordion = (id: string) => {
   }
   expandedCategories.value = set;
 };
+
+const expandAllCategories = () => {
+  const set = new Set<string>();
+  for (const status of ["NOT_STARTED", "IN_PROGRESS", "DONE"] as const) {
+    for (const group of statusCategoryGroups.value[status]) {
+      set.add(`${status}_${group.id}`);
+    }
+  }
+  for (const group of tasksByCategory.value) {
+    set.add(group.id);
+  }
+  if (uncategorizedTasks.value.length > 0) {
+    set.add("uncategorized");
+  }
+  expandedCategories.value = set;
+};
+
+const resetView = () => {
+  expandedCategories.value = new Set();
+};
+
+watch(favoriteFilter, (active) => {
+  if (active) expandAllCategories();
+});
 
 const selectCategory = (category: TaskCategory) => {
   selectedCategory.value = category;
@@ -1160,6 +1092,40 @@ const handleToggleFavorite = async (id: string) => {
   }
 };
 
+const handleUpdatePriority = async (id: string, priority: Priority) => {
+  try {
+    await updateTask(id, { priority });
+    toast.success({ title: "Prioridade atualizada" });
+  } catch {
+    toast.error({ title: "Erro ao atualizar prioridade" });
+  }
+};
+
+const handleUpdateCategory = async (id: string, categoryId: string | null) => {
+  try {
+    const category = categoryId
+      ? categories.value.find((c) => c.id === categoryId) || undefined
+      : undefined;
+    await updateTask(id, {
+      categoryId: categoryId ?? undefined,
+      category,
+    });
+    toast.success({
+      title: categoryId ? "Categoria atualizada" : "Categoria removida",
+    });
+  } catch {
+    toast.error({ title: "Erro ao atualizar categoria" });
+  }
+};
+
+const handleUpdateStatus = async (id: string, status: TaskStatus) => {
+  try {
+    await updateTaskStatus(id, status);
+  } catch {
+    toast.error({ title: "Erro ao atualizar status" });
+  }
+};
+
 const handleDrop = async (taskId: string, newStatus: TaskStatus) => {
   const task = tasks.value.find((t) => t.id === taskId);
   if (task && task.status !== newStatus) {
@@ -1214,21 +1180,9 @@ const handleToggleSubTask = async (subTaskId: string, done: boolean) => {
   }
 };
 
-const closeFilterDropdown = (e: MouseEvent) => {
-  const target = e.target as HTMLElement;
-  if (!target.closest(".category-filter")) {
-    showFilterDropdown.value = false;
-  }
-};
-
 onMounted(() => {
   fetchTasks();
   fetchCategories();
-  document.addEventListener("click", closeFilterDropdown);
-});
-
-onUnmounted(() => {
-  document.removeEventListener("click", closeFilterDropdown);
 });
 </script>
 
@@ -1252,259 +1206,6 @@ onUnmounted(() => {
   gap: var(--spacing-sm);
 }
 
-.search-box,
-.date-filter {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  background: var(--color-surface);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  transition: all 0.2s ease;
-  width: 100%;
-}
-
-.search-box:focus-within,
-.date-filter:focus-within {
-  border-color: var(--color-primary);
-}
-
-.search-box :deep(svg),
-.date-filter :deep(svg) {
-  width: 18px;
-  height: 18px;
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
-.search-input,
-.date-input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  font-size: 14px;
-  color: var(--color-text-primary);
-  outline: none;
-  padding: var(--spacing-xs) 0;
-  min-width: 0;
-}
-
-.search-input::placeholder {
-  color: var(--color-text-secondary);
-}
-
-.clear-search,
-.clear-date {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border: none;
-  background: transparent;
-  border-radius: 50%;
-  cursor: pointer;
-  color: var(--color-text-secondary);
-  transition: all 0.2s ease;
-  padding: 0;
-  flex-shrink: 0;
-}
-
-.clear-search:hover,
-.clear-date:hover {
-  background: var(--color-background);
-  color: var(--color-text-primary);
-}
-
-.clear-search :deep(svg),
-.clear-date :deep(svg) {
-  width: 14px;
-  height: 14px;
-}
-
-.category-filter {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  background: var(--color-surface);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  transition: all 0.2s ease;
-  position: relative;
-  width: 100%;
-}
-
-.category-filter :deep(svg) {
-  width: 16px;
-  height: 16px;
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-}
-
-.filter-label {
-  flex: 1;
-  font-size: 14px;
-  color: var(--color-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0;
-}
-
-.filter-cat-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.filter-chevron {
-  transition: transform 0.2s ease;
-}
-
-.filter-chevron.open {
-  transform: rotate(180deg);
-}
-
-.filter-chevron :deep(svg) {
-  width: 14px;
-  height: 14px;
-}
-
-.filter-dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  z-index: 20;
-  max-height: 240px;
-  overflow-y: auto;
-  padding: 4px;
-}
-
-.filter-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-size: 13px;
-  color: var(--color-text-primary);
-  transition: background-color 0.15s ease;
-}
-
-.filter-option:hover {
-  background-color: var(--color-background);
-}
-
-.filter-option.active {
-  background-color: var(--color-primary);
-  color: white;
-}
-
-.filter-option.active :deep(svg) {
-  color: white;
-}
-
-.filter-option :deep(svg) {
-  width: 15px;
-  height: 15px;
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-}
-
-.priority-filter {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  background: var(--color-surface);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  user-select: none;
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  white-space: nowrap;
-  width: 100%;
-}
-
-.priority-filter:hover {
-  border-color: var(--color-text-secondary);
-}
-
-.priority-filter:has(.priority-checkbox:checked) {
-  border-color: #eab308;
-  background: #fefce8;
-  color: #a16207;
-}
-
-.priority-filter :deep(svg) {
-  width: 16px;
-  height: 16px;
-  color: #9ca3af;
-  transition: color 0.2s ease;
-}
-
-.priority-filter:has(.priority-checkbox:checked) :deep(svg) {
-  color: #eab308;
-}
-
-.priority-checkbox {
-  display: none;
-}
-
-.view-toggle {
-  display: flex;
-  background: var(--color-surface);
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  @media (max-width: 768px) {
-    justify-content: space-between;
-  }
-}
-
-.toggle-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  color: var(--color-text-secondary);
-  transition: all 0.2s ease;
-  @media (max-width: 768px) {
-    width: 50%;
-  }
-}
-
-.toggle-btn.active {
-  background: var(--color-primary);
-  color: white;
-}
-
-.toggle-btn:hover:not(.active) {
-  background: var(--color-background);
-  color: var(--color-text-primary);
-}
-
-.toggle-btn :deep(svg) {
-  width: 18px;
-  height: 18px;
-}
 
 .loading-state {
   display: flex;
@@ -2219,22 +1920,6 @@ onUnmounted(() => {
     flex: 1;
   }
 
-  .search-box,
-  .date-filter {
-    width: auto;
-    min-width: 200px;
-    padding: var(--spacing-xs) var(--spacing-md);
-  }
-
-  .category-filter {
-    width: auto;
-    padding: var(--spacing-xs) var(--spacing-md);
-  }
-
-  .priority-filter {
-    width: auto;
-    padding: var(--spacing-xs) var(--spacing-md);
-  }
 }
 
 @media (min-width: 1024px) {
