@@ -98,6 +98,8 @@ const handleSelect = (value: string) => {
   position: relative;
   width: 100%;
   cursor: pointer;
+  min-height: 40px;
+  box-sizing: border-box;
 }
 
 .category-filter :deep(svg) {
@@ -109,7 +111,7 @@ const handleSelect = (value: string) => {
 
 .filter-label {
   flex: 1;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--color-text-primary);
   white-space: nowrap;
   overflow: hidden;

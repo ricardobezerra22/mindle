@@ -2,12 +2,41 @@
   <div class="planner-page">
     <div class="planner-container">
       <div class="week-header">
-        <h1 class="page-title">
-          Esta semana
-        </h1>
-        <p class="date-range">
-          {{ weekDateRange }}
-        </p>
+        <div class="week-header-top">
+          <div>
+            <h1 class="page-title">
+              Esta semana
+            </h1>
+            <p class="date-range">
+              {{ weekDateRange }}
+            </p>
+          </div>
+          <UiButton @click="showCreateModal = true">
+            <Icon name="lucide:plus" />
+            Nova Tarefa
+          </UiButton>
+        </div>
+
+        <div class="week-toolbar">
+          <TasksTaskPriorityFilter v-model="favoriteFilter" />
+        </div>
+      </div>
+
+      <div
+        v-if="usedCategories.length > 0"
+        class="category-legend"
+      >
+        <span
+          v-for="cat in usedCategories"
+          :key="cat.id"
+          class="legend-item"
+        >
+          <span
+            class="legend-dot"
+            :style="{ backgroundColor: cat.color }"
+          />
+          <span class="legend-name">{{ cat.name }}</span>
+        </span>
       </div>
 
       <div class="weekly-overview-toggle">
@@ -85,6 +114,7 @@
               v-for="task in getTasksForDay(day.date)"
               :key="task.id"
               :class="['task-card', `status-${task.status.toLowerCase()}`]"
+              :style="getTaskCardStyle(task)"
             >
               <button
                 class="task-check"
@@ -132,6 +162,11 @@
         </div>
       </div>
     </div>
+
+    <TasksTaskCreateModal
+      v-model="showCreateModal"
+      @created="fetchTasks"
+    />
   </div>
 </template>
 
@@ -141,6 +176,8 @@ const { playDone } = useSound();
 
 const loading = ref(false);
 const showOverview = ref(false);
+const showCreateModal = ref(false);
+const favoriteFilter = ref(false);
 
 const tasks = ref<any[]>([]);
 const toggleTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -211,12 +248,36 @@ const completedTasks = computed(() => {
   return weekTasks.size;
 });
 
+const usedCategories = computed(() => {
+  const catMap = new Map<string, { id: string; name: string; color: string }>();
+  tasks.value.forEach((t) => {
+    if (t.category?.id) {
+      catMap.set(t.category.id, { id: t.category.id, name: t.category.name, color: t.category.color });
+    }
+  });
+  return Array.from(catMap.values());
+});
+
+const getTaskCardStyle = (task: any) => {
+  if (!task.category?.color) return {};
+  const color = task.category.color;
+  return {
+    backgroundColor: `${color}12`,
+    borderLeftColor: color,
+    borderLeftWidth: '3px',
+  };
+};
+
 const getTasksForDay = (date: string) => {
-  const tasksWithDueDate = tasks.value.filter(
+  let filtered = tasks.value.filter(
     t => t.dueDate && t.dueDate.split("T")[0] === date,
   );
 
-  return tasksWithDueDate.sort((a, b) => {
+  if (favoriteFilter.value) {
+    filtered = filtered.filter(t => t.isFavorite);
+  }
+
+  return filtered.sort((a, b) => {
     if (a.status === "DONE" && b.status !== "DONE") return 1;
     if (a.status !== "DONE" && b.status === "DONE") return -1;
     return 0;
@@ -320,6 +381,50 @@ onMounted(() => {
 
 .week-header {
   margin-bottom: var(--spacing-lg);
+}
+
+.week-header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.week-toolbar {
+  display: flex;
+  gap: var(--spacing-sm);
+  max-width: 180px;
+}
+
+.category-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-name {
+  white-space: nowrap;
 }
 
 .page-title {

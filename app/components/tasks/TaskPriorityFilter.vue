@@ -35,10 +35,12 @@ const emit = defineEmits<{
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--color-text-secondary);
   white-space: nowrap;
   width: 100%;
+  min-height: 40px;
+  box-sizing: border-box;
 }
 
 .priority-filter:hover {

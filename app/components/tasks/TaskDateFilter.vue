@@ -40,6 +40,8 @@ const emit = defineEmits<{
   padding: var(--spacing-xs) var(--spacing-sm);
   transition: all 0.2s ease;
   width: 100%;
+  min-height: 40px;
+  box-sizing: border-box;
 }
 
 .date-filter:focus-within {
@@ -47,8 +49,8 @@ const emit = defineEmits<{
 }
 
 .date-filter :deep(svg) {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   color: var(--color-text-secondary);
   flex-shrink: 0;
   display: flex;
@@ -59,7 +61,7 @@ const emit = defineEmits<{
   flex: 1;
   border: none;
   background: transparent;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--color-text-primary);
   outline: none;
   padding: var(--spacing-xs) 0;

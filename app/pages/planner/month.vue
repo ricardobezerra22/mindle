@@ -30,6 +30,31 @@
         </button>
       </div>
 
+      <div class="month-toolbar">
+        <TasksTaskPriorityFilter v-model="favoriteFilter" />
+        <UiButton @click="showCreateModal = true">
+          <Icon name="lucide:plus" />
+          Nova Tarefa
+        </UiButton>
+      </div>
+
+      <div
+        v-if="usedCategories.length > 0"
+        class="category-legend"
+      >
+        <span
+          v-for="cat in usedCategories"
+          :key="cat.id"
+          class="legend-item"
+        >
+          <span
+            class="legend-dot"
+            :style="{ backgroundColor: cat.color }"
+          />
+          <span class="legend-name">{{ cat.name }}</span>
+        </span>
+      </div>
+
       <div class="monthly-overview">
         <div class="overview-card">
           <h4>Tarefas do mês</h4>
@@ -99,6 +124,7 @@
                 v-for="task in getTasksForDay(day.date)"
                 :key="task.id"
                 :class="['task-item', `status-${task.status.toLowerCase()}`]"
+                :style="getTaskItemStyle(task)"
                 @click="toggleTaskStatus(task.id, task.status)"
               >
                 <Icon
@@ -127,6 +153,11 @@
         </div>
       </div>
     </div>
+
+    <TasksTaskCreateModal
+      v-model="showCreateModal"
+      @created="fetchTasks"
+    />
   </div>
 </template>
 
@@ -135,6 +166,8 @@ const toast = useToast();
 const { playDone } = useSound();
 
 const loading = ref(false);
+const showCreateModal = ref(false);
+const favoriteFilter = ref(false);
 const tasks = ref<any[]>([]);
 const currentDate = ref(new Date());
 const toggleTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -214,12 +247,37 @@ const pendingTasksCount = computed(() => {
   return monthlyTasksCount.value - completedTasksCount.value;
 });
 
+const usedCategories = computed(() => {
+  const catMap = new Map<string, { id: string; name: string; color: string }>();
+  tasks.value.forEach((t) => {
+    if (t.category?.id) {
+      catMap.set(t.category.id, { id: t.category.id, name: t.category.name, color: t.category.color });
+    }
+  });
+  return Array.from(catMap.values());
+});
+
+const getTaskItemStyle = (task: any) => {
+  if (!task.category?.color) return {};
+  const color = task.category.color;
+  return {
+    backgroundColor: `${color}15`,
+    borderLeftColor: color,
+    borderLeftWidth: '2px',
+    borderLeftStyle: 'solid',
+  };
+};
+
 const getTasksForDay = (date: string) => {
-  const tasksWithDueDate = tasks.value.filter(
+  let filtered = tasks.value.filter(
     t => t.dueDate && t.dueDate.split("T")[0] === date,
   );
 
-  return tasksWithDueDate.sort((a, b) => {
+  if (favoriteFilter.value) {
+    filtered = filtered.filter(t => t.isFavorite);
+  }
+
+  return filtered.sort((a, b) => {
     if (a.status === "DONE" && b.status !== "DONE") return 1;
     if (a.status !== "DONE" && b.status === "DONE") return -1;
     if (a.priority === "HIGH" && b.priority !== "HIGH") return -1;
@@ -330,8 +388,49 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
   gap: var(--spacing-md);
+}
+
+.month-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.month-toolbar > :first-child {
+  max-width: 180px;
+}
+
+.category-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-name {
+  white-space: nowrap;
 }
 
 .month-info {

@@ -53,8 +53,8 @@ const emit = defineEmits<{
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  min-height: 40px;
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
@@ -81,6 +81,8 @@ const emit = defineEmits<{
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
   overflow: hidden;
+  min-height: 40px;
+  box-sizing: border-box;
 }
 
 .toggle-btn {
