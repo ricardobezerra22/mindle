@@ -10,7 +10,6 @@ interface Preferences {
   financeReminder: boolean;
   autoArchivePaid: boolean;
   theme: string;
-  reducedMotion: boolean;
   fontSize: string;
 }
 
@@ -26,7 +25,6 @@ const defaults: Preferences = {
   financeReminder: true,
   autoArchivePaid: false,
   theme: "light",
-  reducedMotion: false,
   fontSize: "normal",
 };
 

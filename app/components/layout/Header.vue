@@ -39,7 +39,7 @@ const { isMobile, open: openSidebar } = useSidebar();
 <style scoped>
 .header {
   height: 59px;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--color-surface);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;

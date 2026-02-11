@@ -262,19 +262,6 @@
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">Reduzir animações</span>
-              <span class="setting-description">Menos movimento</span>
-            </div>
-            <button
-              :class="['toggle', { active: preferences.reducedMotion }]"
-              @click="preferences.reducedMotion = !preferences.reducedMotion"
-            >
-              <span class="toggle-thumb" />
-            </button>
-          </div>
-
-          <div class="setting-row">
-            <div class="setting-info">
               <span class="setting-label">Tamanho do texto</span>
               <span class="setting-description">Ajuste para leitura</span>
             </div>
@@ -767,7 +754,7 @@ onMounted(() => {
 
 .feedback-link:hover {
   border-color: var(--color-primary);
-  background: #f0f9f4;
+  background: var(--color-background);
 }
 
 @media (max-width: 768px) {

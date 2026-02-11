@@ -26,7 +26,26 @@
       v-if="loading"
       class="loading-state"
     >
-      <p>Carregando tarefas...</p>
+      <div class="skeleton-columns">
+        <div
+          v-for="i in 3"
+          :key="i"
+          class="skeleton-column"
+        >
+          <UiSkeleton width="80px" height="12px" />
+          <div
+            v-for="j in 3"
+            :key="j"
+            class="skeleton-task-card"
+          >
+            <div class="skeleton-task-row">
+              <UiSkeleton variant="circle" width="20px" height="20px" />
+              <UiSkeleton height="14px" :width="['90%', '70%', '80%'][j - 1]" />
+            </div>
+            <UiSkeleton height="10px" width="50%" />
+          </div>
+        </div>
+      </div>
     </div>
 
     <template v-else>
@@ -249,6 +268,21 @@
         class="category-tree-view"
       >
         <div
+          v-if="tasksByCategory.length === 0 && uncategorizedTasks.length === 0"
+          class="view-empty-state"
+        >
+          <div class="view-empty-icon">
+            <Icon name="lucide:folder-open" size="48" />
+          </div>
+          <h3 class="view-empty-title">Nenhuma tarefa por categoria</h3>
+          <p class="view-empty-description">Crie tarefas e organize por categorias para visualizar aqui.</p>
+          <UiButton @click="openCreateModal">
+            <Icon name="lucide:plus" />
+            Nova Tarefa
+          </UiButton>
+        </div>
+
+        <div
           v-for="group in tasksByCategory"
           :key="group.id"
           class="category-accordion"
@@ -453,6 +487,7 @@ const {
 } = useTasks();
 
 const toast = useToast();
+const { preferences } = usePreferences();
 const showCreateModal = ref(false);
 const showDeleteModal = ref(false);
 const taskToDelete = ref<string | null>(null);
@@ -491,6 +526,10 @@ const filteredTasks = computed(() => {
 
   if (favoriteFilter.value) {
     filtered = filtered.filter((t) => t.isFavorite);
+  }
+
+  if (!preferences.value.showCompleted) {
+    filtered = filtered.filter((t) => t.status !== "DONE");
   }
 
   return filtered;
@@ -786,11 +825,35 @@ onMounted(() => {
 
 
 .loading-state {
+  padding: var(--spacing-md) 0;
+}
+
+.skeleton-columns {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.skeleton-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.skeleton-task-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.skeleton-task-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: var(--spacing-xl);
-  color: var(--color-text-secondary);
+  gap: var(--spacing-sm);
 }
 
 .kanban-board {
@@ -874,6 +937,46 @@ onMounted(() => {
   flex-direction: column;
   gap: var(--spacing-md);
   flex: 1;
+}
+
+.view-empty-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  padding: 60px var(--spacing-lg);
+  text-align: center;
+  background: var(--color-surface);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.view-empty-icon {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background);
+  border-radius: 50%;
+  color: var(--color-text-secondary);
+}
+
+.view-empty-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.view-empty-description {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 320px;
+  line-height: 1.5;
 }
 
 .category-accordion {

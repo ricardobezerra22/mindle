@@ -74,11 +74,31 @@
         v-if="loading"
         class="loading-state"
       >
-        <Icon
-          name="lucide:loader-2"
-          class="spinning"
-        />
-        <p>Carregando...</p>
+        <div class="skeleton-days-grid">
+          <div
+            v-for="i in 7"
+            :key="i"
+            class="skeleton-day-column"
+          >
+            <div class="skeleton-day-header">
+              <UiSkeleton height="16px" :width="['50%', '60%', '45%', '55%', '50%', '60%', '40%'][i - 1]" />
+              <UiSkeleton height="12px" width="40%" />
+            </div>
+            <div class="skeleton-day-tasks">
+              <div
+                v-for="j in (i % 2 === 0 ? 2 : 1)"
+                :key="j"
+                class="skeleton-task"
+              >
+                <UiSkeleton variant="circle" width="20px" height="20px" />
+                <div class="skeleton-task-lines">
+                  <UiSkeleton height="12px" width="85%" />
+                  <UiSkeleton height="10px" width="50%" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div
@@ -173,6 +193,7 @@
 <script setup lang="ts">
 const toast = useToast();
 const { playDone } = useSound();
+const { preferences } = usePreferences();
 
 const loading = ref(false);
 const showOverview = ref(false);
@@ -189,15 +210,23 @@ const weekDays = computed(() => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  const startDay = preferences.value.weekStart === "sunday" ? 0 : 1;
   const currentDay = today.getDay();
-  const daysUntilSunday = 7 - currentDay;
+  const diff = (currentDay - startDay + 7) % 7;
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - diff);
 
-  for (let i = 0; i <= daysUntilSunday; i++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() + i);
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(weekStart);
+    date.setDate(weekStart.getDate() + i);
 
-    const isToday = i === 0;
-    const isTomorrow = i === 1;
+    const todayStr = today.toISOString().split("T")[0];
+    const dateStr = date.toISOString().split("T")[0];
+    const isToday = dateStr === todayStr;
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    const isTomorrow = dateStr === tomorrow.toISOString().split("T")[0];
 
     let label = "";
     if (isToday) {
@@ -210,7 +239,7 @@ const weekDays = computed(() => {
     }
 
     days.push({
-      date: date.toISOString().split("T")[0],
+      date: dateStr,
       dateFormatted: date.toLocaleDateString("pt-PT", {
         day: "2-digit",
         month: "short",
@@ -495,29 +524,52 @@ onMounted(() => {
 }
 
 .loading-state {
-  text-align: center;
-  padding: var(--spacing-xl);
-  color: var(--color-text-secondary);
+  padding: var(--spacing-md) 0;
 }
 
-.loading-state :deep(svg) {
-  width: 48px;
-  height: 48px;
+.skeleton-days-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.skeleton-day-column {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: 16px;
+  padding: var(--spacing-md);
+  min-height: 300px;
+}
+
+.skeleton-day-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding-bottom: var(--spacing-md);
   margin-bottom: var(--spacing-md);
-  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
 }
 
-.spinning {
-  animation: spin 1s linear infinite;
+.skeleton-day-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.skeleton-task {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background: var(--color-background);
+  border-radius: 10px;
+}
+
+.skeleton-task-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
 .days-grid {
@@ -540,7 +592,7 @@ onMounted(() => {
 
 .day-column.today {
   border-color: var(--color-primary);
-  background: #f7fbf9;
+  background: var(--color-today-bg);
 }
 
 .day-header {
@@ -702,33 +754,33 @@ onMounted(() => {
 }
 
 .priority-badge.priority-high {
-  background: #ffebee;
-  color: #c62828;
+  background: var(--status-not-started-bg, #ffebee);
+  color: #ef5350;
 }
 
 .priority-badge.priority-medium {
-  background: #fff3e0;
-  color: #ef6c00;
+  background: var(--status-in-progress-bg, #fff3e0);
+  color: var(--status-in-progress-color, #ef6c00);
 }
 
 .priority-badge.priority-low {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: var(--status-done-bg, #e8f5e9);
+  color: var(--status-done-color, #2e7d32);
 }
 
 .status-badge.status-not_started {
-  background: #e8eaed;
-  color: #5f6368;
+  background: var(--status-not-started-bg, #e8eaed);
+  color: var(--status-not-started-color, #5f6368);
 }
 
 .status-badge.status-in_progress {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: var(--status-in-progress-bg, #e3f2fd);
+  color: var(--status-in-progress-color, #1976d2);
 }
 
 .status-badge.status-done {
-  background: #d1f4e0;
-  color: #2d7a4f;
+  background: var(--status-done-bg, #d1f4e0);
+  color: var(--status-done-color, #2d7a4f);
 }
 
 @media (max-width: 1200px) {

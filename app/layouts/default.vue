@@ -14,6 +14,11 @@
 
 <script setup lang="ts">
 const route = useRoute();
+const { init: initTheme } = useTheme();
+
+onMounted(() => {
+  initTheme();
+});
 
 const pageTitle = computed(() => {
   const titles: Record<string, string> = {

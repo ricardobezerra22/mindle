@@ -1,7 +1,7 @@
 <template>
   <div
     class="task-column"
-    :class="{ 'drag-over': isDragOver }"
+    :class="[`column-${status.toLowerCase()}`, { 'drag-over': isDragOver }]"
     @dragover.prevent="handleDragOver"
     @dragleave="handleDragLeave"
     @drop="handleDrop"
@@ -91,7 +91,7 @@ const handleDrop = (e: DragEvent) => {
   display: flex;
   flex-direction: column;
   transition: all 0.2s ease;
-  border: 2px solid transparent;
+  border: 2px solid var(--color-border);
 }
 
 .task-column.drag-over {
@@ -101,6 +101,8 @@ const handleDrop = (e: DragEvent) => {
 
 .column-header {
   margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .column-title {
@@ -151,18 +153,18 @@ const handleDrop = (e: DragEvent) => {
 }
 
 .task-status-badge.status-not_started {
-  background-color: #dbeafe;
-  color: #1e40af;
+  background-color: var(--status-not-started-bg, #dbeafe);
+  color: var(--status-not-started-color, #1e40af);
 }
 
 .task-status-badge.status-in_progress {
-  background-color: #fef3c7;
-  color: #92400e;
+  background-color: var(--status-in-progress-bg, #fef3c7);
+  color: var(--status-in-progress-color, #92400e);
 }
 
 .task-status-badge.status-done {
-  background-color: #d1fae5;
-  color: #065f46;
+  background-color: var(--status-done-bg, #d1fae5);
+  color: var(--status-done-color, #065f46);
 }
 .task-count {
   display: inline-flex;

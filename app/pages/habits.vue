@@ -40,11 +40,22 @@
           v-if="loading"
           class="loading-state"
         >
-          <Icon
-            name="lucide:loader-2"
-            class="spinning"
-          />
-          <p>Carregando...</p>
+          <div class="skeleton-habits">
+            <div
+              v-for="i in 4"
+              :key="i"
+              class="skeleton-habit-card"
+            >
+              <div class="skeleton-habit-row">
+                <UiSkeleton variant="circle" width="36px" height="36px" />
+                <div class="skeleton-habit-info">
+                  <UiSkeleton height="14px" :width="['70%', '55%', '80%', '60%'][i - 1]" />
+                  <UiSkeleton height="10px" width="40%" />
+                </div>
+                <UiSkeleton variant="circle" width="28px" height="28px" />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div
@@ -262,11 +273,13 @@
 </template>
 
 <script setup lang="ts">
+const { preferences } = usePreferences();
+
 const showAddModal = ref(false);
 const loading = ref(false);
 const isSaving = ref(false);
 const editingHabit = ref<any>(null);
-const showInsights = ref(false);
+const showInsights = ref(preferences.value.showInsights);
 const isBreathing = ref(false);
 const breathingPhase = ref("Inspire...");
 const showEncouragement = ref(false);
@@ -648,14 +661,42 @@ onUnmounted(() => {
   color: var(--color-primary);
 }
 
-.loading-state,
+.loading-state {
+  padding: var(--spacing-md) 0;
+}
+
+.skeleton-habits {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.skeleton-habit-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+}
+
+.skeleton-habit-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.skeleton-habit-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
 .empty-state {
   text-align: center;
   padding: var(--spacing-xl);
   color: var(--color-text-secondary);
 }
 
-.loading-state :deep(svg),
 .empty-state :deep(svg) {
   width: 48px;
   height: 48px;

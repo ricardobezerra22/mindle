@@ -24,7 +24,14 @@
           </div>
 
           <div v-if="loadingTasks" class="loading-placeholder">
-            <Icon name="lucide:loader-2" size="20" class="spinning" />
+            <div
+              v-for="i in 3"
+              :key="i"
+              class="skeleton-focus-task"
+            >
+              <UiSkeleton variant="circle" width="20px" height="20px" />
+              <UiSkeleton height="14px" :width="['85%', '65%', '75%'][i - 1]" />
+            </div>
           </div>
 
           <div v-else-if="todayTasks.length === 0" class="empty-focus">
@@ -144,7 +151,7 @@
           </div>
         </section>
 
-        <section v-if="pendingFinanceCount > 0" class="finance-section">
+        <section v-if="preferences.financeReminder && pendingFinanceCount > 0" class="finance-section">
           <NuxtLink to="/finance" class="finance-card">
             <Icon name="lucide:wallet" size="18" />
             <span>{{ pendingFinanceCount }} {{ pendingFinanceCount === 1 ? "item precisa" : "itens precisam" }} de atenção</span>
@@ -183,6 +190,7 @@
 const { user } = useAuth();
 const toast = useToast();
 const { playDone } = useSound();
+const { preferences } = usePreferences();
 
 const loadingTasks = ref(true);
 const tasks = ref<any[]>([]);
@@ -590,18 +598,18 @@ onMounted(async () => {
 
 .loading-placeholder {
   display: flex;
-  justify-content: center;
-  padding: var(--spacing-lg);
-  color: var(--color-text-secondary);
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) 0;
 }
 
-.spinning {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.skeleton-focus-task {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-background);
+  border-radius: 12px;
 }
 
 .empty-focus {

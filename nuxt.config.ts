@@ -25,6 +25,7 @@ export default defineNuxtConfig({
     },
     resendApiKey: process.env.NUXT_RESEND_API_KEY,
     cronSecret: process.env.NUXT_CRON_SECRET || "mindle-cron-secret-change-in-production",
+    resendWebhookSecret: process.env.RESEND_WEBHOOK_SECRET,
   },
 
   compatibilityDate: "2025-01-15",

@@ -287,6 +287,7 @@
 import type { Task } from "~/types";
 
 const { tasks, fetchTasks } = useTasks();
+const { preferences } = usePreferences();
 
 const focusContext = ref("");
 const selectedDuration = ref(0);
@@ -413,11 +414,13 @@ const completeSession = () => {
   isPaused.value = false;
   sessionComplete.value = true;
 
-  const audio = new Audio(
-    "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwPUKXi8LdjHAU2kdXzzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r9sIQYqgc7y2Ik2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK/bCEGKoHO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs",
-  );
-  audio.volume = 0.2;
-  audio.play().catch(() => {});
+  if (preferences.value.focusSound) {
+    const audio = new Audio(
+      "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe77OeeSwwPUKXi8LdjHAU2kdXzzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r9sIQYqgc7y2Ik2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK/bCEGKoHO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs55tLDA9QpeLwt2McBTaP1vLMeSwFInbI8N6QQQsUX7Pr66hVFApGn+HyvmwhBiuBzvLZiTYIGGe77OebSwwPUKXi8LdjHAU2j9byzHksBSJ2yPDekEELFF+z6+uoVRQKRp/h8r5sIQYrgc7y2Yk2CBhnu+znm0sMD1Cl4vC3YxwFNo/W8sx5LAUidsjw3pBBCxRfs+vrqFUUCkaf4fK+bCEGK4HO8tmJNggYZ7vs",
+    );
+    audio.volume = 0.2;
+    audio.play().catch(() => {});
+  }
 };
 
 const resetSession = () => {
@@ -489,6 +492,10 @@ const progressColor = computed(() => {
 
 onMounted(() => {
   fetchTasks();
+  const prefDuration = parseInt(preferences.value.focusDuration);
+  if (prefDuration > 0) {
+    selectedDuration.value = prefDuration;
+  }
 });
 
 onUnmounted(() => {

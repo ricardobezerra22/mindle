@@ -89,11 +89,26 @@
         v-if="loading"
         class="loading-state"
       >
-        <Icon
-          name="lucide:loader-2"
-          class="spinning"
-        />
-        <p>Carregando...</p>
+        <div class="skeleton-entries">
+          <div
+            v-for="i in 3"
+            :key="i"
+            class="skeleton-entry"
+          >
+            <div class="skeleton-entry-header">
+              <UiSkeleton height="16px" :width="['60%', '45%', '70%'][i - 1]" />
+              <UiSkeleton height="12px" width="60px" radius="12px" />
+            </div>
+            <div class="skeleton-entry-body">
+              <UiSkeleton height="12px" width="80px" />
+              <UiSkeleton height="20px" width="90px" />
+            </div>
+            <div class="skeleton-entry-actions">
+              <UiSkeleton height="32px" width="140px" radius="8px" />
+              <UiSkeleton height="32px" width="36px" radius="8px" />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div
@@ -328,6 +343,7 @@
 
 <script setup lang="ts">
 const toast = useToast();
+const { preferences } = usePreferences();
 
 const showAddModal = ref(false);
 const showArchived = ref(false);
@@ -462,16 +478,27 @@ const saveEntry = async () => {
 
 const markAsPaid = async (id: string) => {
   try {
+    const body: Record<string, any> = {
+      status: "PAID",
+      paidAt: new Date().toISOString(),
+    };
+    if (preferences.value.autoArchivePaid) {
+      body.archived = true;
+    }
     const response = await $fetch(`/api/finance/${id}`, {
       method: "PUT",
-      body: { status: "PAID", paidAt: new Date().toISOString() },
+      body,
     });
     if (response.success) {
       const index = entries.value.findIndex((e) => e.id === id);
       if (index !== -1) {
         entries.value[index] = response.data;
       }
-      toast.success("Marcado como pago");
+      toast.success(
+        preferences.value.autoArchivePaid
+          ? "Pago e arquivado"
+          : "Marcado como pago",
+      );
     }
   } catch (error) {
     console.error("Error marking as paid:", error);
@@ -751,32 +778,54 @@ onMounted(() => {
   color: var(--color-primary-dark);
 }
 
-.loading-state,
+.loading-state {
+  padding: var(--spacing-md) 0;
+}
+
+.skeleton-entries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.skeleton-entry {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.skeleton-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skeleton-entry-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.skeleton-entry-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
 .empty-state {
   text-align: center;
   padding: var(--spacing-xl);
   color: var(--color-text-secondary);
 }
 
-.loading-state :deep(svg),
 .empty-state :deep(svg) {
   width: 48px;
   height: 48px;
   margin-bottom: var(--spacing-md);
   color: var(--color-text-secondary);
-}
-
-.spinning {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .entries-list {

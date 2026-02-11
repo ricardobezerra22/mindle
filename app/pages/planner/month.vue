@@ -80,11 +80,30 @@
         v-if="loading"
         class="loading-state"
       >
-        <Icon
-          name="lucide:loader-2"
-          class="spinning"
-        />
-        <p>Carregando...</p>
+        <div class="skeleton-calendar">
+          <div class="skeleton-calendar-header">
+            <UiSkeleton
+              v-for="i in 7"
+              :key="i"
+              height="14px"
+              width="30px"
+            />
+          </div>
+          <div class="skeleton-calendar-body">
+            <div
+              v-for="i in 35"
+              :key="i"
+              class="skeleton-calendar-cell"
+            >
+              <UiSkeleton height="14px" width="20px" />
+              <UiSkeleton
+                v-if="i % 3 !== 0"
+                height="10px"
+                width="80%"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div
@@ -500,29 +519,39 @@ onMounted(() => {
 }
 
 .loading-state {
-  text-align: center;
-  padding: var(--spacing-xl);
-  color: var(--color-text-secondary);
+  padding: var(--spacing-md) 0;
 }
 
-.loading-state :deep(svg) {
-  width: 48px;
-  height: 48px;
-  margin-bottom: var(--spacing-md);
-  color: var(--color-text-secondary);
+.skeleton-calendar {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: 16px;
+  padding: var(--spacing-md);
 }
 
-.spinning {
-  animation: spin 1s linear infinite;
+.skeleton-calendar-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  padding: var(--spacing-sm);
+  justify-items: center;
+  margin-bottom: var(--spacing-sm);
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.skeleton-calendar-body {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+}
+
+.skeleton-calendar-cell {
+  min-height: 80px;
+  padding: var(--spacing-xs);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
 }
 
 .calendar-container {
@@ -564,21 +593,21 @@ onMounted(() => {
 }
 
 .calendar-day:hover {
-  background: #f7fbf9;
+  background: var(--color-hover-subtle);
 }
 
 .calendar-day.other-month {
-  background: #fafafa;
+  background: var(--color-muted-bg);
   opacity: 0.5;
 }
 
 .calendar-day.today {
-  background: #f0f9f4;
+  background: var(--color-today-bg);
   border: 2px solid var(--color-primary);
 }
 
 .calendar-day.weekend {
-  background: #fafafa;
+  background: var(--color-muted-bg);
 }
 
 .day-number {
@@ -618,7 +647,7 @@ onMounted(() => {
 }
 
 .task-item:hover {
-  background: #f7fbf9;
+  background: var(--color-hover-subtle);
   border-color: var(--color-primary);
 }
 

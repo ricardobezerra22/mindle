@@ -31,8 +31,23 @@
         v-if="loading"
         class="loading-state"
       >
-        <Icon name="lucide:loader-2" class="spinning" size="24" />
-        <p>Carregando metas...</p>
+        <div class="skeleton-goals">
+          <div
+            v-for="i in 3"
+            :key="i"
+            class="skeleton-goal-card"
+          >
+            <div class="skeleton-goal-header">
+              <UiSkeleton variant="circle" width="12px" height="12px" />
+              <UiSkeleton height="16px" :width="['65%', '50%', '75%'][i - 1]" />
+            </div>
+            <UiSkeleton height="8px" width="100%" radius="4px" />
+            <div class="skeleton-goal-footer">
+              <UiSkeleton height="12px" width="80px" />
+              <UiSkeleton height="12px" width="60px" />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div
@@ -199,25 +214,34 @@ onMounted(() => {
 }
 
 .loading-state {
+  padding: var(--spacing-md) 0;
+}
+
+.skeleton-goals {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.skeleton-goal-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.skeleton-goal-header {
+  display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-xl) 0;
-  color: var(--color-text-secondary);
 }
 
-.loading-state p {
-  font-size: 14px;
-  margin: 0;
-}
-
-.spinning {
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.skeleton-goal-footer {
+  display: flex;
+  justify-content: space-between;
 }
 
 .empty-state {
