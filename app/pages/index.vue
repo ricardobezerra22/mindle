@@ -19,40 +19,20 @@
       <div class="col-main">
         <section class="focus-section">
           <div class="section-label">
-            <Icon
-              name="lucide:target"
-              size="16"
-            />
+            <Icon name="lucide:target" size="16" />
             <span>Foco de hoje</span>
           </div>
 
-          <div
-            v-if="loadingTasks"
-            class="loading-placeholder"
-          >
-            <Icon
-              name="lucide:loader-2"
-              size="20"
-              class="spinning"
-            />
+          <div v-if="loadingTasks" class="loading-placeholder">
+            <Icon name="lucide:loader-2" size="20" class="spinning" />
           </div>
 
-          <div
-            v-else-if="todayTasks.length === 0"
-            class="empty-focus"
-          >
-            <p class="empty-message">
-              Hoje está livre.
-            </p>
-            <p class="empty-hint">
-              Escolha uma coisa ou descanse.
-            </p>
+          <div v-else-if="todayTasks.length === 0" class="empty-focus">
+            <p class="empty-message">Hoje está livre.</p>
+            <p class="empty-hint">Escolha uma coisa ou descanse.</p>
           </div>
 
-          <div
-            v-else
-            class="focus-tasks"
-          >
+          <div v-else class="focus-tasks">
             <div
               v-for="task in todayTasks.slice(0, 5)"
               :key="task.id"
@@ -60,59 +40,35 @@
               @click="toggleTaskStatus(task.id, task.status)"
             >
               <Icon
-                :name="
-                  task.status === 'DONE'
-                    ? 'lucide:check-circle-2'
-                    : 'lucide:circle'
-                "
+                :name="task.status === 'DONE' ? 'lucide:check-circle-2' : 'lucide:circle'"
                 size="20"
                 class="task-icon"
               />
               <span class="task-name">{{ task.title }}</span>
-              <span
-                v-if="task.priority === 'HIGH'"
-                class="priority-dot"
-              />
+              <span v-if="task.priority === 'HIGH'" class="priority-dot" />
             </div>
-
-            <p
-              v-if="todayTasks.length > 5"
-              class="more-tasks"
-            >
+            <p v-if="todayTasks.length > 5" class="more-tasks">
               +{{ todayTasks.length - 5 }} mais
             </p>
           </div>
 
-          <NuxtLink
-            to="/focus"
-            class="focus-action"
-          >
-            <Icon
-              name="lucide:play"
-              size="16"
-            />
+          <NuxtLink to="/focus" class="focus-action">
+            <Icon name="lucide:play" size="16" />
             Iniciar foco
           </NuxtLink>
         </section>
 
         <section class="week-view-section">
           <div class="section-label">
-            <Icon
-              name="lucide:calendar-days"
-              size="16"
-            />
+            <Icon name="lucide:calendar-days" size="16" />
             <span>Visão semanal</span>
           </div>
-
           <div class="week-days-row">
             <NuxtLink
               v-for="day in weekDaysPreview"
               :key="day.date"
               to="/planner/week"
-              :class="[
-                'week-day-cell',
-                { 'today': day.isToday, 'has-tasks': day.taskCount > 0 },
-              ]"
+              :class="['week-day-cell', { 'today': day.isToday, 'has-tasks': day.taskCount > 0 }]"
             >
               <span class="week-day-name">{{ day.label }}</span>
               <span class="week-day-number">{{ day.dayNumber }}</span>
@@ -131,19 +87,13 @@
       <div class="col-side">
         <section class="progress-section">
           <div class="section-label">
-            <Icon
-              name="lucide:bar-chart-3"
-              size="16"
-            />
-            <span>Progresso</span>
+            <Icon name="lucide:bar-chart-3" size="16" />
+            <span>Progresso semanal</span>
           </div>
           <div class="progress-cards">
             <div class="progress-card">
               <div class="progress-icon">
-                <Icon
-                  name="lucide:list-checks"
-                  size="18"
-                />
+                <Icon name="lucide:list-checks" size="18" />
               </div>
               <div class="progress-info">
                 <span class="progress-value">{{ weekPlanned }}</span>
@@ -152,10 +102,7 @@
             </div>
             <div class="progress-card">
               <div class="progress-icon done">
-                <Icon
-                  name="lucide:check-check"
-                  size="18"
-                />
+                <Icon name="lucide:check-check" size="18" />
               </div>
               <div class="progress-info">
                 <span class="progress-value">{{ weekCompleted }}</span>
@@ -164,116 +111,67 @@
             </div>
             <div class="progress-card">
               <div class="progress-icon pending">
-                <Icon
-                  name="lucide:clock"
-                  size="18"
-                />
+                <Icon name="lucide:clock" size="18" />
               </div>
               <div class="progress-info">
-                <span class="progress-value">{{
-                  weekPlanned - weekCompleted
-                }}</span>
+                <span class="progress-value">{{ weekPlanned - weekCompleted }}</span>
                 <span class="progress-label">pendentes</span>
               </div>
             </div>
           </div>
-
-          <div
-            v-if="weekPlanned > 0"
-            class="completion-bar-wrap"
-          >
+          <div v-if="weekPlanned > 0" class="completion-bar-wrap">
             <div class="completion-bar">
-              <div
-                class="completion-fill"
-                :style="{ width: completionPercent + '%' }"
-              />
+              <div class="completion-fill" :style="{ width: completionPercent + '%' }" />
             </div>
             <span class="completion-text">{{ completionPercent }}% concluído</span>
           </div>
         </section>
 
-        <section
-          v-if="habits.length > 0"
-          class="habits-section"
-        >
+        <section v-if="habits.length > 0" class="habits-section">
           <div class="section-label">
-            <Icon
-              name="lucide:heart"
-              size="16"
-            />
-            <span>Hábitos</span>
+            <Icon name="lucide:heart" size="16" />
+            <span>Hábitos de hoje</span>
           </div>
-
           <div class="habits-row">
             <button
               v-for="habit in habits"
               :key="habit.id"
-              :class="[
-                'habit-bubble',
-                { checked: isHabitCheckedToday(habit.id) },
-              ]"
+              :class="['habit-bubble', { checked: isHabitCheckedToday(habit.id) }]"
               @click="toggleHabit(habit.id)"
             >
-              <Icon
-                :name="habit.icon || 'lucide:circle'"
-                size="22"
-              />
+              <Icon :name="habit.icon || 'lucide:circle'" size="22" />
             </button>
           </div>
         </section>
 
-        <section
-          v-if="pendingFinanceCount > 0"
-          class="finance-section"
-        >
-          <NuxtLink
-            to="/finance"
-            class="finance-card"
-          >
-            <Icon
-              name="lucide:wallet"
-              size="18"
-            />
-            <span>{{ pendingFinanceCount }}
-              {{
-                pendingFinanceCount === 1 ? "item precisa" : "itens precisam"
-              }}
-              de atenção</span>
-            <Icon
-              name="lucide:arrow-right"
-              size="14"
-            />
+        <section v-if="pendingFinanceCount > 0" class="finance-section">
+          <NuxtLink to="/finance" class="finance-card">
+            <Icon name="lucide:wallet" size="18" />
+            <span>{{ pendingFinanceCount }} {{ pendingFinanceCount === 1 ? "item precisa" : "itens precisam" }} de atenção</span>
+            <Icon name="lucide:arrow-right" size="14" />
           </NuxtLink>
         </section>
 
         <section class="quick-links">
-          <NuxtLink
-            to="/tasks"
-            class="quick-link"
-          >
-            <Icon
-              name="lucide:list-checks"
-              size="18"
-            />
+          <NuxtLink to="/tasks" class="quick-link">
+            <Icon name="lucide:list-checks" size="18" />
             <span>Todas as tarefas</span>
-            <Icon
-              name="lucide:chevron-right"
-              size="14"
-            />
+            <Icon name="lucide:chevron-right" size="14" />
           </NuxtLink>
-          <NuxtLink
-            to="/planner/week"
-            class="quick-link"
-          >
-            <Icon
-              name="lucide:calendar-days"
-              size="18"
-            />
+          <NuxtLink to="/planner/week" class="quick-link">
+            <Icon name="lucide:calendar-days" size="18" />
             <span>Planner semanal</span>
-            <Icon
-              name="lucide:chevron-right"
-              size="14"
-            />
+            <Icon name="lucide:chevron-right" size="14" />
+          </NuxtLink>
+          <NuxtLink to="/projects" class="quick-link">
+            <Icon name="lucide:folder-kanban" size="18" />
+            <span>Projetos</span>
+            <Icon name="lucide:chevron-right" size="14" />
+          </NuxtLink>
+          <NuxtLink to="/metrics" class="quick-link">
+            <Icon name="lucide:bar-chart-2" size="18" />
+            <span>Métricas</span>
+            <Icon name="lucide:chevron-right" size="14" />
           </NuxtLink>
         </section>
       </div>
@@ -702,12 +600,8 @@ onMounted(async () => {
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .empty-focus {

@@ -17,7 +17,8 @@ const route = useRoute();
 
 const pageTitle = computed(() => {
   const titles: Record<string, string> = {
-    "/": "Dashboard",
+    "/": "Início",
+    "/metrics": "Métricas",
     "/tasks": "Tarefas",
     "/projects": "Projetos",
     "/planner/week": "Planner Semanal",

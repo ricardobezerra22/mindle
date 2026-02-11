@@ -28,7 +28,8 @@
         <span
           v-if="isExpanded"
           class="brand-text"
-        >Mindle</span>
+          >Mindle</span
+        >
       </Transition>
       <Transition name="fade">
         <button
@@ -46,13 +47,26 @@
         to="/"
         class="nav-item"
         exact-active-class="active"
-        :title="!isExpanded ? 'Dashboard' : undefined"
+        :title="!isExpanded ? 'Ínicio' : undefined"
         @click="closeMobile"
       >
         <Icon name="lucide:layout-dashboard" />
-        <Transition name="fade"><span v-if="isExpanded">Dashboard</span></Transition>
+        <Transition name="fade"
+          ><span v-if="isExpanded">Ínicio</span></Transition
+        >
       </NuxtLink>
-
+      <NuxtLink
+        to="/metrics"
+        class="nav-item"
+        active-class="active"
+        :title="!isExpanded ? 'Métricas' : undefined"
+        @click="closeMobile"
+      >
+        <Icon name="lucide:bar-chart-2" />
+        <Transition name="fade"
+          ><span v-if="isExpanded">Métricas</span></Transition
+        >
+      </NuxtLink>
       <NuxtLink
         to="/tasks"
         class="nav-item"
@@ -60,19 +74,10 @@
         :title="!isExpanded ? 'Tarefas' : undefined"
         @click="closeMobile"
       >
-        <Icon name="lucide:list-checks" />
-        <Transition name="fade"><span v-if="isExpanded">Tarefas</span></Transition>
-      </NuxtLink>
-
-      <NuxtLink
-        to="/projects"
-        class="nav-item"
-        active-class="active"
-        :title="!isExpanded ? 'Projetos' : undefined"
-        @click="closeMobile"
-      >
-        <Icon name="lucide:folder-kanban" />
-        <Transition name="fade"><span v-if="isExpanded">Projetos</span></Transition>
+        <Icon name="lucide:home" />
+        <Transition name="fade"
+          ><span v-if="isExpanded">Tarefas</span></Transition
+        >
       </NuxtLink>
 
       <div
@@ -139,7 +144,9 @@
         @click="closeMobile"
       >
         <Icon name="lucide:heart" />
-        <Transition name="fade"><span v-if="isExpanded">Hábitos</span></Transition>
+        <Transition name="fade"
+          ><span v-if="isExpanded">Hábitos</span></Transition
+        >
       </NuxtLink>
 
       <NuxtLink
@@ -150,7 +157,21 @@
         @click="closeMobile"
       >
         <Icon name="lucide:wallet" />
-        <Transition name="fade"><span v-if="isExpanded">Finanças</span></Transition>
+        <Transition name="fade"
+          ><span v-if="isExpanded">Finanças</span></Transition
+        >
+      </NuxtLink>
+      <NuxtLink
+        to="/projects"
+        class="nav-item"
+        active-class="active"
+        :title="!isExpanded ? 'Projetos' : undefined"
+        @click="closeMobile"
+      >
+        <Icon name="lucide:folder-kanban" />
+        <Transition name="fade"
+          ><span v-if="isExpanded">Projetos</span></Transition
+        >
       </NuxtLink>
     </nav>
 
@@ -163,7 +184,9 @@
         @click="closeMobile"
       >
         <Icon name="lucide:settings" />
-        <Transition name="fade"><span v-if="isExpanded">Configurações</span></Transition>
+        <Transition name="fade"
+          ><span v-if="isExpanded">Configurações</span></Transition
+        >
       </NuxtLink>
 
       <div
@@ -204,9 +227,8 @@ import { useAuth } from "../../composables/useAuth";
 
 const { user, logout } = useAuth();
 const toast = useToast();
+const { isExpanded, isMobile, closeMobile } = useSidebar();
 
-const isExpanded = ref(false);
-const isMobile = ref(false);
 const swipeTarget = ref<HTMLElement | null>(null);
 
 const userName = computed(() => user.value?.name || "Usuário");
@@ -217,10 +239,6 @@ const userInitial = computed(() =>
 
 const checkMobile = () => {
   isMobile.value = window.innerWidth <= 768;
-  if (isMobile.value) isExpanded.value = false;
-};
-
-const closeMobile = () => {
   if (isMobile.value) isExpanded.value = false;
 };
 
