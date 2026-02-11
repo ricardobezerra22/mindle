@@ -1,0 +1,270 @@
+# Mindle - Project Guidelines
+
+## Project Context
+
+Mindle is a productivity and wellness platform for users with ADHD, built to study the Nuxt ecosystem.
+Production: https://mindle.space
+The challenge: use accessible components and pure CSS (no SCSS, no component libraries beyond Nuxt UI).
+
+---
+
+## Tech Stack
+
+- **Framework**: Nuxt 4 + Vue 3 (Composition API, `<script setup>`)
+- **Language**: TypeScript (strict)
+- **Styling**: Pure CSS with CSS custom properties (no SCSS). Tailwind CSS for utilities only, Nuxt UI for components
+- **State**: Pinia stores (Composition API style) + `useState` for shared composable state
+- **Database**: MongoDB via Prisma ORM
+- **Auth**: JWT (jose) + Google OAuth
+- **Icons**: Lucide via `@iconify-json/lucide`
+- **Package Manager**: pnpm
+
+---
+
+## Architecture & Code Reuse
+
+### Layers
+
+```
+app/
+├── components/ui/       → Reusable base components (Button, Card, etc.)
+├── components/layout/   → Layout components (Header, Sidebar)
+├── components/{feature}/ → Feature-specific components (tasks/, habits/, focus/, planner/)
+├── composables/         → Shared logic (useAuth, useTasks, usePreferences, useSound, etc.)
+├── stores/              → Pinia stores (useDrawerStore, etc.)
+├── types/               → Shared TypeScript interfaces and enums
+├── layouts/             → Nuxt layouts (default, auth, focus, minimal)
+├── middleware/          → Route guards (auth.global.ts)
+├── pages/               → Route pages
+└── utils/               → Pure utility functions
+
+server/
+├── api/{resource}/      → REST API routes (file-based: index.get.ts, [id].put.ts, etc.)
+├── middleware/          → Server middleware (auth injection)
+└── utils/               → Server helpers (auth.ts, prisma.ts, response.ts)
+```
+
+### Existing Reusable Components
+
+Before creating new components, check if these already exist:
+
+| Component | Path | Purpose |
+|-----------|------|---------|
+| `UiButton` | `components/ui/Button.vue` | Button with variants: primary, secondary, ghost. Props: variant, disabled, loading |
+| `UiCard` | `components/ui/Card.vue` | Card container with surface background, border, and shadow |
+| `LayoutHeader` | `components/layout/Header.vue` | Page header with title prop and actions slot |
+| `LayoutSidebar` | `components/layout/Sidebar.vue` | Collapsible sidebar with navigation, mobile swipe support |
+| `TasksTaskItem` | `components/tasks/TaskItem.vue` | Full task card with edit, subtasks, drag, favorite |
+| `TasksTaskColumn` | `components/tasks/TaskColumn.vue` | Kanban column for task grouping |
+| `FocusProgressIndicator` | `components/focus/ProgressIndicator.vue` | Circular progress for focus sessions |
+| `HabitsHabitCheck` | `components/habits/HabitCheck.vue` | Habit completion checkbox |
+| `PlannerPlannerBlock` | `components/planner/PlannerBlock.vue` | Planner calendar block |
+
+### Existing Composables
+
+Before writing new logic, check if these composables already handle it:
+
+| Composable | Purpose |
+|------------|---------|
+| `useAuth()` | Authentication state, login, register, googleLogin, logout |
+| `useTasks()` | CRUD for tasks, categories, subtasks. Includes optimistic updates |
+| `usePreferences()` | User preferences with debounced save and localStorage fallback |
+| `useSound()` | Audio feedback (playDone) via Web Audio API |
+| `useHabits()` | Habit tracking logic (scaffold - needs implementation) |
+| `useFinance()` | Finance tracking logic (scaffold - needs implementation) |
+| `useFocus()` | Focus session logic (scaffold - needs implementation) |
+| `usePlanner()` | Planner logic (scaffold - needs implementation) |
+| `useGoogleAuth()` | Google OAuth flow |
+
+### Existing Types
+
+All shared types live in `app/types/index.ts`:
+- Enums: `TaskStatus`, `Priority`
+- Interfaces: `Task`, `SubTask`, `TaskCategory`, `Groups`, `PlannerEntry`, `FocusSession`, `Habit`, `HabitLog`, `FinanceEntry`
+
+---
+
+## Design System
+
+### CSS Custom Properties (defined in `app/assets/css/main.css`)
+
+```css
+/* Colors */
+--color-primary: #6faf8e
+--color-primary-dark: #4e8a6d
+--color-background: #f7faf9
+--color-surface: #ffffff
+--color-text-primary: #1f2d2b
+--color-text-secondary: #6b7c7a
+--color-border: #e3ece9
+
+/* Spacing */
+--spacing-xs: 4px
+--spacing-sm: 8px
+--spacing-md: 16px
+--spacing-lg: 24px
+--spacing-xl: 32px
+
+/* Border Radius */
+--radius-sm: 6px
+--radius-md: 10px
+--radius-lg: 14px
+```
+
+### Typography
+
+- Font: Inter (400, 500, 600)
+- h1: 32px / 600
+- h2: 24px / 600
+- h3: 18px / 500
+- Body: 14px / 400 / line-height 1.5
+
+### Status Colors (used across features)
+
+```css
+/* Priority badges */
+HIGH:   bg #fee2e2, color #991b1b
+MEDIUM: bg #fef3c7, color #92400e
+LOW:    bg #d1fae5, color #065f46
+
+/* Success/completion */
+Success green: #10b981
+
+/* Danger/delete hover */
+Danger red: bg #fee2e2, color #dc2626
+
+/* Warning/cancel */
+Warning amber: #f59e0b
+
+/* Favorite */
+Star yellow: #eab308
+```
+
+---
+
+## Coding Standards
+
+### Vue Components
+
+1. Always use `<script setup lang="ts">` syntax
+2. Define props with `interface Props` + `defineProps<Props>()` (use `withDefaults` when needed)
+3. Define emits with typed `defineEmits<{ eventName: [args] }>()`
+4. Use scoped CSS (`<style scoped>`) with CSS custom properties from the design system
+5. Nuxt auto-imports: do NOT manually import `ref`, `computed`, `watch`, `onMounted`, `useState`, `useRoute`, `navigateTo`, `definePageMeta`, `useToast`, `$fetch`, `Icon`, etc.
+6. Component naming follows Nuxt convention: `components/ui/Button.vue` → auto-registered as `<UiButton>`
+
+### Composables
+
+1. Export as `export const useXxx = () => { ... }`
+2. Use `useState` for state shared across components (SSR-safe): `useState<T>(key, () => initialValue)`
+3. Use `ref` for local composable state that doesn't need SSR sharing
+4. Return an object with reactive state and methods
+5. Follow the pattern established in `useTasks`: loading, error, fetch, create, update, delete with optimistic updates
+
+### API Response Pattern
+
+All server API routes must use the standardized response helpers from `server/utils/response.ts`:
+
+```ts
+return sendSuccess(event, data);        // { success: true, data }
+return sendError(event, message, 400);  // { success: false, error }
+```
+
+Client-side composables expect `APIResponse<T>` shape: `{ success: boolean; data: T }`
+
+### Server API Routes
+
+1. File-based routing: `server/api/{resource}/index.get.ts`, `[id].put.ts`, etc.
+2. Auth is injected via server middleware → access `event.context.userId`
+3. Always wrap in try/catch, use `sendSuccess` / `sendError`
+4. Import prisma from `../../utils/prisma`
+
+### Pinia Stores
+
+1. Use Composition API syntax: `defineStore("name", () => { ... })`
+2. Nuxt auto-imports `defineStore`, `ref`, `computed`
+3. Keep stores minimal — prefer composables for feature logic with API calls
+
+### TypeScript
+
+1. Define interfaces for all data shapes in `app/types/index.ts`
+2. Use `type` imports: `import type { Task } from "~/types"`
+3. Avoid `any` — use proper typing or `unknown` with type guards
+4. Server-side types can be co-located in server files when not shared
+
+---
+
+## Styling Rules
+
+1. Use CSS custom properties from the design system — never hardcode colors/spacing/radius
+2. Exception: status-specific colors (priority badges, success green, danger red) can be hardcoded
+3. Use `<style scoped>` on every component
+4. Mobile-first: base styles for mobile, `@media (min-width: 768px)` for desktop
+5. Transitions: use `all 0.2s ease` as the standard transition
+6. Icon sizing via `:deep(svg)` selector when inside scoped styles
+7. Interactive elements: always include hover states and cursor changes
+8. Disabled state: `opacity: 0.5; cursor: not-allowed`
+9. Focus states: use `border-color: var(--color-primary)` with subtle box-shadow
+10. Mobile first: base styles for mobile, `@media (min-width: 768px)` for desktop
+
+---
+
+## Accessibility (a11y)
+
+1. Use semantic HTML elements (`<nav>`, `<main>`, `<aside>`, `<header>`, `<button>`, etc.)
+2. All interactive elements must have `title` or `aria-label` attributes
+3. Buttons must be `<button>`, not `<div>` with click handlers
+4. Form inputs need associated labels or `aria-label`
+5. Support `prefers-reduced-motion` via the `reducedMotion` user preference
+6. Ensure proper color contrast (WCAG AA minimum)
+7. Keyboard navigation: focusable elements in logical tab order
+
+---
+
+## Patterns to Follow
+
+### New Feature Checklist
+
+1. **Types**: Add interfaces/enums to `app/types/index.ts`
+2. **Composable**: Create `app/composables/useFeature.ts` following `useTasks` pattern
+3. **Components**: Create in `app/components/{feature}/` — extract reusable parts to `ui/`
+4. **Page**: Create in `app/pages/` with proper layout via `definePageMeta`
+5. **API Routes**: Create in `server/api/{resource}/` using file-based naming
+6. **Sidebar**: Add navigation link in `components/layout/Sidebar.vue`
+7. **Layout Title**: Add page title mapping in `layouts/default.vue`
+
+### Before Creating a New Component
+
+Ask: "Can I compose this from existing `UiButton`, `UiCard`, `LayoutHeader`, or other existing components?"
+If a pattern repeats across 2+ features, extract it to `components/ui/`.
+
+### Optimistic Updates Pattern (from useTasks)
+
+```
+1. Save previous state
+2. Apply update locally (instant UI feedback)
+3. Send API request
+4. On success: merge server response
+5. On failure: rollback to previous state + set error
+```
+
+---
+
+## Language
+
+- UI text is in **Portuguese (pt-BR)**
+- Code (variables, functions, types) is in **English**
+- Toast messages and user-facing strings: Portuguese
+
+---
+
+## Don'ts
+
+- Do NOT use SCSS or CSS preprocessors
+- Do NOT install additional UI component libraries (Nuxt UI is already included for specific needs)
+- Do NOT add comments to the code
+- Do NOT create duplicate types — always check `app/types/index.ts` first
+- Do NOT use `any` type without justification
+- Do NOT hardcode design tokens — use CSS custom properties
+- Do NOT create composables that duplicate existing ones — extend them instead
+- Do NOT use `<div>` for interactive elements — use `<button>` or `<a>`

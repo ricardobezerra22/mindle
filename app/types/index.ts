@@ -83,6 +83,53 @@ export interface HabitLog {
   userId: string;
 }
 
+export interface Project {
+  id: string;
+  title: string;
+  description?: string;
+  archived: boolean;
+  position: number;
+  categoryId?: string;
+  category?: TaskCategory;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  topics?: Topic[];
+}
+
+export interface Topic {
+  id: string;
+  title: string;
+  content?: any;
+  expanded: boolean;
+  position: number;
+  projectId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  subtopics?: Subtopic[];
+}
+
+export interface Subtopic {
+  id: string;
+  title: string;
+  content?: any;
+  expanded: boolean;
+  position: number;
+  topicId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  tasks?: ProjectTask[];
+}
+
+export interface ProjectTask {
+  id: string;
+  title: string;
+  done: boolean;
+  position: number;
+  subtopicId: string;
+  createdAt: Date;
+}
+
 export interface FinanceEntry {
   id: string;
   title: string;

@@ -19,6 +19,7 @@ const pageTitle = computed(() => {
   const titles: Record<string, string> = {
     "/": "Dashboard",
     "/tasks": "Tarefas",
+    "/projects": "Projetos",
     "/planner/week": "Planner Semanal",
     "/planner/month": "Planner Mensal",
     "/focus": "Foco",

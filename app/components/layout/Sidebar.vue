@@ -64,6 +64,17 @@
         <Transition name="fade"><span v-if="isExpanded">Tarefas</span></Transition>
       </NuxtLink>
 
+      <NuxtLink
+        to="/projects"
+        class="nav-item"
+        active-class="active"
+        :title="!isExpanded ? 'Projetos' : undefined"
+        @click="closeMobile"
+      >
+        <Icon name="lucide:folder-kanban" />
+        <Transition name="fade"><span v-if="isExpanded">Projetos</span></Transition>
+      </NuxtLink>
+
       <div
         v-if="isExpanded"
         class="nav-group"

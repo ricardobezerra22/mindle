@@ -1,0 +1,339 @@
+import type {
+  Project,
+  Topic,
+  Subtopic,
+  ProjectTask,
+  TaskCategory,
+} from "~/types";
+
+interface APIResponse<T> {
+  success: boolean;
+  data: T;
+}
+
+export const useProjects = () => {
+  const projects = ref<Project[]>([]);
+  const loading = ref(false);
+  const error = ref<string | null>(null);
+
+  const fetchProjects = async (params?: {
+    search?: string;
+    categoryId?: string;
+  }) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const query: Record<string, string> = {};
+      if (params?.search) query.search = params.search;
+      if (params?.categoryId) query.categoryId = params.categoryId;
+
+      const response = await $fetch<APIResponse<Project[]>>("/api/projects", {
+        query,
+      });
+      if (response.success) {
+        projects.value = response.data;
+      }
+    } catch (e) {
+      error.value = "Failed to fetch projects";
+      console.error(e);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const createProject = async (data: {
+    title: string;
+    description?: string;
+    categoryId?: string;
+  }) => {
+    try {
+      const response = await $fetch<APIResponse<Project>>("/api/projects", {
+        method: "POST",
+        body: data,
+      });
+      if (response.success) {
+        projects.value.push(response.data);
+        return response.data;
+      }
+    } catch (e) {
+      console.error("Failed to create project:", e);
+      throw e;
+    }
+  };
+
+  const updateProject = async (id: string, updates: Partial<Project>) => {
+    const index = projects.value.findIndex((p) => p.id === id);
+    if (index === -1) return;
+
+    const previous = { ...projects.value[index] };
+    projects.value[index] = { ...projects.value[index], ...updates };
+
+    try {
+      const response = await $fetch<APIResponse<Project>>(
+        `/api/projects/${id}`,
+        {
+          method: "PUT",
+          body: updates,
+        },
+      );
+      if (response.success) {
+        projects.value[index] = response.data;
+        return response.data;
+      } else {
+        projects.value[index] = previous;
+      }
+    } catch (e) {
+      projects.value[index] = previous;
+      console.error("Failed to update project:", e);
+      throw e;
+    }
+  };
+
+  const deleteProject = async (id: string) => {
+    const index = projects.value.findIndex((p) => p.id === id);
+    if (index === -1) return;
+
+    const removed = projects.value.splice(index, 1)[0];
+
+    try {
+      await $fetch(`/api/projects/${id}`, { method: "DELETE" });
+    } catch (e) {
+      projects.value.splice(index, 0, removed);
+      console.error("Failed to delete project:", e);
+      throw e;
+    }
+  };
+
+  const createTopic = async (projectId: string, title: string) => {
+    try {
+      const response = await $fetch<APIResponse<Topic>>(
+        "/api/projects/topics",
+        {
+          method: "POST",
+          body: { title, projectId },
+        },
+      );
+      if (response.success) {
+        const project = projects.value.find((p) => p.id === projectId);
+        if (project) {
+          if (!project.topics) project.topics = [];
+          project.topics.push(response.data);
+        }
+        return response.data;
+      }
+    } catch (e) {
+      console.error("Failed to create topic:", e);
+      throw e;
+    }
+  };
+
+  const updateTopic = async (id: string, updates: Partial<Topic>) => {
+    try {
+      const response = await $fetch<APIResponse<Topic>>(
+        "/api/projects/topics",
+        {
+          method: "PUT",
+          body: { id, ...updates },
+        },
+      );
+      if (response.success) {
+        for (const project of projects.value) {
+          const topicIndex = project.topics?.findIndex((t) => t.id === id);
+          if (topicIndex !== undefined && topicIndex >= 0 && project.topics) {
+            project.topics[topicIndex] = response.data;
+            break;
+          }
+        }
+        return response.data;
+      }
+    } catch (e) {
+      console.error("Failed to update topic:", e);
+      throw e;
+    }
+  };
+
+  const deleteTopic = async (id: string) => {
+    try {
+      await $fetch("/api/projects/topics", {
+        method: "DELETE",
+        body: { id },
+      });
+      for (const project of projects.value) {
+        if (project.topics) {
+          project.topics = project.topics.filter((t) => t.id !== id);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to delete topic:", e);
+      throw e;
+    }
+  };
+
+  const createSubtopic = async (topicId: string, title: string) => {
+    try {
+      const response = await $fetch<APIResponse<Subtopic>>(
+        "/api/projects/subtopics",
+        {
+          method: "POST",
+          body: { title, topicId },
+        },
+      );
+      if (response.success) {
+        for (const project of projects.value) {
+          const topic = project.topics?.find((t) => t.id === topicId);
+          if (topic) {
+            if (!topic.subtopics) topic.subtopics = [];
+            topic.subtopics.push(response.data);
+            break;
+          }
+        }
+        return response.data;
+      }
+    } catch (e) {
+      console.error("Failed to create subtopic:", e);
+      throw e;
+    }
+  };
+
+  const updateSubtopic = async (id: string, updates: Partial<Subtopic>) => {
+    try {
+      const response = await $fetch<APIResponse<Subtopic>>(
+        "/api/projects/subtopics",
+        {
+          method: "PUT",
+          body: { id, ...updates },
+        },
+      );
+      if (response.success) {
+        for (const project of projects.value) {
+          for (const topic of project.topics || []) {
+            const idx = topic.subtopics?.findIndex((s) => s.id === id);
+            if (idx !== undefined && idx >= 0 && topic.subtopics) {
+              topic.subtopics[idx] = response.data;
+              return response.data;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Failed to update subtopic:", e);
+      throw e;
+    }
+  };
+
+  const deleteSubtopic = async (id: string) => {
+    try {
+      await $fetch("/api/projects/subtopics", {
+        method: "DELETE",
+        body: { id },
+      });
+      for (const project of projects.value) {
+        for (const topic of project.topics || []) {
+          if (topic.subtopics) {
+            topic.subtopics = topic.subtopics.filter((s) => s.id !== id);
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Failed to delete subtopic:", e);
+      throw e;
+    }
+  };
+
+  const createProjectTask = async (subtopicId: string, title: string) => {
+    try {
+      const response = await $fetch<APIResponse<ProjectTask>>(
+        "/api/projects/project-tasks",
+        {
+          method: "POST",
+          body: { title, subtopicId },
+        },
+      );
+      if (response.success) {
+        for (const project of projects.value) {
+          for (const topic of project.topics || []) {
+            const subtopic = topic.subtopics?.find(
+              (s) => s.id === subtopicId,
+            );
+            if (subtopic) {
+              if (!subtopic.tasks) subtopic.tasks = [];
+              subtopic.tasks.push(response.data);
+              return response.data;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Failed to create project task:", e);
+      throw e;
+    }
+  };
+
+  const toggleProjectTask = async (id: string, done: boolean) => {
+    try {
+      const response = await $fetch<APIResponse<ProjectTask>>(
+        "/api/projects/project-tasks",
+        {
+          method: "PUT",
+          body: { id, done },
+        },
+      );
+      if (response.success) {
+        for (const project of projects.value) {
+          for (const topic of project.topics || []) {
+            for (const subtopic of topic.subtopics || []) {
+              const task = subtopic.tasks?.find((t) => t.id === id);
+              if (task) {
+                task.done = done;
+                return response.data;
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Failed to toggle project task:", e);
+      throw e;
+    }
+  };
+
+  const deleteProjectTask = async (id: string) => {
+    try {
+      await $fetch("/api/projects/project-tasks", {
+        method: "DELETE",
+        body: { id },
+      });
+      for (const project of projects.value) {
+        for (const topic of project.topics || []) {
+          for (const subtopic of topic.subtopics || []) {
+            if (subtopic.tasks) {
+              subtopic.tasks = subtopic.tasks.filter((t) => t.id !== id);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Failed to delete project task:", e);
+      throw e;
+    }
+  };
+
+  return {
+    projects,
+    loading,
+    error,
+    fetchProjects,
+    createProject,
+    updateProject,
+    deleteProject,
+    createTopic,
+    updateTopic,
+    deleteTopic,
+    createSubtopic,
+    updateSubtopic,
+    deleteSubtopic,
+    createProjectTask,
+    toggleProjectTask,
+    deleteProjectTask,
+  };
+};

@@ -39,6 +39,7 @@ model User {
   finances       FinanceEntry[]
   dailyMoods     DailyMood[]
   preferences    UserPreferences?
+  projects       Project[]
 }
 
 model TaskCategory {
@@ -50,7 +51,67 @@ model TaskCategory {
   userId String @db.ObjectId
   user   User   @relation(fields: [userId], references: [id])
 
-  tasks Task[]
+  tasks    Task[]
+  projects Project[]
+}
+
+model Project {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  archived    Boolean  @default(false)
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categoryId String?       @db.ObjectId
+  category   TaskCategory? @relation(fields: [categoryId], references: [id])
+
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+
+  topics Topic[]
+}
+
+model Topic {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   Json?
+  expanded  Boolean  @default(false)
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projectId String  @db.ObjectId
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  subtopics Subtopic[]
+}
+
+model Subtopic {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   Json?
+  expanded  Boolean  @default(false)
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  topicId String @db.ObjectId
+  topic   Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  tasks ProjectTask[]
+}
+
+model ProjectTask {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  done      Boolean    @default(false)
+  position  Int        @default(0)
+  createdAt DateTime   @default(now())
+
+  subtopicId String   @db.ObjectId
+  subtopic   Subtopic @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
 }
 
 model Task {
