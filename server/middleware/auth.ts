@@ -5,6 +5,7 @@ export default defineEventHandler(async (event) => {
 
   if (!path.startsWith("/api/")) return;
   if (path.startsWith("/api/auth/")) return;
+  if (path.startsWith("/api/cron/")) return;
 
   const userId = await getAuthUser(event);
   if (!userId) {

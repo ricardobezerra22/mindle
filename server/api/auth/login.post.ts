@@ -1,5 +1,6 @@
 import { prisma } from "../../utils/prisma";
 import { comparePassword, generateToken } from "../../utils/auth";
+import { sendWelcomeEmail } from "../../services/emailService";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -37,6 +38,10 @@ export default defineEventHandler(async (event) => {
       maxAge: 60 * 60 * 24 * 7,
       path: "/",
     });
+
+    if (!user.welcomeEmailSent) {
+      sendWelcomeEmail(user.id, user.email, user.name).catch(() => {});
+    }
 
     return sendSuccess(event, {
       id: user.id,

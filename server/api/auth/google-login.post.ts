@@ -1,6 +1,7 @@
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import { prisma } from "../../utils/prisma";
 import { generateToken } from "../../utils/auth";
+import { sendWelcomeEmail } from "../../services/emailService";
 
 const GOOGLE_JWKS = createRemoteJWKSet(
   new URL("https://www.googleapis.com/oauth2/v3/certs"),
@@ -36,6 +37,7 @@ export default defineEventHandler(async (event) => {
     }
 
     let user = await prisma.user.findUnique({ where: { email } });
+    let isNewUser = false;
 
     if (user) {
       if (!user.googleId) {
@@ -45,6 +47,7 @@ export default defineEventHandler(async (event) => {
         });
       }
     } else {
+      isNewUser = true;
       user = await prisma.user.create({
         data: {
           name: name || email.split("@")[0],
@@ -72,6 +75,10 @@ export default defineEventHandler(async (event) => {
       maxAge: 60 * 60 * 24 * 7,
       path: "/",
     });
+
+    if (isNewUser || !user.welcomeEmailSent) {
+      sendWelcomeEmail(user.id, user.email, user.name).catch(() => {});
+    }
 
     return sendSuccess(event, {
       id: user.id,

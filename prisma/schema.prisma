@@ -33,8 +33,10 @@ model User {
   googleId String?
   avatar   String?
 
-  isActive  Boolean? @default(false)
-  createdAt DateTime @default(now())
+  isActive           Boolean? @default(false)
+  welcomeEmailSent   Boolean  @default(false)
+  emailNotifications Boolean  @default(true)
+  createdAt          DateTime @default(now())
 
   tasks          Task[]
   taskCategories TaskCategory[]

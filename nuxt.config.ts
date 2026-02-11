@@ -24,6 +24,7 @@ export default defineNuxtConfig({
       googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
     },
     resendApiKey: process.env.NUXT_RESEND_API_KEY,
+    cronSecret: process.env.NUXT_CRON_SECRET || "mindle-cron-secret-change-in-production",
   },
 
   compatibilityDate: "2025-01-15",

@@ -12,7 +12,11 @@
     />
   </Transition>
 
-  <aside :class="['sidebar', { expanded: isExpanded, mobile: isMobile }]">
+  <aside
+    :class="['sidebar', { expanded: isExpanded, mobile: isMobile }]"
+    @mouseenter="onMouseEnter"
+    @mouseleave="onMouseLeave"
+  >
     <div class="sidebar-header">
       <button
         class="toggle-btn"
@@ -239,7 +243,7 @@ import { useAuth } from "../../composables/useAuth";
 
 const { user, logout } = useAuth();
 const toast = useToast();
-const { isExpanded, isMobile, closeMobile } = useSidebar();
+const { isExpanded, isMobile, closeMobile, onMouseEnter, onMouseLeave } = useSidebar();
 
 const swipeTarget = ref<HTMLElement | null>(null);
 

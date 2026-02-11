@@ -296,6 +296,37 @@
         <section class="settings-section">
           <div class="section-header">
             <Icon
+              name="lucide:mail"
+              size="20"
+            />
+            <div>
+              <h2 class="section-title">
+                Notificações por email
+              </h2>
+              <p class="section-hint">
+                Controle o que chega na sua caixa
+              </p>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-label">Resumo diário</span>
+              <span class="setting-description">Receber email às 7h com tarefas, metas e hábitos</span>
+            </div>
+            <button
+              :class="['toggle', { active: emailNotifications }]"
+              :disabled="emailLoading"
+              @click="toggleEmailNotifications"
+            >
+              <span class="toggle-thumb" />
+            </button>
+          </div>
+        </section>
+
+        <section class="settings-section">
+          <div class="section-header">
+            <Icon
               name="lucide:shield"
               size="20"
             />
@@ -375,8 +406,11 @@
 
 <script setup lang="ts">
 const { preferences, fetchPreferences, debouncedSave } = usePreferences();
+const { user } = useAuth();
 const toast = useToast();
 const exporting = ref(false);
+const emailNotifications = ref(true);
+const emailLoading = ref(false);
 
 const focusDurationOptions = [
   { label: "15 minutos", value: "15" },
@@ -462,8 +496,30 @@ const clearCache = () => {
   });
 };
 
+const toggleEmailNotifications = async () => {
+  emailLoading.value = true;
+  const newValue = !emailNotifications.value;
+  try {
+    const response = await $fetch("/api/user/email-notifications", {
+      method: "PUT",
+      body: { enabled: newValue },
+    });
+    if (response.success) {
+      emailNotifications.value = newValue;
+      toast.success({ title: newValue ? "Notificações ativadas" : "Notificações desativadas" });
+    }
+  } catch {
+    toast.error({ title: "Erro ao atualizar notificações" });
+  } finally {
+    emailLoading.value = false;
+  }
+};
+
 onMounted(() => {
   fetchPreferences();
+  if (user.value?.emailNotifications !== undefined) {
+    emailNotifications.value = user.value.emailNotifications;
+  }
 });
 </script>
 
