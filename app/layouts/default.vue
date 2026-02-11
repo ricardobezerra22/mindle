@@ -26,9 +26,12 @@ const pageTitle = computed(() => {
     "/focus": "Foco",
     "/habits": "Hábitos",
     "/finance": "Finanças",
+    "/goals": "Metas",
     "/settings": "Configurações",
   };
-  return titles[route.path] || "Mindle";
+  if (titles[route.path]) return titles[route.path];
+  if (route.path.startsWith("/goals/")) return "Metas";
+  return "Mindle";
 });
 </script>
 

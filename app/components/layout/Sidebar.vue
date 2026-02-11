@@ -173,6 +173,18 @@
           ><span v-if="isExpanded">Projetos</span></Transition
         >
       </NuxtLink>
+      <NuxtLink
+        to="/goals"
+        class="nav-item"
+        active-class="active"
+        :title="!isExpanded ? 'Metas' : undefined"
+        @click="closeMobile"
+      >
+        <Icon name="lucide:target" />
+        <Transition name="fade"
+          ><span v-if="isExpanded">Metas</span></Transition
+        >
+      </NuxtLink>
     </nav>
 
     <div class="sidebar-footer">

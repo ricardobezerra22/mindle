@@ -18,6 +18,7 @@
     "@pinia/nuxt": "^0.11.3",
     "@prisma/client": "6.19",
     "@vercel/analytics": "^1.6.1",
+    "@vue-email/nuxt": "^0.8.19",
     "@vueuse/core": "^14.2.1",
     "@vueuse/nuxt": "^14.2.1",
     "bcryptjs": "^2.4.3",
@@ -28,6 +29,7 @@
     "nuxt-toast": "^1.4.0",
     "pg": "^8.18.0",
     "pinia": "^3.0.4",
+    "resend": "^6.9.2",
     "tailwindcss": "^4.1.18",
     "vite-tsconfig-paths": "^6.0.5",
     "vue-chartjs": "^5.3.3"

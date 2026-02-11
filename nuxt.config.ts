@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     "nuxt-toast",
     "@pinia/nuxt",
     "nuxt-google-auth",
+    "@vue-email/nuxt",
   ],
   devtools: {
     enabled: true,
@@ -22,6 +23,7 @@ export default defineNuxtConfig({
     public: {
       googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
     },
+    resendApiKey: process.env.NUXT_RESEND_API_KEY,
   },
 
   compatibilityDate: "2025-01-15",

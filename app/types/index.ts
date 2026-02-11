@@ -83,14 +83,47 @@ export interface HabitLog {
   userId: string;
 }
 
+export enum GoalStatus {
+  IN_PROGRESS = "IN_PROGRESS",
+  AT_RISK = "AT_RISK",
+  DONE = "DONE",
+}
+
+export interface Goal {
+  id: string;
+  title: string;
+  description?: string;
+  color?: string;
+  status: GoalStatus;
+  deadline?: Date;
+  position: number;
+  archived: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  projects?: Project[];
+}
+
+export interface GoalWithProgress extends Goal {
+  progress: number;
+  totalTasks: number;
+  completedTasks: number;
+  projectCount: number;
+  clarityScore: number;
+  lastActivity?: Date;
+}
+
 export interface Project {
   id: string;
   title: string;
   description?: string;
   archived: boolean;
   position: number;
+  weight: number;
   categoryId?: string;
   category?: TaskCategory;
+  goalId?: string;
+  goal?: Goal;
   createdAt: Date;
   updatedAt: Date;
   userId: string;
