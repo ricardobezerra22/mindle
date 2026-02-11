@@ -365,6 +365,70 @@
         </section>
       </div>
 
+      <section class="settings-section feedback-section">
+        <div class="section-header">
+          <Icon
+            name="lucide:message-circle"
+            size="20"
+          />
+          <div>
+            <h2 class="section-title">
+              Suporte e Feedback
+            </h2>
+            <p class="section-hint">
+              Envie para suporte@mindle.space
+            </p>
+          </div>
+        </div>
+
+        <form
+          class="feedback-form"
+          @submit.prevent="sendFeedback"
+        >
+          <div class="feedback-field">
+            <label
+              for="feedback-subject"
+              class="feedback-label"
+            >Assunto</label>
+            <input
+              id="feedback-subject"
+              v-model="feedbackSubject"
+              type="text"
+              class="feedback-input"
+              placeholder="Qual o tema?"
+              required
+            >
+          </div>
+
+          <div class="feedback-field">
+            <label
+              for="feedback-message"
+              class="feedback-label"
+            >Mensagem</label>
+            <textarea
+              id="feedback-message"
+              v-model="feedbackMessage"
+              class="feedback-textarea"
+              rows="4"
+              placeholder="Descreva sua dúvida, sugestão ou problema..."
+              required
+            />
+          </div>
+
+          <UiButton
+            type="submit"
+            :disabled="sendingFeedback"
+          >
+            <Icon
+              :name="sendingFeedback ? 'lucide:loader-2' : 'lucide:send'"
+              size="16"
+              :class="{ spinning: sendingFeedback }"
+            />
+            {{ sendingFeedback ? "Enviando..." : "Enviar Feedback" }}
+          </UiButton>
+        </form>
+      </section>
+
       <section class="about-section">
         <p class="app-name">
           Mindle
@@ -376,16 +440,6 @@
           Um espaço calmo para organizar o que importa. Sem pressa, sem pressão.
           Feito para quem quer clareza, não mais complexidade.
         </p>
-        <a
-          href="mailto:feedback@mindle.app"
-          class="feedback-link"
-        >
-          <Icon
-            name="lucide:mail"
-            size="16"
-          />
-          Enviar feedback
-        </a>
       </section>
     </div>
   </div>
@@ -398,6 +452,9 @@ const toast = useToast();
 const exporting = ref(false);
 const emailNotifications = ref(true);
 const emailLoading = ref(false);
+const feedbackSubject = ref("");
+const feedbackMessage = ref("");
+const sendingFeedback = ref(false);
 
 const focusDurationOptions = [
   { label: "15 minutos", value: "15" },
@@ -481,6 +538,30 @@ const clearCache = () => {
     title: "Cache limpo",
     message: "Continue assim!",
   });
+};
+
+const sendFeedback = async () => {
+  if (!feedbackSubject.value.trim() || !feedbackMessage.value.trim()) return;
+
+  sendingFeedback.value = true;
+  try {
+    const response = await $fetch("/api/support", {
+      method: "POST",
+      body: {
+        subject: feedbackSubject.value,
+        message: feedbackMessage.value,
+      },
+    });
+    if (response.success) {
+      toast.success({ title: "Feedback enviado", message: "Obrigado por ajudar a melhorar o Mindle!" });
+      feedbackSubject.value = "";
+      feedbackMessage.value = "";
+    }
+  } catch {
+    toast.error({ title: "Erro ao enviar feedback", message: "Tente novamente mais tarde" });
+  } finally {
+    sendingFeedback.value = false;
+  }
 };
 
 const toggleEmailNotifications = async () => {
@@ -738,23 +819,62 @@ onMounted(() => {
   max-width: 380px;
 }
 
-.feedback-link {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--color-primary);
-  text-decoration: none;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 2px solid var(--color-border);
-  border-radius: 10px;
-  transition: all 0.2s ease;
+.feedback-section {
+  grid-column: 1 / -1;
 }
 
-.feedback-link:hover {
-  border-color: var(--color-primary);
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.feedback-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.feedback-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.feedback-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--color-border);
+  border-radius: 10px;
   background: var(--color-background);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.feedback-input:focus {
+  border-color: var(--color-primary);
+}
+
+.feedback-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+  min-height: 100px;
+  transition: border-color 0.2s ease;
+}
+
+.feedback-textarea:focus {
+  border-color: var(--color-primary);
 }
 
 @media (max-width: 768px) {
