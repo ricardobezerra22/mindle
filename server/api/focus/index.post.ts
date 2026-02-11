@@ -5,20 +5,35 @@ export default defineEventHandler(async (event) => {
     const userId = event.context.userId;
 
     const body = await readBody(event);
-    const { focusContext, durationMinutes, elapsedMinutes } = body;
+    const { focusContext, durationMinutes, elapsedMinutes, taskId } = body;
 
     if (!durationMinutes || !elapsedMinutes) {
       return sendError(event, "Missing required fields", 400);
     }
+
+    const elapsed = parseInt(elapsedMinutes);
 
     const focusSession = await prisma.focusSession.create({
       data: {
         userId,
         focusContext: focusContext || null,
         duration: parseInt(durationMinutes),
-        elapsed: parseInt(elapsedMinutes),
+        elapsed,
+        taskId: taskId || null,
+      },
+      include: {
+        task: {
+          select: { id: true, title: true },
+        },
       },
     });
+
+    if (taskId) {
+      await prisma.task.update({
+        where: { id: taskId },
+        data: { timeSpent: { increment: elapsed } },
+      });
+    }
 
     return sendSuccess(event, focusSession);
   } catch (error) {

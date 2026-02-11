@@ -48,18 +48,87 @@
         class="setup-view"
       >
         <div class="focus-context">
+          <label class="context-label">Vincular a uma tarefa?</label>
+          <div class="task-selector">
+            <button
+              class="task-selector-toggle"
+              :class="{ active: showTaskDropdown }"
+              @click="showTaskDropdown = !showTaskDropdown"
+            >
+              <Icon
+                :name="selectedTask ? 'lucide:link' : 'lucide:link-2-off'"
+                size="16"
+              />
+              <span class="task-selector-label">
+                {{ selectedTask ? selectedTask.title : 'Nenhuma tarefa (opcional)' }}
+              </span>
+              <Icon
+                :name="showTaskDropdown ? 'lucide:chevron-up' : 'lucide:chevron-down'"
+                size="14"
+              />
+            </button>
+
+            <div
+              v-if="showTaskDropdown"
+              class="task-dropdown"
+            >
+              <input
+                v-model="taskSearch"
+                type="text"
+                class="task-search-input"
+                placeholder="Buscar tarefa..."
+              />
+              <div class="task-dropdown-list">
+                <button
+                  class="task-dropdown-item none-option"
+                  @click="clearTask"
+                >
+                  <Icon
+                    name="lucide:x"
+                    size="14"
+                  />
+                  Sem tarefa vinculada
+                </button>
+                <button
+                  v-for="task in filteredAvailableTasks"
+                  :key="task.id"
+                  class="task-dropdown-item"
+                  :class="{ selected: selectedTask?.id === task.id }"
+                  @click="selectTask(task)"
+                >
+                  <span
+                    v-if="task.category?.color"
+                    class="task-cat-dot"
+                    :style="{ backgroundColor: task.category.color }"
+                  />
+                  <span class="task-dropdown-title">{{ task.title }}</span>
+                  <span
+                    class="task-priority-dot"
+                    :class="`priority-${task.priority.toLowerCase()}`"
+                  />
+                </button>
+                <div
+                  v-if="filteredAvailableTasks.length === 0"
+                  class="task-dropdown-empty"
+                >
+                  Nenhuma tarefa encontrada
+                </div>
+              </div>
+            </div>
+          </div>
+
           <label
             for="focus-input"
-            class="context-label"
+            class="context-label context-label-secondary"
           >
-            No que você vai focar?
+            {{ selectedTask ? 'Contexto adicional' : 'No que você vai focar?' }}
           </label>
           <input
             id="focus-input"
             v-model="focusContext"
             type="text"
             class="context-input"
-            placeholder="ex: Estudar Hematologia"
+            :placeholder="selectedTask ? 'ex: Revisar capítulo 3' : 'ex: Estudar Hematologia'"
             maxlength="50"
           />
         </div>
@@ -118,10 +187,19 @@
         class="session-view"
       >
         <div
-          v-if="focusContext"
+          v-if="activeContextLabel"
           class="active-context"
         >
-          {{ focusContext }}
+          <span
+            v-if="selectedTask"
+            class="active-task-badge"
+          >
+            <Icon name="lucide:link" size="14" />
+            {{ selectedTask.title }}
+          </span>
+          <span v-if="focusContext" class="active-context-text">
+            {{ focusContext }}
+          </span>
         </div>
 
         <div class="timer-container">
@@ -206,6 +284,10 @@
 </template>
 
 <script setup lang="ts">
+import type { Task } from "~/types";
+
+const { tasks, fetchTasks } = useTasks();
+
 const focusContext = ref("");
 const selectedDuration = ref(0);
 const customMinutes = ref(30);
@@ -218,8 +300,37 @@ const sessionDuration = ref(0);
 const elapsedSeconds = ref(0);
 const elapsedMinutes = ref(0);
 const isLoggingSession = ref(false);
+const selectedTask = ref<Task | null>(null);
+const showTaskDropdown = ref(false);
+const taskSearch = ref("");
 let intervalId: NodeJS.Timeout | null = null;
 let startTime: number | null = null;
+
+const availableTasks = computed(() =>
+  tasks.value.filter(t => t.status !== "DONE"),
+);
+
+const filteredAvailableTasks = computed(() => {
+  if (!taskSearch.value.trim()) return availableTasks.value;
+  const q = taskSearch.value.toLowerCase();
+  return availableTasks.value.filter(t => t.title.toLowerCase().includes(q));
+});
+
+const selectTask = (task: Task) => {
+  selectedTask.value = task;
+  showTaskDropdown.value = false;
+  taskSearch.value = "";
+};
+
+const clearTask = () => {
+  selectedTask.value = null;
+  showTaskDropdown.value = false;
+  taskSearch.value = "";
+};
+
+const activeContextLabel = computed(() =>
+  selectedTask.value || focusContext.value,
+);
 
 const presets = [
   { value: 15, label: "15 min", sublabel: "Foco rápido" },
@@ -321,16 +432,22 @@ const resetSession = () => {
 const logSession = async () => {
   isLoggingSession.value = true;
   try {
+    const context = selectedTask.value
+      ? (focusContext.value ? `${selectedTask.value.title} — ${focusContext.value}` : selectedTask.value.title)
+      : focusContext.value;
+
     await $fetch("/api/focus", {
       method: "POST",
       body: {
-        focusContext: focusContext.value,
+        focusContext: context,
         durationMinutes: sessionDuration.value,
         elapsedMinutes: elapsedMinutes.value,
+        taskId: selectedTask.value?.id || null,
       },
     });
     resetSession();
     focusContext.value = "";
+    selectedTask.value = null;
     selectedDuration.value = 0;
     showCustom.value = false;
   } catch (error) {
@@ -368,6 +485,10 @@ const progressColor = computed(() => {
   if (progress > 0.5) return "#6FAF8E";
   if (progress > 0.25) return "#8BC4A8";
   return "#A8D5C0";
+});
+
+onMounted(() => {
+  fetchTasks();
 });
 
 onUnmounted(() => {
@@ -564,14 +685,35 @@ onUnmounted(() => {
 }
 
 .active-context {
-  font-size: 18px;
-  color: var(--color-primary-dark);
-  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
   text-align: center;
   padding: var(--spacing-md) var(--spacing-lg);
   background: var(--color-surface);
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(111, 175, 142, 0.1);
+}
+
+.active-task-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+}
+
+.active-task-badge :deep(svg) {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.active-context-text {
+  font-size: 13px;
+  color: var(--color-text-secondary);
 }
 
 .timer-container {
@@ -848,6 +990,155 @@ onUnmounted(() => {
 .reset-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.context-label-secondary {
+  margin-top: var(--spacing-lg);
+  color: var(--color-text-secondary);
+}
+
+.task-selector {
+  position: relative;
+  margin-bottom: var(--spacing-sm);
+}
+
+.task-selector-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  text-align: left;
+}
+
+.task-selector-toggle:hover,
+.task-selector-toggle.active {
+  border-color: var(--color-primary);
+}
+
+.task-selector-toggle.active {
+  color: var(--color-text-primary);
+}
+
+.task-selector-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 20;
+  overflow: hidden;
+}
+
+.task-search-input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 13px;
+  color: var(--color-text-primary);
+  background: transparent;
+  outline: none;
+}
+
+.task-search-input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.task-dropdown-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.task-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.task-dropdown-item:hover {
+  background: var(--color-background);
+}
+
+.task-dropdown-item.selected {
+  background: #E8F3ED;
+  font-weight: 500;
+}
+
+.task-dropdown-item.none-option {
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.task-dropdown-item.none-option :deep(svg) {
+  width: 14px;
+  height: 14px;
+}
+
+.task-cat-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.task-dropdown-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-priority-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.task-priority-dot.priority-high {
+  background: #dc2626;
+}
+
+.task-priority-dot.priority-medium {
+  background: #f59e0b;
+}
+
+.task-priority-dot.priority-low {
+  background: #10b981;
+}
+
+.task-dropdown-empty {
+  padding: var(--spacing-md);
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-text-secondary);
 }
 
 @media (max-width: 768px) {

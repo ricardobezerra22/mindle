@@ -34,6 +34,7 @@ export interface Task {
   isFavorite: boolean;
   categoryId?: string;
   category?: TaskCategory;
+  timeSpent: number;
   createdAt: Date;
   userId: string;
   subTasks?: SubTask[];
@@ -57,7 +58,11 @@ export interface PlannerEntry {
 export interface FocusSession {
   id: string;
   duration: number;
+  elapsed: number;
+  focusContext?: string;
   date: Date;
+  taskId?: string;
+  task?: Task;
   userId: string;
 }
 

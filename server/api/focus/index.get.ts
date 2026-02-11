@@ -6,8 +6,11 @@ export default defineEventHandler(async (event) => {
 
     const sessions = await prisma.focusSession.findMany({
       where: { userId },
-      orderBy: {
-        createdAt: "desc",
+      orderBy: { date: "desc" },
+      include: {
+        task: {
+          select: { id: true, title: true, category: true },
+        },
       },
     });
 
