@@ -4,7 +4,7 @@
 
     <div class="layout-main">
       <LayoutHeader :title="pageTitle" />
-
+      <SpeedInsights />
       <main class="layout-content">
         <slot />
       </main>
@@ -13,6 +13,8 @@
 </template>
 
 <script setup lang="ts">
+import { SpeedInsights } from "@vercel/speed-insights/nuxt";
+
 const route = useRoute();
 const { init: initTheme } = useTheme();
 
