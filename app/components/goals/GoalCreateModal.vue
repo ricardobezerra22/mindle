@@ -78,7 +78,6 @@
                 v-model="form.status"
               >
                 <option value="IN_PROGRESS">Em andamento</option>
-                <option value="AT_RISK">Em risco</option>
                 <option value="DONE">Concluída</option>
               </select>
             </div>

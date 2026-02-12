@@ -6,21 +6,32 @@
   >
     <div class="goal-top">
       <div class="goal-badges">
-        <span :class="['status-badge', `status-${goal.status.toLowerCase().replace('_', '-')}`]">
+        <span
+          :class="[
+            'status-badge',
+            `status-${goal.status.toLowerCase().replace('_', '-')}`,
+          ]"
+        >
           {{ statusLabel }}
         </span>
         <span
           v-if="isDeadlineClose"
           class="badge-indicator deadline"
         >
-          <Icon name="lucide:clock" size="12" />
+          <Icon
+            name="lucide:clock"
+            size="12"
+          />
           {{ daysLeftLabel }}
         </span>
         <span
           v-if="isInactive"
           class="badge-indicator inactive"
         >
-          <Icon name="lucide:moon" size="12" />
+          <Icon
+            name="lucide:moon"
+            size="12"
+          />
           Inativa
         </span>
       </div>
@@ -36,7 +47,9 @@
       <p
         v-if="goal.description"
         class="goal-description"
-      >{{ goal.description }}</p>
+      >
+        {{ goal.description }}
+      </p>
     </div>
 
     <GoalsGoalProgressBar
@@ -47,20 +60,39 @@
 
     <div class="goal-footer">
       <div class="goal-stat">
-        <Icon name="lucide:folder" size="14" />
-        <span>{{ goal.projectCount }} {{ goal.projectCount === 1 ? 'projeto' : 'projetos' }}</span>
+        <Icon
+          name="lucide:folder"
+          size="14"
+        />
+        <span
+          >{{ goal.projectCount }}
+          {{ goal.projectCount === 1 ? "projeto" : "projetos" }}</span
+        >
       </div>
       <div class="goal-stat">
-        <Icon name="lucide:check-circle-2" size="14" />
+        <Icon
+          name="lucide:check-circle-2"
+          size="14"
+        />
         <span>{{ goal.completedTasks }}/{{ goal.totalTasks }}</span>
       </div>
-      <div class="clarity-score" :title="`Clareza: ${goal.clarityScore}%`">
+      <div
+        class="clarity-score"
+        :title="`Clareza: ${goal.clarityScore}%`"
+      >
         <div class="clarity-dots">
           <span
             v-for="i in 4"
             :key="i"
-            :class="['clarity-dot', { filled: i <= Math.ceil(goal.clarityScore / 25) }]"
-            :style="i <= Math.ceil(goal.clarityScore / 25) ? { backgroundColor: goal.color || 'var(--color-primary)' } : {}"
+            :class="[
+              'clarity-dot',
+              { filled: i <= Math.ceil(goal.clarityScore / 25) },
+            ]"
+            :style="
+              i <= Math.ceil(goal.clarityScore / 25)
+                ? { backgroundColor: goal.color || 'var(--color-primary)' }
+                : {}
+            "
           />
         </div>
       </div>
@@ -80,7 +112,6 @@ const props = defineProps<Props>();
 const statusLabel = computed(() => {
   const map: Record<string, string> = {
     IN_PROGRESS: "Em andamento",
-    AT_RISK: "Em risco",
     DONE: "Concluída",
   };
   return map[props.goal.status] || props.goal.status;
@@ -106,7 +137,8 @@ const daysLeftLabel = computed(() => {
 const isInactive = computed(() => {
   if (!props.goal.lastActivity) return true;
   const daysSince = Math.floor(
-    (Date.now() - new Date(props.goal.lastActivity).getTime()) / (1000 * 60 * 60 * 24),
+    (Date.now() - new Date(props.goal.lastActivity).getTime()) /
+      (1000 * 60 * 60 * 24),
   );
   return daysSince > 10;
 });
@@ -132,7 +164,9 @@ const cardAccent = computed(() => {
   padding: var(--spacing-lg);
   text-decoration: none;
   color: inherit;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
   cursor: pointer;
 }
 
@@ -171,6 +205,44 @@ const cardAccent = computed(() => {
 .status-badge.status-at-risk {
   background: rgba(245, 158, 11, 0.12);
   color: #92400e;
+}
+
+.risk-tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 2px;
+  cursor: help;
+}
+
+.risk-info-icon {
+  opacity: 0.7;
+}
+
+.risk-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  padding: 8px 12px;
+  background: var(--color-text-primary);
+  color: white;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  border-radius: var(--radius-sm);
+  text-transform: none;
+  letter-spacing: normal;
+  z-index: 10;
+  pointer-events: none;
+  white-space: normal;
+}
+
+.risk-tooltip-wrapper:hover .risk-tooltip,
+.risk-tooltip-wrapper:focus-within .risk-tooltip {
+  display: block;
 }
 
 .status-badge.status-done {

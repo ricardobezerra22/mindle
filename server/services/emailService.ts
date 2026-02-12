@@ -56,7 +56,6 @@ export const sendDailyTrackingEmail = async (userId: string) => {
       dueTodayTasks,
       overdueTasks,
       activeGoals,
-      goalAtRisk,
       habits,
       yesterdayLogs,
     ] = await Promise.all([
@@ -79,9 +78,6 @@ export const sendDailyTrackingEmail = async (userId: string) => {
       }),
       prisma.goal.count({
         where: { userId, status: "IN_PROGRESS", archived: false },
-      }),
-      prisma.goal.count({
-        where: { userId, status: "AT_RISK", archived: false },
       }),
       prisma.habit.count({ where: { userId } }),
       prisma.habitLog.count({
@@ -111,7 +107,6 @@ export const sendDailyTrackingEmail = async (userId: string) => {
         dueTodayTasks,
         overdueTasks,
         activeGoals,
-        goalAtRisk,
         streakHabits: yesterdayLogs,
         totalHabits: habits,
       }),

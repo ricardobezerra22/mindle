@@ -4,7 +4,6 @@ interface DailyTrackingData {
   dueTodayTasks: number;
   overdueTasks: number;
   activeGoals: number;
-  goalAtRisk: number;
   streakHabits: number;
   totalHabits: number;
 }
@@ -89,11 +88,6 @@ export const dailyTrackingTemplate = (data: DailyTrackingData) => {
   if (data.dueTodayTasks > 0) {
     urgentItems.push(
       `📌 <strong>${data.dueTodayTasks}</strong> tarefa${data.dueTodayTasks > 1 ? "s" : ""} para hoje`,
-    );
-  }
-  if (data.goalAtRisk > 0) {
-    urgentItems.push(
-      `🔥 <strong>${data.goalAtRisk}</strong> meta${data.goalAtRisk > 1 ? "s" : ""} em risco`,
     );
   }
 

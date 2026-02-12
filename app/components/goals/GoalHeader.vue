@@ -106,7 +106,6 @@ const strokeOffset = computed(() =>
 const statusLabel = computed(() => {
   const map: Record<string, string> = {
     IN_PROGRESS: "Em andamento",
-    AT_RISK: "Em risco",
     DONE: "Concluída",
   };
   return map[props.goal.status] || props.goal.status;

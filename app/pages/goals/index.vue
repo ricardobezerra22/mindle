@@ -97,22 +97,20 @@
 </template>
 
 <script setup lang="ts">
-const { goals, loading, activeGoals, completedGoals, atRiskGoals, fetchGoals } = useGoals();
+const { goals, loading, activeGoals, completedGoals, fetchGoals } = useGoals();
 
 const showCreateModal = ref(false);
-const activeFilter = ref<"all" | "active" | "at_risk" | "done">("all");
+const activeFilter = ref<"all" | "active" | "done">("all");
 
 const filters = computed(() => [
   { label: "Todas", value: "all" as const, count: goals.value.length },
   { label: "Em andamento", value: "active" as const, count: activeGoals.value.length },
-  { label: "Em risco", value: "at_risk" as const, count: atRiskGoals.value.length },
   { label: "Concluídas", value: "done" as const, count: completedGoals.value.length },
 ]);
 
 const filteredGoals = computed(() => {
   switch (activeFilter.value) {
     case "active": return activeGoals.value;
-    case "at_risk": return atRiskGoals.value;
     case "done": return completedGoals.value;
     default: return goals.value;
   }

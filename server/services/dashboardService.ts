@@ -339,7 +339,6 @@ const getFinanceMetrics = async (userId: string, range: DateRange) => {
     where: {
       userId,
       createdAt: { gte: range.startDate, lte: range.endDate },
-      archived: false,
     },
     select: {
       amount: true,

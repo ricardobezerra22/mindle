@@ -120,17 +120,12 @@ export const useGoals = () => {
     goals.value.filter(g => g.status === "DONE"),
   );
 
-  const atRiskGoals = computed(() =>
-    goals.value.filter(g => g.status === "AT_RISK"),
-  );
-
   return {
     goals,
     loading,
     error,
     activeGoals,
     completedGoals,
-    atRiskGoals,
     fetchGoals,
     fetchGoalById,
     createGoal,
