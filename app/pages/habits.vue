@@ -2,24 +2,14 @@
   <div class="habits-page">
     <div class="habits-container">
       <div class="check-in-section">
-        <h2 class="section-title">Como você está hoje?</h2>
-        <div class="mood-options">
-          <button
-            v-for="mood in moodOptions"
-            :key="mood.value"
-            :class="['mood-btn', { selected: todayMood === mood.value }]"
-            @click="selectMood(mood.value)"
-          >
-            <Icon :name="mood.icon" />
-            <span>{{ mood.label }}</span>
-          </button>
-        </div>
-        <p
-          v-if="todayMood"
-          class="mood-feedback"
-        >
-          Obrigado por compartilhar.
-        </p>
+        <HabitsMoodSelector
+          v-model="todayMood"
+          @update:model-value="selectMood"
+        />
+        <HabitsEnergyLevel
+          v-model="todayEnergy"
+          @update:model-value="selectEnergy"
+        />
       </div>
 
       <div class="habits-section">
@@ -74,7 +64,18 @@
           <div
             v-for="habit in habits"
             :key="habit.id"
-            :class="['habit-card', { checked: isHabitCheckedToday(habit.id) }]"
+            :class="[
+              'habit-card',
+              { checked: isHabitCheckedToday(habit.id) },
+              { dragging: habitDrag.isDragging(habit.id) },
+              { 'drag-over': habitDrag.isDragOver(habit.id) },
+            ]"
+            draggable="true"
+            @dragstart="habitDrag.onDragStart(habit.id, $event)"
+            @dragover="habitDrag.onDragOver(habit.id, $event)"
+            @dragleave="habitDrag.onDragLeave()"
+            @drop="habitDrag.onDrop(habit.id, $event)"
+            @dragend="habitDrag.onDragEnd()"
           >
             <button
               class="habit-check"
@@ -98,6 +99,10 @@
                 />
                 <h3 class="habit-title">{{ habit.title }}</h3>
               </div>
+              <HabitsWeeklyProgress
+                :completed="getWeeklyCompleted(habit.id)"
+                :goal="habit.weeklyGoal || 3"
+              />
             </div>
 
             <button
@@ -223,6 +228,29 @@
             </div>
           </div>
 
+          <div class="form-group">
+            <label for="weeklyGoal">Meta semanal</label>
+            <div class="weekly-goal-input">
+              <button
+                type="button"
+                class="goal-btn"
+                :disabled="formData.weeklyGoal <= 1"
+                @click="formData.weeklyGoal--"
+              >
+                <Icon name="lucide:minus" size="16" />
+              </button>
+              <span class="goal-value">{{ formData.weeklyGoal }}x por semana</span>
+              <button
+                type="button"
+                class="goal-btn"
+                :disabled="formData.weeklyGoal >= 7"
+                @click="formData.weeklyGoal++"
+              >
+                <Icon name="lucide:plus" size="16" />
+              </button>
+            </div>
+          </div>
+
           <div
             v-if="editingHabit"
             class="form-group"
@@ -273,12 +301,15 @@
 </template>
 
 <script setup lang="ts">
+import { Mood, EnergyLevel } from "~/types";
+import type { Habit, HabitLog } from "~/types";
+
 const { preferences } = usePreferences();
 
 const showAddModal = ref(false);
 const loading = ref(false);
 const isSaving = ref(false);
-const editingHabit = ref<any>(null);
+const editingHabit = ref<Habit | null>(null);
 const showInsights = ref(preferences.value.showInsights);
 const isBreathing = ref(false);
 const breathingPhase = ref("Inspire...");
@@ -288,18 +319,29 @@ const encouragementText = ref("");
 const formData = ref({
   title: "",
   icon: "",
+  weeklyGoal: 3,
 });
 
-const habits = ref<any[]>([]);
-const habitLogs = ref<any[]>([]);
-const todayMood = ref<string | null>(null);
+const habits = ref<Habit[]>([]);
+const habitLogs = ref<HabitLog[]>([]);
+const todayMood = ref<Mood | null>(null);
+const todayEnergy = ref<EnergyLevel | null>(null);
 
-const moodOptions = [
-  { value: "calm", label: "Calmo", icon: "lucide:smile" },
-  { value: "okay", label: "Ok", icon: "lucide:meh" },
-  { value: "tired", label: "Cansado", icon: "lucide:cloud" },
-  { value: "overwhelmed", label: "Sobrecarregado", icon: "lucide:frown" },
-];
+const reorderHabits = async (items: { id: string; position: number }[]) => {
+  try {
+    await $fetch("/api/habits/reorder", {
+      method: "PUT",
+      body: { items },
+    });
+  } catch (e) {
+    console.error("Failed to reorder habits:", e);
+  }
+};
+
+const habitDrag = useDragReorder({
+  items: habits,
+  onReorder: reorderHabits,
+});
 
 const iconOptions = [
   { value: "lucide:droplet" },
@@ -385,26 +427,59 @@ const fetchHabitLogs = async () => {
   }
 };
 
+const getWeekStartDate = () => {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = day === 0 ? 6 : day - 1;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - diff);
+  monday.setHours(0, 0, 0, 0);
+  return monday;
+};
+
+const getWeeklyCompleted = (habitId: string) => {
+  const weekStart = getWeekStartDate();
+  return habitLogs.value.filter(
+    (log) =>
+      log.habitId === habitId &&
+      log.done &&
+      new Date(log.date) >= weekStart,
+  ).length;
+};
+
 const fetchTodayMood = async () => {
   try {
     const response = await $fetch("/api/habits/mood-today");
     if (response.success && response.data) {
-      todayMood.value = response.data.mood;
+      todayMood.value = response.data.mood as Mood;
+      todayEnergy.value = (response.data.energy as EnergyLevel) || null;
     }
   } catch (error) {
     console.error("Error fetching mood:", error);
   }
 };
 
-const selectMood = async (mood: string) => {
+const selectMood = async (mood: Mood) => {
   todayMood.value = mood;
   try {
     await $fetch("/api/habits/mood", {
       method: "POST",
-      body: { mood },
+      body: { mood, energy: todayEnergy.value },
     });
   } catch (error) {
     console.error("Error saving mood:", error);
+  }
+};
+
+const selectEnergy = async (energy: EnergyLevel) => {
+  todayEnergy.value = energy;
+  try {
+    await $fetch("/api/habits/mood", {
+      method: "POST",
+      body: { mood: todayMood.value || Mood.OK, energy },
+    });
+  } catch (error) {
+    console.error("Error saving energy:", error);
   }
 };
 
@@ -502,11 +577,12 @@ const deleteHabit = async () => {
   }
 };
 
-const openEditModal = (habit: any) => {
+const openEditModal = (habit: Habit) => {
   editingHabit.value = habit;
   formData.value = {
     title: habit.title,
     icon: habit.icon || "",
+    weeklyGoal: habit.weeklyGoal || 3,
   };
 };
 
@@ -516,6 +592,7 @@ const closeModal = () => {
   formData.value = {
     title: "",
     icon: "",
+    weeklyGoal: 3,
   };
 };
 
@@ -738,6 +815,20 @@ onUnmounted(() => {
   align-items: center;
   gap: var(--spacing-md);
   transition: all 0.2s ease;
+  cursor: grab;
+}
+
+.habit-card:active {
+  cursor: grabbing;
+}
+
+.habit-card.dragging {
+  opacity: 0.4;
+}
+
+.habit-card.drag-over {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(111, 175, 142, 0.2);
 }
 
 .habit-card.checked {
@@ -1161,13 +1252,51 @@ onUnmounted(() => {
   height: 16px;
 }
 
+.weekly-goal-input {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.goal-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+}
+
+.goal-btn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.goal-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.goal-value {
+  flex: 1;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
 @media (max-width: 768px) {
   .habits-page {
     padding: var(--spacing-md);
-  }
-
-  .mood-options {
-    grid-template-columns: repeat(2, 1fr);
   }
 
   .icon-picker {

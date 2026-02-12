@@ -13,6 +13,8 @@ export default defineEventHandler(async (event) => {
 
     if (body.title !== undefined) updateData.title = body.title;
     if (body.icon !== undefined) updateData.icon = body.icon || null;
+    if (body.weeklyGoal !== undefined) updateData.weeklyGoal = body.weeklyGoal;
+    if (body.position !== undefined) updateData.position = body.position;
 
     const habit = await prisma.habit.update({
       where: { id },

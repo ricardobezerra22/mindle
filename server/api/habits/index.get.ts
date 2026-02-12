@@ -6,8 +6,16 @@ export default defineEventHandler(async (event) => {
 
     const habits = await prisma.habit.findMany({
       where: { userId },
+      include: {
+        logs: {
+          where: {
+            done: true,
+          },
+          orderBy: { date: "desc" },
+        },
+      },
       orderBy: {
-        createdAt: "asc",
+        position: "asc",
       },
     });
 
