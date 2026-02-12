@@ -10,6 +10,21 @@ export enum Priority {
   HIGH = "HIGH",
 }
 
+export enum Mood {
+  HAPPY = "HAPPY",
+  CALMLY = "CALMLY",
+  OK = "OK",
+  SAD = "SAD",
+  TIRED = "TIRED",
+  OVERWHELMED = "OVERWHELMED",
+}
+
+export enum EnergyLevel {
+  LOW = "LOW",
+  MEDIUM = "MEDIUM",
+  HIGH = "HIGH",
+}
+
 export interface TaskCategory {
   id: string;
   name: string;
@@ -32,6 +47,7 @@ export interface Task {
   dueDate?: Date;
   color?: string;
   isFavorite: boolean;
+  position: number;
   categoryId?: string;
   category?: TaskCategory;
   timeSpent: number;
@@ -50,6 +66,7 @@ export interface SubTask {
 export interface PlannerEntry {
   id: string;
   date: Date;
+  position: number;
   taskId: string;
   task?: Task;
   userId: string;
@@ -70,9 +87,20 @@ export interface Habit {
   id: string;
   title: string;
   icon?: string;
+  weeklyGoal: number;
+  position: number;
   createdAt: Date;
   userId: string;
   logs?: HabitLog[];
+}
+
+export interface DailyMood {
+  id: string;
+  date: Date;
+  mood: Mood;
+  energy?: EnergyLevel;
+  createdAt: Date;
+  userId: string;
 }
 
 export interface HabitLog {
@@ -85,7 +113,6 @@ export interface HabitLog {
 
 export enum GoalStatus {
   IN_PROGRESS = "IN_PROGRESS",
-  AT_RISK = "AT_RISK",
   DONE = "DONE",
 }
 
@@ -118,6 +145,7 @@ export interface Project {
   title: string;
   description?: string;
   archived: boolean;
+  archivedAt?: Date;
   position: number;
   weight: number;
   categoryId?: string;
@@ -128,6 +156,7 @@ export interface Project {
   updatedAt: Date;
   userId: string;
   topics?: Topic[];
+  tasks?: ProjectTask[];
 }
 
 export interface Topic {
@@ -140,6 +169,7 @@ export interface Topic {
   createdAt: Date;
   updatedAt: Date;
   subtopics?: Subtopic[];
+  tasks?: ProjectTask[];
 }
 
 export interface Subtopic {
@@ -159,7 +189,9 @@ export interface ProjectTask {
   title: string;
   done: boolean;
   position: number;
-  subtopicId: string;
+  projectId?: string;
+  topicId?: string;
+  subtopicId?: string;
   createdAt: Date;
 }
 

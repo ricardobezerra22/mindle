@@ -19,9 +19,23 @@ enum Priority {
   HIGH
 }
 
+enum Mood {
+  HAPPY
+  CALMLY
+  OK
+  SAD
+  TIRED
+  OVERWHELMED
+}
+
+enum EnergyLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
 enum GoalStatus {
   IN_PROGRESS
-  AT_RISK
   DONE
 }
 
@@ -84,14 +98,15 @@ model Goal {
 }
 
 model Project {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String?
-  archived    Boolean  @default(false)
-  position    Int      @default(0)
-  weight      Int      @default(1)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  archived    Boolean   @default(false)
+  archivedAt  DateTime?
+  position    Int       @default(0)
+  weight      Int       @default(1)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   categoryId String?       @db.ObjectId
   category   TaskCategory? @relation(fields: [categoryId], references: [id])
@@ -103,6 +118,7 @@ model Project {
   user   User   @relation(fields: [userId], references: [id])
 
   topics Topic[]
+  tasks  ProjectTask[]
 }
 
 model Topic {
@@ -118,6 +134,7 @@ model Topic {
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   subtopics Subtopic[]
+  tasks      ProjectTask[]
 }
 
 model Subtopic {
@@ -136,14 +153,20 @@ model Subtopic {
 }
 
 model ProjectTask {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   title     String
-  done      Boolean    @default(false)
-  position  Int        @default(0)
-  createdAt DateTime   @default(now())
+  done      Boolean  @default(false)
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
 
-  subtopicId String   @db.ObjectId
-  subtopic   Subtopic @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
+  projectId  String?  @db.ObjectId
+  project    Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  topicId    String?  @db.ObjectId
+  topic      Topic?   @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  subtopicId String?  @db.ObjectId
+  subtopic   Subtopic? @relation(fields: [subtopicId], references: [id], onDelete: Cascade)
 }
 
 model Task {
@@ -155,6 +178,7 @@ model Task {
   dueDate     DateTime?
   color       String?
   isFavorite  Boolean    @default(false)
+  position    Int        @default(0)
   createdAt   DateTime   @default(now())
 
   categoryId String?       @db.ObjectId
@@ -180,8 +204,9 @@ model SubTask {
 }
 
 model PlannerEntry {
-  id   String   @id @default(auto()) @map("_id") @db.ObjectId
-  date DateTime
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  date     DateTime
+  position Int      @default(0)
 
   taskId String @db.ObjectId
   task   Task   @relation(fields: [taskId], references: [id])
@@ -205,10 +230,12 @@ model FocusSession {
 }
 
 model Habit {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  icon      String?
-  createdAt DateTime @default(now())
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  title      String
+  icon       String?
+  weeklyGoal Int      @default(3)
+  position   Int      @default(0)
+  createdAt  DateTime @default(now())
 
   userId String @db.ObjectId
   user   User   @relation(fields: [userId], references: [id])
@@ -229,10 +256,11 @@ model HabitLog {
 }
 
 model DailyMood {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  date      DateTime @default(now())
-  mood      String
-  createdAt DateTime @default(now())
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  date        DateTime     @default(now())
+  mood        Mood
+  energy      EnergyLevel?
+  createdAt   DateTime     @default(now())
 
   userId String @db.ObjectId
   user   User   @relation(fields: [userId], references: [id])
