@@ -32,6 +32,7 @@
 
       <div class="month-toolbar">
         <TasksTaskPriorityFilter v-model="favoriteFilter" />
+        <TasksTaskSortFilter v-model="sortBy" />
         <UiButton @click="showCreateModal = true">
           <Icon name="lucide:plus" />
           Nova Tarefa
@@ -128,8 +129,12 @@
                 'other-month': !day.isCurrentMonth,
                 'today': day.isToday,
                 'weekend': day.isWeekend,
+                'drag-over': dragOverDay === day.date,
               },
             ]"
+            @dragover.prevent="day.isCurrentMonth && handleDragOver(day.date)"
+            @dragleave="handleDragLeave"
+            @drop.prevent="day.isCurrentMonth && handleDrop(day.date)"
           >
             <div class="day-number">
               {{ day.dayNumber }}
@@ -142,8 +147,11 @@
               <div
                 v-for="task in getTasksForDay(day.date)"
                 :key="task.id"
-                :class="['task-item', `status-${task.status.toLowerCase()}`]"
+                :class="['task-item', `status-${task.status.toLowerCase()}`, { dragging: draggedTaskId === task.id }]"
                 :style="getTaskItemStyle(task)"
+                draggable="true"
+                @dragstart.stop="handleDragStart(task.id, day.date)"
+                @dragend="handleDragEnd"
                 @click="toggleTaskStatus(task.id, task.status)"
               >
                 <Icon
@@ -187,11 +195,15 @@ const { playDone } = useSound();
 const loading = ref(false);
 const showCreateModal = ref(false);
 const favoriteFilter = ref(false);
+const sortBy = ref<"HIGHEST_PRIORITY" | "LOWEST_PRIORITY" | "">("HIGHEST_PRIORITY");
 const tasks = ref<any[]>([]);
 const currentDate = ref(new Date());
 const toggleTimers = new Map<string, ReturnType<typeof setTimeout>>();
 const toggleVersions = new Map<string, number>();
 const toggleInFlight = new Set<string>();
+const draggedTaskId = ref<string | null>(null);
+const dragSourceDay = ref<string | null>(null);
+const dragOverDay = ref<string | null>(null);
 
 const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
@@ -296,13 +308,70 @@ const getTasksForDay = (date: string) => {
     filtered = filtered.filter(t => t.isFavorite);
   }
 
+  const priorityWeight: Record<string, number> = { HIGH: 3, MEDIUM: 2, LOW: 1 };
+
   return filtered.sort((a, b) => {
     if (a.status === "DONE" && b.status !== "DONE") return 1;
     if (a.status !== "DONE" && b.status === "DONE") return -1;
-    if (a.priority === "HIGH" && b.priority !== "HIGH") return -1;
-    if (a.priority !== "HIGH" && b.priority === "HIGH") return 1;
+
+    if (sortBy.value) {
+      const dir = sortBy.value === "HIGHEST_PRIORITY" ? -1 : 1;
+      const diff = (priorityWeight[a.priority] || 0) - (priorityWeight[b.priority] || 0);
+      if (diff !== 0) return dir * diff;
+    }
+
     return 0;
   });
+};
+
+const handleDragStart = (taskId: string, date: string) => {
+  draggedTaskId.value = taskId;
+  dragSourceDay.value = date;
+};
+
+const handleDragOver = (date: string) => {
+  dragOverDay.value = date;
+};
+
+const handleDragLeave = () => {
+  dragOverDay.value = null;
+};
+
+const handleDragEnd = () => {
+  draggedTaskId.value = null;
+  dragSourceDay.value = null;
+  dragOverDay.value = null;
+};
+
+const handleDrop = async (targetDate: string) => {
+  dragOverDay.value = null;
+  const taskId = draggedTaskId.value;
+  const sourceDate = dragSourceDay.value;
+  draggedTaskId.value = null;
+  dragSourceDay.value = null;
+
+  if (!taskId || sourceDate === targetDate) return;
+
+  const index = tasks.value.findIndex(t => t.id === taskId);
+  if (index === -1) return;
+
+  const oldDueDate = tasks.value[index].dueDate;
+  tasks.value[index] = { ...tasks.value[index], dueDate: `${targetDate}T${oldDueDate?.split("T")[1] || "12:00:00.000Z"}` };
+
+  try {
+    const response = await $fetch(`/api/tasks/${taskId}`, {
+      method: "PUT",
+      body: { dueDate: new Date(`${targetDate}T12:00:00.000Z`) },
+    });
+    if (response.success) {
+      const i = tasks.value.findIndex(t => t.id === taskId);
+      if (i !== -1) tasks.value[i] = response.data;
+    }
+  } catch (error) {
+    tasks.value[index] = { ...tasks.value[index], dueDate: oldDueDate };
+    console.error("Error moving task:", error);
+    toast.error({ title: "Erro ao mover tarefa" });
+  }
 };
 
 const fetchTasks = async () => {
@@ -418,7 +487,8 @@ onMounted(() => {
   margin-bottom: var(--spacing-md);
 }
 
-.month-toolbar > :first-child {
+.month-toolbar > :nth-child(1),
+.month-toolbar > :nth-child(2) {
   max-width: 180px;
 }
 
@@ -604,6 +674,23 @@ onMounted(() => {
 .calendar-day.today {
   background: var(--color-today-bg);
   border: 2px solid var(--color-primary);
+}
+
+.calendar-day.drag-over {
+  background: rgba(111, 175, 142, 0.08);
+  border: 2px solid var(--color-primary);
+}
+
+.task-item.dragging {
+  opacity: 0.4;
+}
+
+.task-item[draggable="true"] {
+  cursor: grab;
+}
+
+.task-item[draggable="true"]:active {
+  cursor: grabbing;
 }
 
 .calendar-day.weekend {

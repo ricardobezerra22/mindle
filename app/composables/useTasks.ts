@@ -200,6 +200,18 @@ export const useTasks = () => {
     }
   };
 
+  const reorderTasks = async (items: { id: string; position: number }[]) => {
+    try {
+      await $fetch("/api/tasks/reorder", {
+        method: "PUT",
+        body: { items },
+      });
+    } catch (e) {
+      console.error("Failed to reorder tasks:", e);
+      throw e;
+    }
+  };
+
   return {
     tasks,
     categories,
@@ -215,5 +227,6 @@ export const useTasks = () => {
     toggleFavorite,
     addSubTask,
     toggleSubTask,
+    reorderTasks,
   };
 };

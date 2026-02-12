@@ -25,15 +25,22 @@ export default defineEventHandler(async (event) => {
       ];
     }
 
+    const sortBy = query.sortBy ? String(query.sortBy) : undefined;
+    let orderBy: any = { createdAt: "desc" };
+
+    if (sortBy === "HIGHEST_PRIORITY" || sortBy === "LOWEST_PRIORITY") {
+      orderBy = [{ priority: sortBy === "HIGHEST_PRIORITY" ? "desc" : "asc" }, { createdAt: "desc" }];
+    } else if (sortBy === "position") {
+      orderBy = { position: "asc" };
+    }
+
     const tasks = await prisma.task.findMany({
       where,
       include: {
         category: true,
         subTasks: true,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy,
     });
 
     return sendSuccess(event, tasks);

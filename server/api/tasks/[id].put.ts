@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
       return sendError(event, "Task ID is required", 400);
     }
 
-    const { title, description, status, priority, dueDate, color, categoryId, isFavorite } = body;
+    const { title, description, status, priority, dueDate, color, categoryId, isFavorite, position } = body;
 
     const task = await prisma.task.update({
       where: { id },
@@ -22,6 +22,7 @@ export default defineEventHandler(async (event) => {
         ...(color !== undefined && { color }),
         ...(isFavorite !== undefined && { isFavorite }),
         ...(categoryId !== undefined && { categoryId: categoryId || null }),
+        ...(position !== undefined && { position }),
       },
       include: {
         category: true,

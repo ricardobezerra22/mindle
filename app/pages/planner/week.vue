@@ -19,6 +19,7 @@
 
         <div class="week-toolbar">
           <TasksTaskPriorityFilter v-model="favoriteFilter" />
+          <TasksTaskSortFilter v-model="sortBy" />
         </div>
       </div>
 
@@ -108,7 +109,10 @@
         <div
           v-for="day in weekDays"
           :key="day.date"
-          :class="['day-column', { today: day.isToday }]"
+          :class="['day-column', { today: day.isToday, 'drag-over': dragOverDay === day.date }]"
+          @dragover.prevent="handleDragOver(day.date)"
+          @dragleave="handleDragLeave"
+          @drop.prevent="handleDrop(day.date)"
         >
           <div class="day-header">
             <div class="day-info">
@@ -133,8 +137,11 @@
             <div
               v-for="task in getTasksForDay(day.date)"
               :key="task.id"
-              :class="['task-card', `status-${task.status.toLowerCase()}`]"
+              :class="['task-card', `status-${task.status.toLowerCase()}`, { dragging: draggedTaskId === task.id }]"
               :style="getTaskCardStyle(task)"
+              draggable="true"
+              @dragstart="handleDragStart(task.id, day.date)"
+              @dragend="handleDragEnd"
             >
               <button
                 class="task-check"
@@ -199,11 +206,15 @@ const loading = ref(false);
 const showOverview = ref(false);
 const showCreateModal = ref(false);
 const favoriteFilter = ref(false);
+const sortBy = ref<"HIGHEST_PRIORITY" | "LOWEST_PRIORITY" | "">("HIGHEST_PRIORITY");
 
 const tasks = ref<any[]>([]);
 const toggleTimers = new Map<string, ReturnType<typeof setTimeout>>();
 const toggleVersions = new Map<string, number>();
 const toggleInFlight = new Set<string>();
+const draggedTaskId = ref<string | null>(null);
+const dragSourceDay = ref<string | null>(null);
+const dragOverDay = ref<string | null>(null);
 
 const weekDays = computed(() => {
   const days = [];
@@ -306,11 +317,70 @@ const getTasksForDay = (date: string) => {
     filtered = filtered.filter(t => t.isFavorite);
   }
 
+  const priorityWeight: Record<string, number> = { HIGH: 3, MEDIUM: 2, LOW: 1 };
+
   return filtered.sort((a, b) => {
     if (a.status === "DONE" && b.status !== "DONE") return 1;
     if (a.status !== "DONE" && b.status === "DONE") return -1;
+
+    if (sortBy.value) {
+      const dir = sortBy.value === "HIGHEST_PRIORITY" ? -1 : 1;
+      const diff = (priorityWeight[a.priority] || 0) - (priorityWeight[b.priority] || 0);
+      if (diff !== 0) return dir * diff;
+    }
+
     return 0;
   });
+};
+
+const handleDragStart = (taskId: string, date: string) => {
+  draggedTaskId.value = taskId;
+  dragSourceDay.value = date;
+};
+
+const handleDragOver = (date: string) => {
+  dragOverDay.value = date;
+};
+
+const handleDragLeave = () => {
+  dragOverDay.value = null;
+};
+
+const handleDragEnd = () => {
+  draggedTaskId.value = null;
+  dragSourceDay.value = null;
+  dragOverDay.value = null;
+};
+
+const handleDrop = async (targetDate: string) => {
+  dragOverDay.value = null;
+  const taskId = draggedTaskId.value;
+  const sourceDate = dragSourceDay.value;
+  draggedTaskId.value = null;
+  dragSourceDay.value = null;
+
+  if (!taskId || sourceDate === targetDate) return;
+
+  const index = tasks.value.findIndex(t => t.id === taskId);
+  if (index === -1) return;
+
+  const oldDueDate = tasks.value[index].dueDate;
+  tasks.value[index] = { ...tasks.value[index], dueDate: `${targetDate}T${oldDueDate?.split("T")[1] || "12:00:00.000Z"}` };
+
+  try {
+    const response = await $fetch(`/api/tasks/${taskId}`, {
+      method: "PUT",
+      body: { dueDate: new Date(`${targetDate}T12:00:00.000Z`) },
+    });
+    if (response.success) {
+      const i = tasks.value.findIndex(t => t.id === taskId);
+      if (i !== -1) tasks.value[i] = response.data;
+    }
+  } catch (error) {
+    tasks.value[index] = { ...tasks.value[index], dueDate: oldDueDate };
+    console.error("Error moving task:", error);
+    toast.error({ title: "Erro ao mover tarefa" });
+  }
 };
 
 const fetchTasks = async () => {
@@ -423,7 +493,7 @@ onMounted(() => {
 .week-toolbar {
   display: flex;
   gap: var(--spacing-sm);
-  max-width: 180px;
+  max-width: 360px;
 }
 
 .category-legend {
@@ -593,6 +663,23 @@ onMounted(() => {
 .day-column.today {
   border-color: var(--color-primary);
   background: var(--color-today-bg);
+}
+
+.day-column.drag-over {
+  border-color: var(--color-primary);
+  background: rgba(111, 175, 142, 0.06);
+}
+
+.task-card.dragging {
+  opacity: 0.4;
+}
+
+.task-card[draggable="true"] {
+  cursor: grab;
+}
+
+.task-card[draggable="true"]:active {
+  cursor: grabbing;
 }
 
 .day-header {

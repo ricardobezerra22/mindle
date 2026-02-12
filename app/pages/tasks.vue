@@ -9,9 +9,11 @@
           :categories="categories"
         />
         <TasksTaskPriorityFilter v-model="favoriteFilter" />
+        <TasksTaskSortFilter v-model="sortBy" />
         <TasksTaskViewToggle
           v-model="viewMode"
           :has-expanded-items="expandedCategories.size > 0"
+          @expand-all="expandAllCategories"
           @reset-view="resetView"
         />
       </div>
@@ -497,6 +499,7 @@ const searchQuery = ref("");
 const dateFilter = ref("");
 const categoryFilter = ref("");
 const favoriteFilter = ref(false);
+const sortBy = ref<"HIGHEST_PRIORITY" | "LOWEST_PRIORITY" | "">("HIGHEST_PRIORITY");
 
 const expandedCategories = ref(new Set<string>());
 
@@ -530,6 +533,14 @@ const filteredTasks = computed(() => {
 
   if (!preferences.value.showCompleted) {
     filtered = filtered.filter((t) => t.status !== "DONE");
+  }
+
+  if (sortBy.value) {
+    const priorityWeight: Record<string, number> = { HIGH: 3, MEDIUM: 2, LOW: 1 };
+    const direction = sortBy.value === "HIGHEST_PRIORITY" ? -1 : 1;
+    filtered = [...filtered].sort(
+      (a, b) => direction * ((priorityWeight[a.priority] || 0) - (priorityWeight[b.priority] || 0)),
+    );
   }
 
   return filtered;
@@ -730,7 +741,24 @@ const handleUpdateCategory = async (id: string, categoryId: string | null) => {
   }
 };
 
+const preserveExpandedOnStatusChange = (taskId: string, newStatus: TaskStatus) => {
+  const task = tasks.value.find((t) => t.id === taskId);
+  if (!task) return;
+
+  const oldStatus = task.status;
+  const catKey = task.categoryId || "uncategorized";
+  const oldKey = `${oldStatus}_${catKey}`;
+  const newKey = `${newStatus}_${catKey}`;
+
+  if (expandedCategories.value.has(oldKey)) {
+    const set = new Set(expandedCategories.value);
+    set.add(newKey);
+    expandedCategories.value = set;
+  }
+};
+
 const handleUpdateStatus = async (id: string, status: TaskStatus) => {
+  preserveExpandedOnStatusChange(id, status);
   try {
     await updateTaskStatus(id, status);
   } catch {
@@ -741,6 +769,7 @@ const handleUpdateStatus = async (id: string, status: TaskStatus) => {
 const handleDrop = async (taskId: string, newStatus: TaskStatus) => {
   const task = tasks.value.find((t) => t.id === taskId);
   if (task && task.status !== newStatus) {
+    preserveExpandedOnStatusChange(taskId, newStatus);
     try {
       await updateTaskStatus(taskId, newStatus);
     } catch (e) {

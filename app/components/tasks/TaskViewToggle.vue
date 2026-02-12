@@ -1,7 +1,15 @@
 <template>
   <div class="view-toggle-wrapper">
     <button
-      v-if="hasExpandedItems"
+      v-if="!hasExpandedItems"
+      class="reset-view-btn"
+      title="Expandir todos os cards"
+      @click="emit('expandAll')"
+    >
+      <Icon name="lucide:maximize-2" />
+    </button>
+    <button
+      v-else
       class="reset-view-btn"
       title="Fechar todos os cards"
       @click="emit('resetView')"
@@ -38,6 +46,7 @@ defineProps<Props>();
 
 const emit = defineEmits<{
   "update:modelValue": [value: "kanban" | "categories"];
+  expandAll: [];
   resetView: [];
 }>();
 </script>
