@@ -5,10 +5,20 @@ export default defineEventHandler(async (event) => {
     const userId = event.context.userId;
 
     const body = await readBody(event);
-    const { mood } = body;
+    const { mood, energy } = body;
 
     if (!mood) {
       return sendError(event, "Mood is required", 400);
+    }
+
+    const validMoods = ["HAPPY", "CALMLY", "OK", "SAD", "TIRED", "OVERWHELMED"];
+    if (!validMoods.includes(mood)) {
+      return sendError(event, "Invalid mood value", 400);
+    }
+
+    const validEnergy = ["LOW", "MEDIUM", "HIGH"];
+    if (energy && !validEnergy.includes(energy)) {
+      return sendError(event, "Invalid energy value", 400);
     }
 
     const today = new Date();
@@ -26,7 +36,10 @@ export default defineEventHandler(async (event) => {
     if (existingMood) {
       const updated = await prisma.dailyMood.update({
         where: { id: existingMood.id },
-        data: { mood },
+        data: {
+          mood,
+          ...(energy !== undefined && { energy }),
+        },
       });
       return sendSuccess(event, updated);
     }
@@ -35,6 +48,7 @@ export default defineEventHandler(async (event) => {
       data: {
         userId,
         mood,
+        ...(energy && { energy }),
         date: new Date(),
       },
     });
