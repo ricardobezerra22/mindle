@@ -2,8 +2,29 @@
   <div class="projects-page">
     <div class="page-header">
       <div class="header-top">
+        <div class="tab-toggle">
+          <button
+            :class="['tab-btn', { active: activeTab === 'active' }]"
+            @click="activeTab = 'active'"
+          >
+            Ativos
+          </button>
+          <button
+            :class="['tab-btn', { active: activeTab === 'archived' }]"
+            @click="activeTab = 'archived'; fetchArchivedProjects()"
+          >
+            <Icon name="lucide:archive" size="14" />
+            Arquivados
+            <span
+              v-if="archivedProjects.length > 0"
+              class="tab-badge"
+            >{{ archivedProjects.length }}</span>
+          </button>
+        </div>
+
         <div class="header-actions">
           <button
+            v-if="activeTab === 'active'"
             class="expand-collapse-btn"
             @click="toggleAllExpanded"
           >
@@ -15,6 +36,7 @@
           </button>
 
           <button
+            v-if="activeTab === 'active'"
             class="new-project-btn"
             @click="showCreateModal = true"
           >
@@ -25,9 +47,29 @@
       </div>
 
       <ProjectsProjectGlobalFilter
+        v-if="activeTab === 'active'"
         v-model="filters"
         :categories="categories"
       />
+
+      <div
+        v-if="activeTab === 'archived'"
+        class="archive-controls"
+      >
+        <input
+          v-model="archiveSearch"
+          type="text"
+          class="archive-search"
+          placeholder="Buscar arquivados..."
+        />
+        <button
+          class="archive-sort-btn"
+          @click="archiveSortOrder = archiveSortOrder === 'desc' ? 'asc' : 'desc'"
+        >
+          <Icon :name="archiveSortOrder === 'desc' ? 'lucide:arrow-down' : 'lucide:arrow-up'" size="14" />
+          Data
+        </button>
+      </div>
     </div>
 
     <div
@@ -76,31 +118,75 @@
       </button>
     </div>
 
-    <TransitionGroup
-      v-else
-      name="project-list"
-      tag="div"
-      class="projects-list"
-    >
-      <ProjectsProjectCard
-        v-for="project in filteredProjects"
-        :key="project.id"
-        :project="project"
-        @edit="openEditModal"
-        @delete="confirmDelete"
-        @update="handleUpdateProject"
-        @add-topic="handleAddTopic"
-        @delete-topic="handleDeleteTopic"
-        @update-topic="handleUpdateTopic"
-        @add-subtopic="handleAddSubtopic"
-        @delete-subtopic="handleDeleteSubtopic"
-        @update-subtopic="handleUpdateSubtopic"
-        @add-task="handleAddTask"
-        @toggle-task="handleToggleTask"
-        @delete-task="handleDeleteTask"
-        @update-task="handleUpdateTask"
-      />
-    </TransitionGroup>
+    <template v-if="activeTab === 'active'">
+      <TransitionGroup
+        v-if="filteredProjects.length > 0"
+        name="project-list"
+        tag="div"
+        class="projects-list"
+      >
+        <ProjectsProjectCard
+          v-for="project in filteredProjects"
+          :key="project.id"
+          :project="project"
+          @edit="openEditModal"
+          @delete="confirmDelete"
+          @update="handleUpdateProject"
+          @add-topic="handleAddTopic"
+          @delete-topic="handleDeleteTopic"
+          @update-topic="handleUpdateTopic"
+          @add-subtopic="handleAddSubtopic"
+          @delete-subtopic="handleDeleteSubtopic"
+          @update-subtopic="handleUpdateSubtopic"
+          @add-task="(parentId: string, title: string, level: 'project' | 'topic' | 'subtopic') => handleAddTask(parentId, title, level)"
+          @toggle-task="handleToggleTask"
+          @delete-task="handleDeleteTask"
+          @update-task="handleUpdateTask"
+          @archive="confirmArchive"
+        />
+      </TransitionGroup>
+    </template>
+
+    <template v-if="activeTab === 'archived'">
+      <div
+        v-if="filteredArchivedProjects.length === 0"
+        class="empty-state"
+      >
+        <Icon name="lucide:archive" size="48" />
+        <h3 class="empty-title">Nenhum projeto arquivado</h3>
+        <p class="empty-text">Projetos arquivados aparecerão aqui.</p>
+      </div>
+
+      <div
+        v-else
+        class="archived-list"
+      >
+        <div
+          v-for="project in filteredArchivedProjects"
+          :key="project.id"
+          class="archived-card"
+        >
+          <div class="archived-card-info">
+            <h3 class="archived-card-title">{{ project.title }}</h3>
+            <p
+              v-if="project.description"
+              class="archived-card-desc"
+            >{{ project.description }}</p>
+            <span class="archived-card-date">
+              Arquivado em {{ formatDate(project.archivedAt) }}
+            </span>
+          </div>
+          <button
+            class="restore-btn"
+            title="Restaurar projeto"
+            @click="handleRestore(project.id)"
+          >
+            <Icon name="lucide:archive-restore" size="16" />
+            Restaurar
+          </button>
+        </div>
+      </div>
+    </template>
 
     <div
       v-if="showCreateModal"
@@ -217,6 +303,37 @@
         </div>
       </div>
     </div>
+
+    <div
+      v-if="showArchiveModal"
+      class="modal-overlay"
+      @click.self="showArchiveModal = false"
+    >
+      <div class="modal-content modal-small">
+        <div class="modal-header">
+          <h3>Arquivar projeto?</h3>
+        </div>
+        <div class="modal-body">
+          <p class="delete-warning">
+            O projeto será movido para a aba de arquivados. Você pode restaurá-lo a qualquer momento.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn-cancel"
+            @click="showArchiveModal = false"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn-save"
+            @click="handleArchiveProject"
+          >
+            Arquivar
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -225,11 +342,15 @@ import type { Project, Topic, Subtopic } from "~/types";
 
 const {
   projects,
+  archivedProjects,
   loading,
   fetchProjects,
+  fetchArchivedProjects,
   createProject,
   updateProject,
   deleteProject,
+  archiveProject,
+  restoreProject,
   createTopic,
   updateTopic,
   deleteTopic,
@@ -244,12 +365,17 @@ const {
 const { categories, fetchCategories } = useTasks();
 const toast = useToast();
 
+const activeTab = ref<"active" | "archived">("active");
 const filters = ref({ search: "", categoryId: "" });
 const showCreateModal = ref(false);
 const showDeleteModal = ref(false);
+const showArchiveModal = ref(false);
 const editingProject = ref<Project | null>(null);
 const deletingProjectId = ref<string | null>(null);
+const archivingProjectId = ref<string | null>(null);
 const allExpanded = ref(true);
+const archiveSearch = ref("");
+const archiveSortOrder = ref<"asc" | "desc">("desc");
 
 const formTitle = ref("");
 const formDescription = ref("");
@@ -354,6 +480,55 @@ const handleDeleteProject = async () => {
   }
 };
 
+const confirmArchive = (id: string) => {
+  archivingProjectId.value = id;
+  showArchiveModal.value = true;
+};
+
+const handleArchiveProject = async () => {
+  if (!archivingProjectId.value) return;
+  try {
+    await archiveProject(archivingProjectId.value);
+    toast.success({ title: "Projeto arquivado" });
+  } catch {
+    toast.error({ title: "Erro ao arquivar projeto" });
+  } finally {
+    showArchiveModal.value = false;
+    archivingProjectId.value = null;
+  }
+};
+
+const handleRestore = async (id: string) => {
+  try {
+    await restoreProject(id);
+    toast.success({ title: "Projeto restaurado" });
+  } catch {
+    toast.error({ title: "Erro ao restaurar projeto" });
+  }
+};
+
+const filteredArchivedProjects = computed(() => {
+  let result = archivedProjects.value;
+  if (archiveSearch.value) {
+    const q = archiveSearch.value.toLowerCase();
+    result = result.filter((p) => p.title.toLowerCase().includes(q));
+  }
+  return [...result].sort((a, b) => {
+    const dateA = new Date(a.archivedAt || a.updatedAt).getTime();
+    const dateB = new Date(b.archivedAt || b.updatedAt).getTime();
+    return archiveSortOrder.value === "desc" ? dateB - dateA : dateA - dateB;
+  });
+});
+
+const formatDate = (date?: Date | string) => {
+  if (!date) return "";
+  return new Date(date).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
 const handleUpdateProject = async (id: string, updates: Partial<Project>) => {
   try {
     await updateProject(id, updates);
@@ -410,9 +585,9 @@ const handleUpdateSubtopic = async (id: string, updates: Partial<Subtopic>) => {
   }
 };
 
-const handleAddTask = async (subtopicId: string, title: string) => {
+const handleAddTask = async (parentId: string, title: string, level: "project" | "topic" | "subtopic" = "subtopic") => {
   try {
-    await createProjectTask(subtopicId, title);
+    await createProjectTask(parentId, title, level);
   } catch {
     toast.error({ title: "Erro ao criar tarefa" });
   }
@@ -441,13 +616,14 @@ const handleUpdateTask = async (id: string, title: string) => {
       body: { id, title },
     });
     for (const project of projects.value) {
+      const pt = project.tasks?.find((t) => t.id === id);
+      if (pt) { pt.title = title; return; }
       for (const topic of project.topics || []) {
+        const tt = topic.tasks?.find((t) => t.id === id);
+        if (tt) { tt.title = title; return; }
         for (const sub of topic.subtopics || []) {
-          const task = sub.tasks?.find((t) => t.id === id);
-          if (task) {
-            task.title = title;
-            return;
-          }
+          const st = sub.tasks?.find((t) => t.id === id);
+          if (st) { st.title = title; return; }
         }
       }
     }
@@ -475,6 +651,7 @@ onMounted(() => {
   }
   fetchProjects();
   fetchCategories();
+  fetchArchivedProjects();
 });
 </script>
 
@@ -495,12 +672,175 @@ onMounted(() => {
 .header-top {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.tab-toggle {
+  display: flex;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+.tab-btn:hover:not(.active) {
+  background: var(--color-background);
+}
+
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tab-btn:not(.active) .tab-badge {
+  background: var(--color-border);
+  color: var(--color-text-secondary);
 }
 
 .header-actions {
   display: flex;
   gap: var(--spacing-sm);
+}
+
+.archive-controls {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.archive-search {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.archive-search:focus {
+  border-color: var(--color-primary);
+}
+
+.archive-sort-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.archive-sort-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.archived-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.archived-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  opacity: 0.75;
+  transition: opacity 0.2s ease;
+}
+
+.archived-card:hover {
+  opacity: 1;
+}
+
+.archived-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.archived-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 2px 0;
+}
+
+.archived-card-desc {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.archived-card-date {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.restore-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.restore-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: #e8f3ed;
 }
 
 .expand-collapse-btn {

@@ -8,15 +8,17 @@ interface GoalInput {
 }
 
 interface GoalUpdateInput extends Partial<GoalInput> {
-  status?: "IN_PROGRESS" | "AT_RISK" | "DONE";
+  status?: "IN_PROGRESS" | "DONE";
   archived?: boolean;
   position?: number;
 }
 
 const deepProjectInclude = {
   category: true,
+  tasks: true,
   topics: {
     include: {
+      tasks: true,
       subtopics: {
         include: {
           tasks: true,
@@ -30,7 +32,16 @@ const computeProjectProgress = (project: any) => {
   let total = 0;
   let done = 0;
 
+  for (const task of project.tasks || []) {
+    total++;
+    if (task.done) done++;
+  }
+
   for (const topic of project.topics || []) {
+    for (const task of topic.tasks || []) {
+      total++;
+      if (task.done) done++;
+    }
     for (const subtopic of topic.subtopics || []) {
       for (const task of subtopic.tasks || []) {
         total++;
@@ -75,11 +86,13 @@ const computeClarityScore = (goal: any) => {
   if (goal.deadline) score++;
   if (goal.projects && goal.projects.length > 0) score++;
 
-  const hasTasks = goal.projects?.some((p: any) =>
-    p.topics?.some((t: any) =>
-      t.subtopics?.some((s: any) => s.tasks && s.tasks.length > 0),
-    ),
-  );
+  const hasTasks = goal.projects?.some((p: any) => {
+    if (p.tasks && p.tasks.length > 0) return true;
+    return p.topics?.some((t: any) => {
+      if (t.tasks && t.tasks.length > 0) return true;
+      return t.subtopics?.some((s: any) => s.tasks && s.tasks.length > 0);
+    });
+  });
   if (hasTasks) score++;
 
   const { lastActivity } = computeGoalProgress(goal.projects || []);

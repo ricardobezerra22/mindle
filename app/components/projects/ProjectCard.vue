@@ -67,6 +67,13 @@
                 <Icon name="lucide:pencil" size="14" />
               </button>
               <button
+                class="action-btn"
+                title="Arquivar projeto"
+                @click.stop="$emit('archive', project.id)"
+              >
+                <Icon name="lucide:archive" size="14" />
+              </button>
+              <button
                 class="action-btn danger"
                 title="Excluir projeto"
                 @click.stop="$emit('delete', project.id)"
@@ -98,7 +105,7 @@
             @delete-subtopic="(id: string) => $emit('deleteSubtopic', id)"
             @update-subtopic="(id: string, u: any) => $emit('updateSubtopic', id, u)"
             @toggle-subtopic-expand="handleSubtopicExpand"
-            @add-task="(sid: string, t: string) => $emit('addTask', sid, t)"
+            @add-task="(parentId: string, t: string, level: 'topic' | 'subtopic') => $emit('addTask', parentId, t, level)"
             @toggle-task="(id: string, d: boolean) => $emit('toggleTask', id, d)"
             @delete-task="(id: string) => $emit('deleteTask', id)"
             @update-task="(id: string, t: string) => $emit('updateTask', id, t)"
@@ -120,14 +127,53 @@
           />
         </div>
 
-        <button
-          v-if="!showAddTopic"
-          class="add-topic-btn"
-          @click="showAddTopic = true"
+        <div
+          v-if="project.tasks && project.tasks.length > 0"
+          class="project-tasks-list"
         >
-          <Icon name="lucide:plus" size="14" />
-          Tópico
-        </button>
+          <ProjectsProjectTaskItem
+            v-for="task in project.tasks"
+            :key="task.id"
+            :task="task"
+            @toggle="(id: string, done: boolean) => $emit('toggleTask', id, done)"
+            @delete="(id: string) => $emit('deleteTask', id)"
+            @update="(id: string, title: string) => $emit('updateTask', id, title)"
+          />
+        </div>
+
+        <div
+          v-if="showAddProjectTask"
+          class="add-inline"
+        >
+          <input
+            ref="newProjectTaskInput"
+            v-model="newProjectTaskTitle"
+            class="add-input"
+            placeholder="Nova tarefa..."
+            @keydown.enter="addProjectTask"
+            @keydown.escape="cancelAddProjectTask"
+            @blur="addProjectTask"
+          />
+        </div>
+
+        <div class="project-add-actions">
+          <button
+            v-if="!showAddProjectTask"
+            class="add-topic-btn"
+            @click="showAddProjectTask = true"
+          >
+            <Icon name="lucide:plus" size="14" />
+            Tarefa
+          </button>
+          <button
+            v-if="!showAddTopic"
+            class="add-topic-btn"
+            @click="showAddTopic = true"
+          >
+            <Icon name="lucide:plus" size="14" />
+            Tópico
+          </button>
+        </div>
       </div>
     </ProjectsExpandableSection>
   </div>
@@ -145,6 +191,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
   edit: [id: string];
   delete: [id: string];
+  archive: [id: string];
   update: [id: string, updates: Partial<Project>];
   addTopic: [projectId: string, title: string];
   deleteTopic: [id: string];
@@ -152,7 +199,7 @@ const emit = defineEmits<{
   addSubtopic: [topicId: string, title: string];
   deleteSubtopic: [id: string];
   updateSubtopic: [id: string, updates: Partial<Subtopic>];
-  addTask: [subtopicId: string, title: string];
+  addTask: [parentId: string, title: string, level: "project" | "topic" | "subtopic"];
   toggleTask: [id: string, done: boolean];
   deleteTask: [id: string];
   updateTask: [id: string, title: string];
@@ -165,10 +212,14 @@ const titleInput = ref<HTMLInputElement | null>(null);
 const showAddTopic = ref(false);
 const newTopicTitle = ref("");
 const newTopicInput = ref<HTMLInputElement | null>(null);
+const showAddProjectTask = ref(false);
+const newProjectTaskTitle = ref("");
+const newProjectTaskInput = ref<HTMLInputElement | null>(null);
 
 const totalTasks = computed(() => {
-  let count = 0;
+  let count = props.project.tasks?.length ?? 0;
   for (const topic of props.project.topics || []) {
+    count += topic.tasks?.length ?? 0;
     for (const sub of topic.subtopics || []) {
       count += sub.tasks?.length ?? 0;
     }
@@ -177,8 +228,9 @@ const totalTasks = computed(() => {
 });
 
 const doneTasks = computed(() => {
-  let count = 0;
+  let count = props.project.tasks?.filter((t) => t.done).length ?? 0;
   for (const topic of props.project.topics || []) {
+    count += topic.tasks?.filter((t) => t.done).length ?? 0;
     for (const sub of topic.subtopics || []) {
       count += sub.tasks?.filter((t) => t.done).length ?? 0;
     }
@@ -239,6 +291,20 @@ const cancelAddTopic = () => {
   showAddTopic.value = false;
 };
 
+const addProjectTask = () => {
+  const trimmed = newProjectTaskTitle.value.trim();
+  if (trimmed) {
+    emit("addTask", props.project.id, trimmed, "project");
+  }
+  newProjectTaskTitle.value = "";
+  showAddProjectTask.value = false;
+};
+
+const cancelAddProjectTask = () => {
+  newProjectTaskTitle.value = "";
+  showAddProjectTask.value = false;
+};
+
 const handleTopicExpand = (topicId: string, expanded: boolean) => {
   const topic = props.project.topics?.find((t) => t.id === topicId);
   if (topic) topic.expanded = expanded;
@@ -256,6 +322,10 @@ const handleSubtopicExpand = (subtopicId: string, expanded: boolean) => {
 
 watch(showAddTopic, (val) => {
   if (val) nextTick(() => newTopicInput.value?.focus());
+});
+
+watch(showAddProjectTask, (val) => {
+  if (val) nextTick(() => newProjectTaskInput.value?.focus());
 });
 </script>
 
@@ -450,6 +520,19 @@ watch(showAddTopic, (val) => {
 .add-topic-btn:hover {
   color: var(--color-primary);
   background: var(--color-background);
+}
+
+.project-tasks-list {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--spacing-xs);
+  padding: var(--spacing-xs) 0;
+  border-top: 1px dashed var(--color-border);
+}
+
+.project-add-actions {
+  display: flex;
+  gap: var(--spacing-xs);
 }
 
 @media (max-width: 640px) {

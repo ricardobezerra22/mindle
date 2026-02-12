@@ -16,13 +16,19 @@ export default defineEventHandler(async (event) => {
 
     const { title, description, categoryId, archived, position } = body;
 
+    const archiveData: any = {};
+    if (archived !== undefined) {
+      archiveData.archived = archived;
+      archiveData.archivedAt = archived ? new Date() : null;
+    }
+
     const project = await prisma.project.update({
       where: { id },
       data: {
         ...(title !== undefined && { title: title.trim() }),
         ...(description !== undefined && { description: description?.trim() || null }),
         ...(categoryId !== undefined && { categoryId: categoryId || null }),
-        ...(archived !== undefined && { archived }),
+        ...archiveData,
         ...(position !== undefined && { position }),
       },
       include: {

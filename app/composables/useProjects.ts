@@ -240,28 +240,50 @@ export const useProjects = () => {
     }
   };
 
-  const createProjectTask = async (subtopicId: string, title: string) => {
+  const createProjectTask = async (
+    parentId: string,
+    title: string,
+    level: "project" | "topic" | "subtopic" = "subtopic",
+  ) => {
     try {
+      const body: Record<string, string> = { title };
+      if (level === "project") body.projectId = parentId;
+      else if (level === "topic") body.topicId = parentId;
+      else body.subtopicId = parentId;
+
       const response = await $fetch<APIResponse<ProjectTask>>(
         "/api/projects/project-tasks",
-        {
-          method: "POST",
-          body: { title, subtopicId },
-        },
+        { method: "POST", body },
       );
       if (response.success) {
-        for (const project of projects.value) {
-          for (const topic of project.topics || []) {
-            const subtopic = topic.subtopics?.find(
-              (s) => s.id === subtopicId,
-            );
-            if (subtopic) {
-              if (!subtopic.tasks) subtopic.tasks = [];
-              subtopic.tasks.push(response.data);
-              return response.data;
+        if (level === "project") {
+          const project = projects.value.find((p) => p.id === parentId);
+          if (project) {
+            if (!project.tasks) project.tasks = [];
+            project.tasks.push(response.data);
+          }
+        } else if (level === "topic") {
+          for (const project of projects.value) {
+            const topic = project.topics?.find((t) => t.id === parentId);
+            if (topic) {
+              if (!topic.tasks) topic.tasks = [];
+              topic.tasks.push(response.data);
+              break;
+            }
+          }
+        } else {
+          for (const project of projects.value) {
+            for (const topic of project.topics || []) {
+              const subtopic = topic.subtopics?.find((s) => s.id === parentId);
+              if (subtopic) {
+                if (!subtopic.tasks) subtopic.tasks = [];
+                subtopic.tasks.push(response.data);
+                return response.data;
+              }
             }
           }
         }
+        return response.data;
       }
     } catch (e) {
       console.error("Failed to create project task:", e);
@@ -269,27 +291,31 @@ export const useProjects = () => {
     }
   };
 
+  const findProjectTask = (id: string) => {
+    for (const project of projects.value) {
+      const pt = project.tasks?.find((t) => t.id === id);
+      if (pt) return pt;
+      for (const topic of project.topics || []) {
+        const tt = topic.tasks?.find((t) => t.id === id);
+        if (tt) return tt;
+        for (const subtopic of topic.subtopics || []) {
+          const st = subtopic.tasks?.find((t) => t.id === id);
+          if (st) return st;
+        }
+      }
+    }
+    return null;
+  };
+
   const toggleProjectTask = async (id: string, done: boolean) => {
     try {
       const response = await $fetch<APIResponse<ProjectTask>>(
         "/api/projects/project-tasks",
-        {
-          method: "PUT",
-          body: { id, done },
-        },
+        { method: "PUT", body: { id, done } },
       );
       if (response.success) {
-        for (const project of projects.value) {
-          for (const topic of project.topics || []) {
-            for (const subtopic of topic.subtopics || []) {
-              const task = subtopic.tasks?.find((t) => t.id === id);
-              if (task) {
-                task.done = done;
-                return response.data;
-              }
-            }
-          }
-        }
+        const task = findProjectTask(id);
+        if (task) task.done = done;
       }
     } catch (e) {
       console.error("Failed to toggle project task:", e);
@@ -304,7 +330,13 @@ export const useProjects = () => {
         body: { id },
       });
       for (const project of projects.value) {
+        if (project.tasks) {
+          project.tasks = project.tasks.filter((t) => t.id !== id);
+        }
         for (const topic of project.topics || []) {
+          if (topic.tasks) {
+            topic.tasks = topic.tasks.filter((t) => t.id !== id);
+          }
           for (const subtopic of topic.subtopics || []) {
             if (subtopic.tasks) {
               subtopic.tasks = subtopic.tasks.filter((t) => t.id !== id);
@@ -318,14 +350,89 @@ export const useProjects = () => {
     }
   };
 
+  const archivedProjects = ref<Project[]>([]);
+
+  const fetchArchivedProjects = async (params?: {
+    search?: string;
+    order?: "asc" | "desc";
+  }) => {
+    try {
+      const query: Record<string, string> = {};
+      if (params?.search) query.search = params.search;
+      if (params?.order) query.order = params.order;
+
+      const response = await $fetch<APIResponse<Project[]>>(
+        "/api/projects/archived",
+        { query },
+      );
+      if (response.success) {
+        archivedProjects.value = response.data;
+      }
+    } catch (e) {
+      console.error("Failed to fetch archived projects:", e);
+    }
+  };
+
+  const archiveProject = async (id: string) => {
+    const index = projects.value.findIndex((p) => p.id === id);
+    if (index === -1) return;
+
+    const removed = projects.value.splice(index, 1)[0];
+
+    try {
+      const response = await $fetch<APIResponse<Project>>(
+        `/api/projects/${id}`,
+        {
+          method: "PUT",
+          body: { archived: true },
+        },
+      );
+      if (response.success) {
+        archivedProjects.value.unshift(response.data);
+      }
+    } catch (e) {
+      projects.value.splice(index, 0, removed);
+      console.error("Failed to archive project:", e);
+      throw e;
+    }
+  };
+
+  const restoreProject = async (id: string) => {
+    const index = archivedProjects.value.findIndex((p) => p.id === id);
+    if (index === -1) return;
+
+    const removed = archivedProjects.value.splice(index, 1)[0];
+
+    try {
+      const response = await $fetch<APIResponse<Project>>(
+        `/api/projects/${id}`,
+        {
+          method: "PUT",
+          body: { archived: false },
+        },
+      );
+      if (response.success) {
+        projects.value.push(response.data);
+      }
+    } catch (e) {
+      archivedProjects.value.splice(index, 0, removed);
+      console.error("Failed to restore project:", e);
+      throw e;
+    }
+  };
+
   return {
     projects,
+    archivedProjects,
     loading,
     error,
     fetchProjects,
+    fetchArchivedProjects,
     createProject,
     updateProject,
     deleteProject,
+    archiveProject,
+    restoreProject,
     createTopic,
     updateTopic,
     deleteTopic,

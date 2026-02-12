@@ -64,7 +64,7 @@
         @delete="(id: string) => $emit('deleteSubtopic', id)"
         @update="(id: string, u: any) => $emit('updateSubtopic', id, u)"
         @toggle-expand="(id: string, v: boolean) => $emit('toggleSubtopicExpand', id, v)"
-        @add-task="(sid: string, t: string) => $emit('addTask', sid, t)"
+        @add-task="(sid: string, t: string) => $emit('addTask', sid, t, 'subtopic')"
         @toggle-task="(id: string, d: boolean) => $emit('toggleTask', id, d)"
         @delete-task="(id: string) => $emit('deleteTask', id)"
         @update-task="(id: string, t: string) => $emit('updateTask', id, t)"
@@ -85,14 +85,53 @@
         />
       </div>
 
-      <button
-        v-if="!showAddSubtopic"
-        class="add-btn"
-        @click="showAddSubtopic = true"
+      <div
+        v-if="topic.tasks && topic.tasks.length > 0"
+        class="topic-tasks-list"
       >
-        <Icon name="lucide:plus" size="14" />
-        Subtópico
-      </button>
+        <ProjectsProjectTaskItem
+          v-for="task in topic.tasks"
+          :key="task.id"
+          :task="task"
+          @toggle="(id: string, done: boolean) => $emit('toggleTask', id, done)"
+          @delete="(id: string) => $emit('deleteTask', id)"
+          @update="(id: string, title: string) => $emit('updateTask', id, title)"
+        />
+      </div>
+
+      <div
+        v-if="showAddTopicTask"
+        class="add-inline"
+      >
+        <input
+          ref="newTopicTaskInput"
+          v-model="newTopicTaskTitle"
+          class="add-input"
+          placeholder="Nova tarefa..."
+          @keydown.enter="addTopicTask"
+          @keydown.escape="cancelAddTopicTask"
+          @blur="addTopicTask"
+        />
+      </div>
+
+      <div class="topic-add-actions">
+        <button
+          v-if="!showAddTopicTask"
+          class="add-btn"
+          @click="showAddTopicTask = true"
+        >
+          <Icon name="lucide:plus" size="14" />
+          Tarefa
+        </button>
+        <button
+          v-if="!showAddSubtopic"
+          class="add-btn"
+          @click="showAddSubtopic = true"
+        >
+          <Icon name="lucide:plus" size="14" />
+          Subtópico
+        </button>
+      </div>
     </div>
   </ProjectsExpandableSection>
 </template>
@@ -114,7 +153,7 @@ const emit = defineEmits<{
   deleteSubtopic: [id: string];
   updateSubtopic: [id: string, updates: Partial<Subtopic>];
   toggleSubtopicExpand: [id: string, expanded: boolean];
-  addTask: [subtopicId: string, title: string];
+  addTask: [parentId: string, title: string, level: "topic" | "subtopic"];
   toggleTask: [id: string, done: boolean];
   deleteTask: [id: string];
   updateTask: [id: string, title: string];
@@ -127,8 +166,12 @@ const showAddSubtopic = ref(false);
 const newSubtopicTitle = ref("");
 const newSubtopicInput = ref<HTMLInputElement | null>(null);
 
+const showAddTopicTask = ref(false);
+const newTopicTaskTitle = ref("");
+const newTopicTaskInput = ref<HTMLInputElement | null>(null);
+
 const totalTasks = computed(() => {
-  let count = 0;
+  let count = props.topic.tasks?.length ?? 0;
   for (const sub of props.topic.subtopics || []) {
     count += sub.tasks?.length ?? 0;
   }
@@ -136,7 +179,7 @@ const totalTasks = computed(() => {
 });
 
 const doneTasks = computed(() => {
-  let count = 0;
+  let count = props.topic.tasks?.filter((t) => t.done).length ?? 0;
   for (const sub of props.topic.subtopics || []) {
     count += sub.tasks?.filter((t) => t.done).length ?? 0;
   }
@@ -181,8 +224,26 @@ const cancelAdd = () => {
   showAddSubtopic.value = false;
 };
 
+const addTopicTask = () => {
+  const trimmed = newTopicTaskTitle.value.trim();
+  if (trimmed) {
+    emit("addTask", props.topic.id, trimmed, "topic");
+  }
+  newTopicTaskTitle.value = "";
+  showAddTopicTask.value = false;
+};
+
+const cancelAddTopicTask = () => {
+  newTopicTaskTitle.value = "";
+  showAddTopicTask.value = false;
+};
+
 watch(showAddSubtopic, (val) => {
   if (val) nextTick(() => newSubtopicInput.value?.focus());
+});
+
+watch(showAddTopicTask, (val) => {
+  if (val) nextTick(() => newTopicTaskInput.value?.focus());
 });
 </script>
 
@@ -325,5 +386,18 @@ watch(showAddSubtopic, (val) => {
 .add-btn:hover {
   color: var(--color-primary);
   background: var(--color-background);
+}
+
+.topic-tasks-list {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--spacing-xs);
+  padding: var(--spacing-xs) 0;
+  border-top: 1px dashed var(--color-border);
+}
+
+.topic-add-actions {
+  display: flex;
+  gap: var(--spacing-xs);
 }
 </style>

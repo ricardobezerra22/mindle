@@ -5,29 +5,21 @@ export default defineEventHandler(async (event) => {
     const userId = event.context.userId;
     const query = getQuery(event);
 
-    const where: any = { userId, archived: false };
-
-    if (query.categoryId) {
-      where.categoryId = String(query.categoryId);
-    }
+    const where: any = { userId, archived: true };
 
     if (query.search) {
       where.title = { contains: String(query.search), mode: "insensitive" };
     }
 
+    const sortOrder = query.order === "asc" ? "asc" : "desc";
+
     const projects = await prisma.project.findMany({
       where,
       include: {
         category: true,
-        tasks: {
-          orderBy: { position: "asc" },
-        },
         topics: {
           orderBy: { position: "asc" },
           include: {
-            tasks: {
-              orderBy: { position: "asc" },
-            },
             subtopics: {
               orderBy: { position: "asc" },
               include: {
@@ -39,12 +31,12 @@ export default defineEventHandler(async (event) => {
           },
         },
       },
-      orderBy: { position: "asc" },
+      orderBy: { archivedAt: sortOrder },
     });
 
     return sendSuccess(event, projects);
   } catch (error) {
-    console.error("Error fetching projects:", error);
-    return sendError(event, "Failed to fetch projects", 500);
+    console.error("Error fetching archived projects:", error);
+    return sendError(event, "Failed to fetch archived projects", 500);
   }
 });
