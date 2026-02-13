@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
       data: {
         ...(title !== undefined && { title }),
         ...(description !== undefined && { description }),
-        ...(status !== undefined && { status }),
+        ...(status !== undefined && { status, doneAt: status === "DONE" ? new Date() : null }),
         ...(priority !== undefined && { priority }),
         ...(dueDate !== undefined && { dueDate: dueDate ? new Date(dueDate) : null }),
         ...(color !== undefined && { color }),

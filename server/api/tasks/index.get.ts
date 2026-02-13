@@ -7,6 +7,10 @@ export default defineEventHandler(async (event) => {
 
     const where: any = { userId };
 
+    if (query.status) {
+      where.status = String(query.status);
+    }
+
     if (query.categoryId) {
       where.categoryId = String(query.categoryId);
     }
@@ -15,6 +19,12 @@ export default defineEventHandler(async (event) => {
       where.dueDate = {};
       if (query.from) where.dueDate.gte = new Date(String(query.from));
       if (query.to) where.dueDate.lte = new Date(String(query.to));
+    }
+
+    if (query.doneFrom || query.doneTo) {
+      where.doneAt = {};
+      if (query.doneFrom) where.doneAt.gte = new Date(String(query.doneFrom));
+      if (query.doneTo) where.doneAt.lte = new Date(String(query.doneTo));
     }
 
     if (query.search) {

@@ -1,6 +1,29 @@
 <template>
   <div class="tasks-page">
-    <div class="page-header">
+    <div class="tasks-tab-toggle">
+      <button
+        :class="['tasks-tab-btn', { active: activeTasksTab === 'active' }]"
+        @click="activeTasksTab = 'active'"
+      >
+        Tarefas
+      </button>
+      <button
+        :class="['tasks-tab-btn', { active: activeTasksTab === 'done' }]"
+        @click="activeTasksTab = 'done'; fetchDoneTasks()"
+      >
+        <Icon name="lucide:check-circle-2" size="14" />
+        Concluídas
+        <span
+          v-if="doneTasks.length > 0"
+          class="tasks-tab-badge"
+        >{{ doneTasks.length }}</span>
+      </button>
+    </div>
+
+    <div
+      v-if="activeTasksTab === 'active'"
+      class="page-header"
+    >
       <div class="filters-section">
         <TasksTaskSearchBox v-model="searchQuery" />
         <TasksTaskDateFilter v-model="dateFilter" />
@@ -24,8 +47,119 @@
       </UiButton>
     </div>
 
+    <template v-if="activeTasksTab === 'done'">
+      <div class="done-tasks-header">
+        <div class="done-date-filters">
+          <button
+            :class="['done-filter-pill', { active: doneFilterMode === 'today' }]"
+            @click="doneFilterMode = 'today'; fetchDoneTasks()"
+          >
+            Hoje
+          </button>
+          <button
+            :class="['done-filter-pill', { active: doneFilterMode === 'week' }]"
+            @click="doneFilterMode = 'week'; fetchDoneTasks()"
+          >
+            Esta semana
+          </button>
+          <button
+            :class="['done-filter-pill', { active: doneFilterMode === 'month' }]"
+            @click="doneFilterMode = 'month'; fetchDoneTasks()"
+          >
+            Este mês
+          </button>
+          <button
+            :class="['done-filter-pill', { active: doneFilterMode === 'custom' }]"
+            @click="doneFilterMode = 'custom'"
+          >
+            Personalizado
+          </button>
+        </div>
+        <div
+          v-if="doneFilterMode === 'custom'"
+          class="done-custom-range"
+        >
+          <input
+            v-model="doneCustomFrom"
+            type="date"
+            class="done-date-input"
+            @change="fetchDoneTasks()"
+          />
+          <span class="done-range-sep">→</span>
+          <input
+            v-model="doneCustomTo"
+            type="date"
+            class="done-date-input"
+            @change="fetchDoneTasks()"
+          />
+        </div>
+      </div>
+
+      <div
+        v-if="doneLoading"
+        class="loading-state"
+      >
+        <div class="skeleton-columns">
+          <div class="skeleton-column">
+            <UiSkeleton width="120px" height="12px" />
+            <div
+              v-for="j in 4"
+              :key="j"
+              class="skeleton-task-card"
+            >
+              <div class="skeleton-task-row">
+                <UiSkeleton variant="circle" width="20px" height="20px" />
+                <UiSkeleton height="14px" :width="['90%', '70%', '80%', '60%'][j - 1]" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-else-if="doneTasks.length === 0"
+        class="empty-state"
+      >
+        <Icon name="lucide:check-circle-2" size="48" />
+        <h3 class="empty-title">Nenhuma tarefa concluída</h3>
+        <p class="empty-text">Tarefas concluídas no período selecionado aparecerão aqui.</p>
+      </div>
+
+      <div
+        v-else
+        class="done-tasks-list"
+      >
+        <div
+          v-for="task in doneTasks"
+          :key="task.id"
+          class="done-task-card"
+        >
+          <div class="done-task-check">
+            <Icon name="lucide:check-circle-2" size="18" />
+          </div>
+          <div class="done-task-info">
+            <span class="done-task-title">{{ task.title }}</span>
+            <div class="done-task-meta">
+              <span
+                v-if="task.category"
+                class="done-task-cat"
+                :style="{ color: task.category.color }"
+              >{{ task.category.name }}</span>
+              <span
+                v-if="task.doneAt"
+                class="done-task-date"
+              >{{ formatDoneDate(task.doneAt) }}</span>
+              <span
+                :class="['done-task-priority', task.priority.toLowerCase()]"
+              >{{ priorityLabel(task.priority) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
     <div
-      v-if="loading"
+      v-if="activeTasksTab === 'active' && loading"
       class="loading-state"
     >
       <div class="skeleton-columns">
@@ -50,7 +184,7 @@
       </div>
     </div>
 
-    <template v-else>
+    <template v-else-if="activeTasksTab === 'active'">
       <div
         v-if="viewMode === 'kanban'"
         class="kanban-board"
@@ -500,6 +634,78 @@ const dateFilter = ref("");
 const categoryFilter = ref("");
 const favoriteFilter = ref(false);
 const sortBy = ref<"HIGHEST_PRIORITY" | "LOWEST_PRIORITY" | "">("HIGHEST_PRIORITY");
+
+const activeTasksTab = ref<"active" | "done">("active");
+const doneTasks = ref<Task[]>([]);
+const doneLoading = ref(false);
+const doneFilterMode = ref<"today" | "week" | "month" | "custom">("today");
+const doneCustomFrom = ref("");
+const doneCustomTo = ref("");
+
+const getDoneDateRange = () => {
+  const now = new Date();
+  if (doneFilterMode.value === "today") {
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(now);
+    end.setHours(23, 59, 59, 999);
+    return { doneFrom: start.toISOString(), doneTo: end.toISOString() };
+  }
+  if (doneFilterMode.value === "week") {
+    const day = now.getDay();
+    const diff = day === 0 ? 6 : day - 1;
+    const start = new Date(now);
+    start.setDate(now.getDate() - diff);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(now);
+    end.setHours(23, 59, 59, 999);
+    return { doneFrom: start.toISOString(), doneTo: end.toISOString() };
+  }
+  if (doneFilterMode.value === "month") {
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    const end = new Date(now);
+    end.setHours(23, 59, 59, 999);
+    return { doneFrom: start.toISOString(), doneTo: end.toISOString() };
+  }
+  if (doneFilterMode.value === "custom" && doneCustomFrom.value && doneCustomTo.value) {
+    return {
+      doneFrom: new Date(doneCustomFrom.value).toISOString(),
+      doneTo: new Date(doneCustomTo.value + "T23:59:59").toISOString(),
+    };
+  }
+  return {};
+};
+
+const fetchDoneTasks = async () => {
+  doneLoading.value = true;
+  try {
+    const range = getDoneDateRange();
+    const response = await $fetch<{ success: boolean; data: Task[] }>("/api/tasks", {
+      query: { status: "DONE", ...range },
+    });
+    if (response.success) {
+      doneTasks.value = response.data;
+    }
+  } catch (e) {
+    console.error("Error fetching done tasks:", e);
+  } finally {
+    doneLoading.value = false;
+  }
+};
+
+const formatDoneDate = (date: Date | string) => {
+  return new Date(date).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+const priorityLabel = (priority: string) => {
+  const labels: Record<string, string> = { HIGH: "Alta", MEDIUM: "Média", LOW: "Baixa" };
+  return labels[priority] || priority;
+};
 
 const expandedCategories = ref(new Set<string>());
 
@@ -1265,5 +1471,218 @@ onMounted(() => {
 :deep(.delete-button:hover) {
   background-color: #b91c1c !important;
   color: white !important;
+}
+
+.tasks-tab-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--color-background);
+  padding: 4px;
+  border-radius: var(--radius-md);
+  width: fit-content;
+  margin-bottom: var(--spacing-md);
+}
+
+.tasks-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.tasks-tab-btn.active {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.tasks-tab-badge {
+  padding: 0 6px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--color-primary);
+  color: white;
+}
+
+.tasks-tab-btn:not(.active) .tasks-tab-badge {
+  background: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.done-tasks-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.done-date-filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.done-filter-pill {
+  padding: 6px 14px;
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.done-filter-pill.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: white;
+}
+
+.done-filter-pill:hover:not(.active) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.done-custom-range {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.done-date-input {
+  padding: 6px 12px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.done-date-input:focus {
+  border-color: var(--color-primary);
+}
+
+.done-range-sep {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.done-tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.done-task-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: box-shadow 0.2s ease;
+}
+
+.done-task-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.done-task-check {
+  color: #10b981;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.done-task-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.done-task-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.done-task-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.done-task-cat {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.done-task-date {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.done-task-priority {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 6px;
+}
+
+.done-task-priority.high {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.done-task-priority.medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.done-task-priority.low {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: var(--spacing-md) 0 var(--spacing-xs) 0;
+}
+
+.empty-text {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
 }
 </style>
