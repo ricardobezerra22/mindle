@@ -3,14 +3,41 @@
     <div class="settings-container">
       <div class="settings-header">
         <h1 class="page-title">
-          Preferências
+          Configurações
         </h1>
         <p class="page-subtitle">
-          Ajuste como o Mindle funciona para você. Tudo salva automaticamente.
+          Personalize o Mindle ao seu ritmo.
         </p>
       </div>
 
-      <div class="settings-grid">
+      <div class="settings-tabs">
+        <button
+          :class="['settings-tab', { active: settingsTab === 'preferences' }]"
+          @click="settingsTab = 'preferences'"
+        >
+          <Icon name="lucide:sliders-horizontal" size="16" />
+          Preferências
+        </button>
+        <button
+          :class="['settings-tab', { active: settingsTab === 'guidelines' }]"
+          @click="settingsTab = 'guidelines'"
+        >
+          <Icon name="lucide:book-open" size="16" />
+          Guia da plataforma
+        </button>
+        <button
+          :class="['settings-tab', { active: settingsTab === 'assistance' }]"
+          @click="settingsTab = 'assistance'"
+        >
+          <Icon name="lucide:life-buoy" size="16" />
+          Assistência
+        </button>
+      </div>
+
+      <div
+        v-if="settingsTab === 'preferences'"
+        class="settings-grid"
+      >
         <section class="settings-section">
           <div class="section-header">
             <Icon
@@ -365,82 +392,274 @@
         </section>
       </div>
 
-      <section class="settings-section feedback-section">
-        <div class="section-header">
-          <Icon
-            name="lucide:message-circle"
-            size="20"
-          />
-          <div>
-            <h2 class="section-title">
-              Suporte e Feedback
-            </h2>
-            <p class="section-hint">
-              Envie para suporte@mindle.space
+      <div
+        v-if="settingsTab === 'guidelines'"
+        class="guidelines-content"
+      >
+        <div class="guide-hero">
+          <div class="guide-hero-icon">
+            <Icon name="lucide:sparkles" size="28" />
+          </div>
+          <h2 class="guide-hero-title">Bem-vindo ao Mindle</h2>
+          <p class="guide-hero-text">
+            Um espaço calmo e intuitivo para organizar sua vida.
+            Projetado para quem tem TDAH ou simplesmente quer clareza sem complexidade.
+          </p>
+        </div>
+
+        <div class="guide-grid">
+          <div class="guide-card">
+            <div class="guide-card-icon" style="background: #d1fae5; color: #059669">
+              <Icon name="lucide:check-square" size="22" />
+            </div>
+            <h3 class="guide-card-title">Tarefas</h3>
+            <p class="guide-card-text">
+              Organize com prioridades, categorias e datas. Visualize em kanban ou por categorias.
+              Arraste entre colunas, marque favoritas e acompanhe subtarefas.
             </p>
+            <div class="guide-card-tips">
+              <span class="guide-tip">Kanban visual</span>
+              <span class="guide-tip">Prioridades</span>
+              <span class="guide-tip">Subtarefas</span>
+            </div>
+          </div>
+
+          <div class="guide-card">
+            <div class="guide-card-icon" style="background: #e0e7ff; color: #4f46e5">
+              <Icon name="lucide:target" size="22" />
+            </div>
+            <h3 class="guide-card-title">Foco</h3>
+            <p class="guide-card-text">
+              Sessões de concentração com timer configurável. Vincule a uma tarefa
+              e acompanhe quanto tempo dedicou. Som ao concluir e pausa automática.
+            </p>
+            <div class="guide-card-tips">
+              <span class="guide-tip">Timer</span>
+              <span class="guide-tip">Vincula tarefas</span>
+              <span class="guide-tip">Estatísticas</span>
+            </div>
+          </div>
+
+          <div class="guide-card">
+            <div class="guide-card-icon" style="background: #fce7f3; color: #db2777">
+              <Icon name="lucide:heart" size="22" />
+            </div>
+            <h3 class="guide-card-title">Hábitos</h3>
+            <p class="guide-card-text">
+              Crie hábitos com meta semanal e acompanhe streaks.
+              Registre humor e energia diariamente. Exercícios de respiração integrados.
+            </p>
+            <div class="guide-card-tips">
+              <span class="guide-tip">Streaks</span>
+              <span class="guide-tip">Humor diário</span>
+              <span class="guide-tip">Respiração</span>
+            </div>
+          </div>
+
+          <div class="guide-card">
+            <div class="guide-card-icon" style="background: #fef3c7; color: #d97706">
+              <Icon name="lucide:calendar-days" size="22" />
+            </div>
+            <h3 class="guide-card-title">Planner</h3>
+            <p class="guide-card-text">
+              Planeje sua semana ou mês arrastando tarefas para os dias.
+              Visualize o que já foi feito e o que está pendente por período.
+            </p>
+            <div class="guide-card-tips">
+              <span class="guide-tip">Semana e mês</span>
+              <span class="guide-tip">Drag & drop</span>
+              <span class="guide-tip">Visual limpo</span>
+            </div>
+          </div>
+
+          <div class="guide-card">
+            <div class="guide-card-icon" style="background: #dbeafe; color: #2563eb">
+              <Icon name="lucide:folder-kanban" size="22" />
+            </div>
+            <h3 class="guide-card-title">Projetos</h3>
+            <p class="guide-card-text">
+              Estruture projetos com tópicos, subtópicos e tarefas em cada nível.
+              Defina prazos, acompanhe progresso e arquive quando concluir.
+            </p>
+            <div class="guide-card-tips">
+              <span class="guide-tip">Hierarquia</span>
+              <span class="guide-tip">Progresso %</span>
+              <span class="guide-tip">Arquivo</span>
+            </div>
+          </div>
+
+          <div class="guide-card">
+            <div class="guide-card-icon" style="background: #f3e8ff; color: #7c3aed">
+              <Icon name="lucide:trophy" size="22" />
+            </div>
+            <h3 class="guide-card-title">Metas</h3>
+            <p class="guide-card-text">
+              Defina metas de longo prazo e vincule projetos a elas.
+              Veja o progresso geral e mantenha a direção clara.
+            </p>
+            <div class="guide-card-tips">
+              <span class="guide-tip">Vincula projetos</span>
+              <span class="guide-tip">Progresso</span>
+              <span class="guide-tip">Deadlines</span>
+            </div>
+          </div>
+
+          <div class="guide-card">
+            <div class="guide-card-icon" style="background: #ccfbf1; color: #0d9488">
+              <Icon name="lucide:wallet" size="22" />
+            </div>
+            <h3 class="guide-card-title">Finanças</h3>
+            <p class="guide-card-text">
+              Registre pagamentos com categorias e datas de vencimento.
+              Acompanhe pendentes, pagos e vencidos sem complicação.
+            </p>
+            <div class="guide-card-tips">
+              <span class="guide-tip">Categorias</span>
+              <span class="guide-tip">Status</span>
+              <span class="guide-tip">Vencimentos</span>
+            </div>
+          </div>
+
+          <div class="guide-card">
+            <div class="guide-card-icon" style="background: #fee2e2; color: #dc2626">
+              <Icon name="lucide:bar-chart-3" size="22" />
+            </div>
+            <h3 class="guide-card-title">Métricas</h3>
+            <p class="guide-card-text">
+              Dashboard completo com KPIs, gráficos e insights automáticos.
+              Humor, energia, hábitos, foco, tarefas e finanças — tudo num só lugar.
+            </p>
+            <div class="guide-card-tips">
+              <span class="guide-tip">KPIs</span>
+              <span class="guide-tip">Gráficos</span>
+              <span class="guide-tip">Insights IA</span>
+            </div>
           </div>
         </div>
 
-        <form
-          class="feedback-form"
-          @submit.prevent="sendFeedback"
-        >
-          <div class="feedback-field">
-            <label
-              for="feedback-subject"
-              class="feedback-label"
-            >Assunto</label>
-            <input
-              id="feedback-subject"
-              v-model="feedbackSubject"
-              type="text"
-              class="feedback-input"
-              placeholder="Qual o tema?"
-              required
-            >
-          </div>
+        <div class="guide-philosophy">
+          <Icon name="lucide:leaf" size="20" />
+          <p>
+            O Mindle foi criado para quem busca <strong>clareza, não mais complexidade</strong>.
+            Cada funcionalidade é pensada para ser leve, acessível e gentil com o seu ritmo.
+            Sem pressa, sem pressão — apenas o que importa.
+          </p>
+        </div>
+      </div>
 
-          <div class="feedback-field">
-            <label
-              for="feedback-message"
-              class="feedback-label"
-            >Mensagem</label>
-            <textarea
-              id="feedback-message"
-              v-model="feedbackMessage"
-              class="feedback-textarea"
-              rows="4"
-              placeholder="Descreva sua dúvida, sugestão ou problema..."
-              required
-            />
-          </div>
-
-          <UiButton
-            type="submit"
-            :disabled="sendingFeedback"
-          >
+      <div
+        v-if="settingsTab === 'assistance'"
+        class="assistance-content"
+      >
+        <section class="settings-section feedback-section">
+          <div class="section-header">
             <Icon
-              :name="sendingFeedback ? 'lucide:loader-2' : 'lucide:send'"
-              size="16"
-              :class="{ spinning: sendingFeedback }"
+              name="lucide:message-circle"
+              size="20"
             />
-            {{ sendingFeedback ? "Enviando..." : "Enviar Feedback" }}
-          </UiButton>
-        </form>
-      </section>
+            <div>
+              <h2 class="section-title">
+                Suporte e Feedback
+              </h2>
+              <p class="section-hint">
+                Envie para suporte@mindle.space
+              </p>
+            </div>
+          </div>
 
-      <section class="about-section">
-        <p class="app-name">
-          Mindle
-        </p>
-        <p class="app-version">
-          v1.0.0
-        </p>
-        <p class="app-philosophy">
-          Um espaço calmo para organizar o que importa. Sem pressa, sem pressão.
-          Feito para quem quer clareza, não mais complexidade.
-        </p>
-      </section>
+          <form
+            class="feedback-form"
+            @submit.prevent="sendFeedback"
+          >
+            <div class="feedback-field">
+              <label
+                for="feedback-subject"
+                class="feedback-label"
+              >Assunto</label>
+              <input
+                id="feedback-subject"
+                v-model="feedbackSubject"
+                type="text"
+                class="feedback-input"
+                placeholder="Qual o tema?"
+                required
+              >
+            </div>
+
+            <div class="feedback-field">
+              <label
+                for="feedback-message"
+                class="feedback-label"
+              >Mensagem</label>
+              <textarea
+                id="feedback-message"
+                v-model="feedbackMessage"
+                class="feedback-textarea"
+                rows="4"
+                placeholder="Descreva sua dúvida, sugestão ou problema..."
+                required
+              />
+            </div>
+
+            <UiButton
+              type="submit"
+              :disabled="sendingFeedback"
+            >
+              <Icon
+                :name="sendingFeedback ? 'lucide:loader-2' : 'lucide:send'"
+                size="16"
+                :class="{ spinning: sendingFeedback }"
+              />
+              {{ sendingFeedback ? "Enviando..." : "Enviar Feedback" }}
+            </UiButton>
+          </form>
+        </section>
+
+        <section class="settings-section">
+          <div class="section-header">
+            <Icon
+              name="lucide:help-circle"
+              size="20"
+            />
+            <div>
+              <h2 class="section-title">Perguntas frequentes</h2>
+              <p class="section-hint">Dúvidas comuns sobre o Mindle</p>
+            </div>
+          </div>
+
+          <div class="faq-list">
+            <details class="faq-item">
+              <summary class="faq-question">Meus dados são salvos automaticamente?</summary>
+              <p class="faq-answer">Sim! Todas as suas alterações em preferências, tarefas, hábitos e projetos são salvas automaticamente na nuvem.</p>
+            </details>
+            <details class="faq-item">
+              <summary class="faq-question">Posso exportar meus dados?</summary>
+              <p class="faq-answer">Sim, vá em Preferências → Dados e segurança → Exportar dados. Você receberá um arquivo JSON com tudo.</p>
+            </details>
+            <details class="faq-item">
+              <summary class="faq-question">O Mindle é gratuito?</summary>
+              <p class="faq-answer">Sim, o Mindle é 100% gratuito. Foi criado como um projeto de estudo e paixão por produtividade acessível.</p>
+            </details>
+            <details class="faq-item">
+              <summary class="faq-question">Posso usar no celular?</summary>
+              <p class="faq-answer">Sim! A interface é totalmente responsiva e funciona bem em qualquer dispositivo.</p>
+            </details>
+          </div>
+        </section>
+
+        <section class="about-section">
+          <p class="app-name">
+            Mindle
+          </p>
+          <p class="app-version">
+            v1.0.0
+          </p>
+          <p class="app-philosophy">
+            Um espaço calmo para organizar o que importa. Sem pressa, sem pressão.
+            Feito para quem quer clareza, não mais complexidade.
+          </p>
+        </section>
+      </div>
     </div>
   </div>
 </template>
@@ -449,6 +668,7 @@
 const { preferences, fetchPreferences, debouncedSave } = usePreferences();
 const { user } = useAuth();
 const toast = useToast();
+const settingsTab = ref<"preferences" | "guidelines" | "assistance">("preferences");
 const exporting = ref(false);
 const emailNotifications = ref(true);
 const emailLoading = ref(false);
@@ -877,6 +1097,219 @@ onMounted(() => {
   border-color: var(--color-primary);
 }
 
+.settings-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--color-background);
+  padding: 4px;
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-xl);
+  width: fit-content;
+}
+
+.settings-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.settings-tab.active {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.settings-tab:hover:not(.active) {
+  color: var(--color-text-primary);
+}
+
+.guidelines-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.guide-hero {
+  text-align: center;
+  padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.guide-hero-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, var(--color-primary), #4e8a6d);
+  border-radius: 16px;
+  color: white;
+  margin-bottom: var(--spacing-md);
+}
+
+.guide-hero-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.guide-hero-text {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.guide-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.guide-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.guide-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+}
+
+.guide-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guide-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.guide-card-text {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.guide-card-tips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: var(--spacing-xs);
+}
+
+.guide-tip {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--color-background);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.guide-philosophy {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-lg);
+}
+
+.guide-philosophy :deep(svg) {
+  color: var(--color-primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.guide-philosophy p {
+  font-size: 14px;
+  color: var(--color-text-primary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.assistance-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 640px;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.faq-question {
+  padding: var(--spacing-md) 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.faq-question::-webkit-details-marker {
+  display: none;
+}
+
+.faq-question::before {
+  content: "+";
+  font-size: 18px;
+  font-weight: 300;
+  color: var(--color-text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.faq-item[open] .faq-question::before {
+  content: "−";
+}
+
+.faq-answer {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-md) 0;
+  padding-left: 26px;
+}
+
 @media (max-width: 768px) {
   .settings-page {
     padding: var(--spacing-md);
@@ -888,6 +1321,15 @@ onMounted(() => {
 
   .setting-select {
     width: 140px;
+  }
+
+  .settings-tabs {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .guide-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>
