@@ -71,7 +71,9 @@ interface FinanceMetrics {
 interface MoodMetrics {
   total: number;
   distribution: Record<string, number>;
-  dailyMoods: { date: string; mood: string }[];
+  energyDistribution: Record<string, number>;
+  moodHabitCorrelation: Record<string, number>;
+  dailyMoods: { date: string; mood: string; energy: string | null }[];
 }
 
 export interface DashboardMetrics {

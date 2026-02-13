@@ -91,6 +91,14 @@
             <DashboardHabitConsistencyChart :habits="metrics.habits.habits" />
           </section>
 
+          <section class="charts-grid">
+            <DashboardMoodChart
+              :distribution="metrics.mood.distribution"
+              :energy-distribution="metrics.mood.energyDistribution"
+              :mood-habit-correlation="metrics.mood.moodHabitCorrelation"
+            />
+          </section>
+
           <DashboardInsightSummary
             :metrics="metrics"
             :period-label="periodLabel"

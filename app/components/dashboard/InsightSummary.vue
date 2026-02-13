@@ -142,6 +142,34 @@ const insights = computed<Insight[]>(() => {
     });
   }
 
+  if (m.mood.total > 0) {
+    const moodEntries = Object.entries(m.mood.distribution);
+    const dominant = moodEntries.sort((a, b) => b[1] - a[1])[0];
+    const moodLabels: Record<string, string> = {
+      HAPPY: "feliz", CALMLY: "calmo", OK: "neutro",
+      SAD: "triste", TIRED: "cansado", OVERWHELMED: "sobrecarregado",
+    };
+    if (dominant) {
+      const label = moodLabels[dominant[0]] || dominant[0];
+      const pct = Math.round((dominant[1] / m.mood.total) * 100);
+      list.push({
+        icon: "lucide:smile",
+        text: `Seu humor predominante foi "${label}" em ${pct}% dos dias registrados.`,
+        type: ["HAPPY", "CALMLY"].includes(dominant[0]) ? "positive" : ["SAD", "OVERWHELMED"].includes(dominant[0]) ? "warning" : "neutral",
+      });
+    }
+
+    const bestMoodHabit = Object.entries(m.mood.moodHabitCorrelation).sort((a, b) => b[1] - a[1])[0];
+    if (bestMoodHabit && bestMoodHabit[1] > 50) {
+      const label = moodLabels[bestMoodHabit[0]] || bestMoodHabit[0];
+      list.push({
+        icon: "lucide:heart-handshake",
+        text: `Nos dias em que você se sentiu "${label}", completou ${bestMoodHabit[1]}% dos hábitos.`,
+        type: "positive",
+      });
+    }
+  }
+
   if (m.finance.overdue > 0) {
     list.push({
       icon: "lucide:alert-circle",

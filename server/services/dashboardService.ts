@@ -394,23 +394,61 @@ const getMoodMetrics = async (userId: string, range: DateRange) => {
       userId,
       date: { gte: range.startDate, lte: range.endDate },
     },
-    select: { mood: true, date: true },
+    select: { mood: true, energy: true, date: true },
     orderBy: { date: "asc" },
   });
 
+  const habitLogs = await prisma.habitLog.findMany({
+    where: {
+      userId,
+      date: { gte: range.startDate, lte: range.endDate },
+      done: true,
+    },
+    select: { date: true },
+  });
+
+  const totalHabits = await prisma.habit.count({ where: { userId } });
+
   const distribution = new Map<string, number>();
+  const energyDistribution = new Map<string, number>();
+  const moodHabitMap = new Map<string, { totalDays: number; totalRate: number }>();
+
   for (const m of moods) {
     distribution.set(m.mood, (distribution.get(m.mood) || 0) + 1);
+    if (m.energy) {
+      energyDistribution.set(m.energy, (energyDistribution.get(m.energy) || 0) + 1);
+    }
+
+    const dayStr = m.date.toISOString().split("T")[0];
+    const logsForDay = habitLogs.filter(
+      l => l.date.toISOString().split("T")[0] === dayStr,
+    ).length;
+    const dayRate = totalHabits > 0 ? Math.round((logsForDay / totalHabits) * 100) : 0;
+
+    const entry = moodHabitMap.get(m.mood) || { totalDays: 0, totalRate: 0 };
+    entry.totalDays++;
+    entry.totalRate += dayRate;
+    moodHabitMap.set(m.mood, entry);
+  }
+
+  const moodHabitCorrelation: Record<string, number> = {};
+  for (const [mood, data] of moodHabitMap) {
+    moodHabitCorrelation[mood] = data.totalDays > 0
+      ? Math.round(data.totalRate / data.totalDays)
+      : 0;
   }
 
   const dailyMoods = moods.map(m => ({
     date: m.date.toISOString().split("T")[0],
     mood: m.mood,
+    energy: m.energy || null,
   }));
 
   return {
     total: moods.length,
     distribution: Object.fromEntries(distribution),
+    energyDistribution: Object.fromEntries(energyDistribution),
+    moodHabitCorrelation,
     dailyMoods,
   };
 };
