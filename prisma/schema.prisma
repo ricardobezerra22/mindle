@@ -101,6 +101,7 @@ model Project {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String?
+  dueDate     DateTime?
   archived    Boolean   @default(false)
   archivedAt  DateTime?
   position    Int       @default(0)
@@ -179,6 +180,7 @@ model Task {
   color       String?
   isFavorite  Boolean    @default(false)
   position    Int        @default(0)
+  doneAt      DateTime?
   createdAt   DateTime   @default(now())
 
   categoryId String?       @db.ObjectId

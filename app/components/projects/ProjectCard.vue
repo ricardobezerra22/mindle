@@ -93,6 +93,18 @@
           {{ project.description }}
         </p>
 
+        <div
+          v-if="project.dueDate"
+          :class="['project-deadline', { overdue: isOverdue }]"
+        >
+          <Icon name="lucide:calendar-clock" size="14" />
+          <span>{{ formatDeadline(project.dueDate) }}</span>
+          <span
+            v-if="daysRemaining !== null"
+            class="deadline-badge"
+          >{{ deadlineLabel }}</span>
+        </div>
+
         <div class="topics-list">
           <ProjectsTopicSection
             v-for="topic in project.topics"
@@ -242,6 +254,29 @@ const progressPercent = computed(() => {
   if (totalTasks.value === 0) return 0;
   return Math.round((doneTasks.value / totalTasks.value) * 100);
 });
+
+const daysRemaining = computed(() => {
+  if (!props.project.dueDate) return null;
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const due = new Date(props.project.dueDate);
+  due.setHours(0, 0, 0, 0);
+  return Math.ceil((due.getTime() - now.getTime()) / 86400000);
+});
+
+const isOverdue = computed(() => daysRemaining.value !== null && daysRemaining.value < 0);
+
+const deadlineLabel = computed(() => {
+  if (daysRemaining.value === null) return "";
+  if (daysRemaining.value < 0) return `${Math.abs(daysRemaining.value)}d atrasado`;
+  if (daysRemaining.value === 0) return "Hoje";
+  if (daysRemaining.value === 1) return "Amanhã";
+  return `${daysRemaining.value}d restantes`;
+});
+
+const formatDeadline = (date: Date | string) => {
+  return new Date(date).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+};
 
 const cardBorderStyle = computed(() => {
   if (!props.project.category?.color) return {};
@@ -475,6 +510,36 @@ watch(showAddProjectTask, (val) => {
   color: var(--color-text-secondary);
   margin: 0 0 var(--spacing-md) 0;
   line-height: 1.5;
+}
+
+.project-deadline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+  padding: 6px 10px;
+  background: var(--color-background);
+  border-radius: var(--radius-sm);
+  width: fit-content;
+}
+
+.project-deadline.overdue {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+.deadline-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.project-deadline.overdue .deadline-badge {
+  background: rgba(220, 38, 38, 0.15);
 }
 
 .topics-list {

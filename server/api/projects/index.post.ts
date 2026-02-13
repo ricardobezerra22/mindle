@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   try {
     const userId = event.context.userId;
     const body = await readBody(event);
-    const { title, description, categoryId } = body;
+    const { title, description, categoryId, dueDate } = body;
 
     if (!title?.trim()) {
       return sendError(event, "Title is required", 400);
@@ -17,6 +17,7 @@ export default defineEventHandler(async (event) => {
         title: title.trim(),
         description: description?.trim() || null,
         categoryId: categoryId || null,
+        dueDate: dueDate ? new Date(dueDate) : null,
         position: count,
         userId,
       },

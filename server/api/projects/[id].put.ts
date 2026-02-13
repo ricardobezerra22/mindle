@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
     if (!existing) return sendError(event, "Project not found", 404);
 
-    const { title, description, categoryId, archived, position } = body;
+    const { title, description, categoryId, archived, position, dueDate } = body;
 
     const archiveData: any = {};
     if (archived !== undefined) {
@@ -28,6 +28,7 @@ export default defineEventHandler(async (event) => {
         ...(title !== undefined && { title: title.trim() }),
         ...(description !== undefined && { description: description?.trim() || null }),
         ...(categoryId !== undefined && { categoryId: categoryId || null }),
+        ...(dueDate !== undefined && { dueDate: dueDate ? new Date(dueDate) : null }),
         ...archiveData,
         ...(position !== undefined && { position }),
       },

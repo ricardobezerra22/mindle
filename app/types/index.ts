@@ -48,6 +48,7 @@ export interface Task {
   color?: string;
   isFavorite: boolean;
   position: number;
+  doneAt?: Date;
   categoryId?: string;
   category?: TaskCategory;
   timeSpent: number;
@@ -144,6 +145,7 @@ export interface Project {
   id: string;
   title: string;
   description?: string;
+  dueDate?: Date;
   archived: boolean;
   archivedAt?: Date;
   position: number;

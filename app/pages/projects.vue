@@ -228,6 +228,15 @@
           </div>
 
           <div class="form-group">
+            <label class="form-label">Prazo (opcional)</label>
+            <input
+              v-model="formDueDate"
+              type="date"
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
             <label class="form-label">Categoria</label>
             <div class="category-chips">
               <button
@@ -380,6 +389,7 @@ const archiveSortOrder = ref<"asc" | "desc">("desc");
 const formTitle = ref("");
 const formDescription = ref("");
 const formCategoryId = ref("");
+const formDueDate = ref("");
 const projectNameInput = ref<HTMLInputElement | null>(null);
 
 const hasActiveFilters = computed(() =>
@@ -426,6 +436,7 @@ const openEditModal = (id: string) => {
   formTitle.value = project.title;
   formDescription.value = project.description || "";
   formCategoryId.value = project.categoryId || "";
+  formDueDate.value = project.dueDate ? new Date(project.dueDate).toISOString().split("T")[0] : "";
   showCreateModal.value = true;
 };
 
@@ -435,6 +446,7 @@ const closeModal = () => {
   formTitle.value = "";
   formDescription.value = "";
   formCategoryId.value = "";
+  formDueDate.value = "";
 };
 
 const handleSubmitProject = async () => {
@@ -446,14 +458,16 @@ const handleSubmitProject = async () => {
         title: formTitle.value.trim(),
         description: formDescription.value.trim() || undefined,
         categoryId: formCategoryId.value || undefined,
-      });
+        dueDate: formDueDate.value || undefined,
+      } as any);
       toast.success({ title: "Projeto atualizado" });
     } else {
       await createProject({
         title: formTitle.value.trim(),
         description: formDescription.value.trim() || undefined,
         categoryId: formCategoryId.value || undefined,
-      });
+        dueDate: formDueDate.value || undefined,
+      } as any);
       toast.success({ title: "Projeto criado" });
     }
     closeModal();
