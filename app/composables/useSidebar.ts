@@ -29,7 +29,7 @@ export const useSidebar = () => {
     hoverTimer = setTimeout(() => {
       expandedByHover.value = true;
       isExpanded.value = true;
-    }, 300);
+    }, 100);
   };
 
   const onMouseLeave = () => {
