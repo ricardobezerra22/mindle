@@ -19,7 +19,17 @@ export default defineEventHandler(async (event) => {
     sessionCache.set(sessionId, { userId, expiresAt: Date.now() + 5 * 60_000 });
     return sendSuccess(event, { ...result, sessionId });
   } catch (error) {
-    console.error("Agent preview error:", error);
-    return sendError(event, "Erro ao processar sua solicitação", 500);
+    const err = error as Error;
+    console.error("Agent preview error:", {
+      message: err.message,
+      stack: err.stack,
+      userId,
+      sessionId,
+    });
+    return sendError(
+      event,
+      "Erro ao processar sua solicitação. Tente novamente.",
+      500,
+    );
   }
 });
