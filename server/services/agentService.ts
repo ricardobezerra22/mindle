@@ -127,7 +127,7 @@ class OpenRouterLlm extends BaseLlm {
 
   constructor() {
     super({
-      model: process.env.OPENROUTER_MODEL ?? "google/gemma-4-31b-it",
+      model: process.env.OPENROUTER_MODEL ?? "anthropic/claude-3.5-sonnet",
     });
     this.#client = new OpenAI({
       baseURL: "https://openrouter.ai/api/v1",
@@ -222,8 +222,7 @@ export async function runPreviewAgent(
     description: "Returns all task categories available to the user",
     execute: async () => {
       const cached = categoryCache.get(userId);
-      if (cached && Date.now() < cached.expiresAt)
-        return { categories: cached.cats };
+      if (cached && Date.now() < cached.expiresAt) return { categories: cached.cats };
       const cats = await prisma.taskCategory.findMany({
         where: { userId },
         select: { id: true, name: true, color: true },
@@ -255,9 +254,7 @@ export async function runPreviewAgent(
       newMessage: { role: "user", parts: [{ text: currentInput }] },
     })) {
       if (isFinalResponse(event) && event.content?.parts) {
-        finalText = event.content.parts
-          .map((p) => (p as Part).text ?? "")
-          .join("");
+        finalText = event.content.parts.map(p => (p as Part).text ?? "").join("");
       }
     }
 
@@ -269,9 +266,7 @@ export async function runPreviewAgent(
 
       const parsed = JSON.parse(cleaned) as AgentPreviewResult;
 
-      const knownIds = new Set(
-        (categoryCache.get(userId)?.cats ?? []).map((c) => c.id),
-      );
+      const knownIds = new Set((categoryCache.get(userId)?.cats ?? []).map(c => c.id));
       const issues: string[] = [];
 
       for (const task of parsed.tasks ?? []) {
@@ -280,13 +275,9 @@ export async function runPreviewAgent(
           continue;
         }
         if (task.categoryId && !knownIds.has(task.categoryId))
-          issues.push(
-            `Task "${task.title}": categoryId not found in existing categories.`,
-          );
+          issues.push(`Task "${task.title}": categoryId not found in existing categories.`);
         if (!task.categoryId && !task.proposedCategoryName)
-          issues.push(
-            `Task "${task.title}": missing categoryId and proposedCategoryName.`,
-          );
+          issues.push(`Task "${task.title}": missing categoryId and proposedCategoryName.`);
       }
 
       if (issues.length > 0 && attempts < 2) {
@@ -308,28 +299,25 @@ export async function runPreviewAgent(
     result = {
       tasks: [],
       newCategories: [],
-      summary:
-        "Não consegui interpretar as tarefas com segurança. Tente novamente com mais detalhes.",
+      summary: "Não consegui interpretar as tarefas com segurança. Tente novamente com mais detalhes.",
     };
   }
 
-  await prisma.agentAuditLog
-    .create({
-      data: {
-        userId,
-        sessionId,
-        step: "preview",
-        action: "agent_preview_completed",
-        inputText: text,
-        outputJson: JSON.stringify(result),
-        promptTokens: llm.usage.promptTokens,
-        completionTokens: llm.usage.completionTokens,
-        totalTokens: llm.usage.totalTokens,
-        model: llm.model,
-        durationMs: Date.now() - startTime,
-      },
-    })
-    .catch(() => {});
+  await prisma.agentAuditLog.create({
+    data: {
+      userId,
+      sessionId,
+      step: "preview",
+      action: "agent_preview_completed",
+      inputText: text,
+      outputJson: JSON.stringify(result),
+      promptTokens: llm.usage.promptTokens,
+      completionTokens: llm.usage.completionTokens,
+      totalTokens: llm.usage.totalTokens,
+      model: llm.model,
+      durationMs: Date.now() - startTime,
+    },
+  }).catch(() => {});
 
   return result;
 }
