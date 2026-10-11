@@ -206,3 +206,45 @@ export interface FinanceEntry {
   date: Date;
   userId: string;
 }
+
+export interface NewCategory {
+  name: string;
+  color: string;
+}
+
+export interface PreviewSubTask {
+  title: string;
+}
+
+export interface PreviewTask {
+  title: string;
+  description?: string;
+  priority: Priority;
+  dueDate?: string;
+  categoryId?: string;
+  categoryName?: string;
+  proposedCategoryName?: string;
+  subTasks?: PreviewSubTask[];
+}
+
+export interface AgentPreviewResult {
+  tasks: PreviewTask[];
+  newCategories: NewCategory[];
+  summary: string;
+}
+
+export interface AgentAuditLog {
+  id: string;
+  userId: string;
+  sessionId: string;
+  step: string;
+  action: string;
+  inputText?: string;
+  outputJson?: string;
+  promptTokens?: number;
+  completionTokens?: number;
+  totalTokens?: number;
+  model?: string;
+  durationMs?: number;
+  createdAt: Date;
+}

@@ -37,12 +37,9 @@ export const useAuth = () => {
       }
 
       return response;
-    } catch (err: any) {
-      const data = err?.data;
-      if (data && data.error) {
-        return { success: false, error: data.error };
-      }
-      return { success: false, error: "Erro ao fazer login" };
+    } catch (err: unknown) {
+      const e = err as { data?: { error?: string }; statusCode?: number };
+      return { success: false as const, error: e?.data?.error ?? "Erro ao fazer login", statusCode: e?.statusCode };
     }
   };
 
@@ -71,12 +68,9 @@ export const useAuth = () => {
       }
 
       return response;
-    } catch (err: any) {
-      const data = err?.data;
-      if (data && data.error) {
-        return { success: false, error: data.error };
-      }
-      return { success: false, error: "Erro ao fazer login com Google" };
+    } catch (err: unknown) {
+      const e = err as { data?: { error?: string }; statusCode?: number };
+      return { success: false as const, error: e?.data?.error ?? "Erro ao fazer login com Google", statusCode: e?.statusCode };
     }
   };
 

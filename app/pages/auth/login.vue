@@ -178,8 +178,19 @@ const { login, googleLogin } = useAuth();
 const { googleReady, googleButtonContainer, initializeGoogleButton } =
   useGoogleAuth();
 
+const ERROR_MESSAGES: Record<number, string> = {
+  400: "Dados inválidos. Verifique os dados e tente novamente.",
+  401: "Email ou senha incorretos.",
+  429: "Muitas tentativas. Aguarde 1 minuto e tente novamente.",
+  500: "Erro interno do servidor. Tente novamente.",
+};
+
+const resolveError = (statusCode?: number, fallback?: string) =>
+  (statusCode !== undefined ? ERROR_MESSAGES[statusCode] : undefined) ??
+  fallback ??
+  "Erro ao processar. Tente novamente.";
+
 const email = ref("");
-const password = ref("");
 const showPassword = ref(false);
 const rememberMe = ref(false);
 const submitting = ref(false);
@@ -225,7 +236,7 @@ const handleLogin = async () => {
     if (response.success) {
       navigateTo("/");
     } else {
-      errorMessage.value = response.error || "Erro ao fazer login";
+      errorMessage.value = resolveError(response.statusCode, response.error);
     }
   } catch {
     errorMessage.value = "Erro de conexão. Tente novamente.";
@@ -241,7 +252,7 @@ const handleGoogleSuccess = async (e: { credential: string; claims: any }) => {
     if (response.success) {
       navigateTo("/");
     } else {
-      errorMessage.value = response.error || "Erro ao fazer login com Google";
+      errorMessage.value = resolveError(response.statusCode, response.error);
     }
   } catch {
     errorMessage.value = "Erro de conexão. Tente novamente.";
@@ -251,7 +262,10 @@ const handleGoogleSuccess = async (e: { credential: string; claims: any }) => {
 };
 
 const handleGoogleError = () => {
-  errorMessage.value = "Erro ao autenticar com Google. Tente novamente.";
+  errorMessage.value = resolveError(
+    undefined,
+    "Erro ao autenticar com Google. Tente novamente.",
+  );
 };
 
 onMounted(() => {
@@ -267,10 +281,15 @@ onMounted(() => {
 
 <style scoped lang="css">
 .auth-card {
-  background: var(--color-surface);
-  border: 2px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 78%, transparent);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid color-mix(in srgb, var(--color-surface) 60%, transparent);
   border-radius: 24px;
   padding: var(--spacing-xl);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.07),
+    0 1px 0 color-mix(in srgb, white 40%, transparent) inset;
 }
 
 .auth-title {
@@ -326,11 +345,13 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  border: 2px solid var(--color-border);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 0 var(--spacing-md);
   height: 48px;
-  background: var(--color-background);
+  background: color-mix(in srgb, var(--color-background) 70%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: all 0.2s ease;
 }
 

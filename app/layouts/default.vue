@@ -9,6 +9,8 @@
         <slot />
       </main>
     </div>
+
+    <AgentVoiceTaskChat />
   </div>
 </template>
 

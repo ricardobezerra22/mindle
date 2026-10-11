@@ -243,7 +243,8 @@ import { useAuth } from "../../composables/useAuth";
 
 const { user, logout } = useAuth();
 const toast = useToast();
-const { isExpanded, isMobile, closeMobile, onMouseEnter, onMouseLeave } = useSidebar();
+const { isExpanded, isMobile, closeMobile, onMouseEnter, onMouseLeave } =
+  useSidebar();
 
 const swipeTarget = ref<HTMLElement | null>(null);
 
