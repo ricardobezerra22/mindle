@@ -448,6 +448,12 @@
         "small": "Pequeno",
         "normal": "Normal",
         "large": "Grande"
+      },
+      "palette": "Paleta de cores",
+      "paletteHint": "Cores e tipografia da interface",
+      "palettes": {
+        "contrastful": "Contrastful (alto contraste, Lexend)",
+        "classic": "Clássica (Inter)"
       }
     },
     "notifications": {
@@ -890,7 +896,7 @@
       "emailLabel": "Email",
       "emailPlaceholder": "seu{'@'}email.com",
       "passwordLabel": "Senha",
-      "passwordPlaceholder": "••••••••",
+      "passwordPlaceholder": "Sua senha",
       "rememberMe": "Lembrar de mim",
       "forgotPassword": "Esqueceu a senha?",
       "signIn": "Entrar",
@@ -955,7 +961,45 @@
     },
     "connectionError": "Erro de conexão. Tente novamente.",
     "tagline": "Clareza, foco e calma.",
-    "googleAuthError": "Erro ao autenticar com Google. Tente novamente."
+    "googleAuthError": "Erro ao autenticar com Google. Tente novamente.",
+    "hero": {
+      "headlineTop": "Uma coisa",
+      "headlineAccent": "de cada vez.",
+      "body": "O Mindle transforma tarefas grandes em passos pequenos. Respire, escolha um, comece.",
+      "phrase1": "Sem pressa. Seu ritmo é o certo.",
+      "phrase2": "Um passo pequeno já conta.",
+      "phrase3": "Você chegou. Isso já é começar.",
+      "sceneLabel": "Um círculo que respira no centro, com pequenos passos orbitando ao redor"
+    },
+    "showPassword": "Mostrar senha",
+    "hidePassword": "Ocultar senha",
+    "continueWithGoogle": "Continuar com a Google",
+    "signUpWithGoogle": "Cadastrar com a Google",
+    "progressSaved": "Seu progresso fica salvo. Nada se perde.",
+    "back": "Voltar",
+    "welcome": {
+      "breatheIn": "Inspire…",
+      "breatheOut": "Expire…",
+      "orbLabel": "Um círculo que respira devagar",
+      "title1": "Oi! Vamos",
+      "title2": "com calma.",
+      "subtitle": "Aqui, nada é urgente até você decidir que é.",
+      "start": "Começar",
+      "step1": "Passo 1 de 2",
+      "step2": "Passo 2 de 2",
+      "splitTitle1": "Tarefa grande?",
+      "splitTitle2": "Vira passo pequeno.",
+      "splitLabel": "Uma tarefa grande se divide em três passos pequenos, e um deles é destacado e concluído",
+      "bigTask": "Organizar a mudança",
+      "task1": "Encaixotar os livros",
+      "task2": "Ligar a internet",
+      "task3": "Avisar o banco",
+      "cap0": "Quebre a tarefa em passos.",
+      "cap1": "Só este agora. Os outros esperam.",
+      "cap2": "Feito. Um passo já é progresso.",
+      "createFirst": "Criar minha primeira tarefa",
+      "haveAccount": "Já tenho conta"
+    }
   },
   "planner": {
     "overview": "Visão geral",

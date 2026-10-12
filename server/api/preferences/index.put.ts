@@ -19,7 +19,12 @@ export default defineEventHandler(async (event) => {
       theme,
       reducedMotion,
       fontSize,
+      palette,
     } = body;
+
+    const validPalette = ["classic", "contrastful"].includes(palette)
+      ? palette
+      : undefined;
 
     const prefs = await prisma.userPreferences.upsert({
       where: { userId },
@@ -37,6 +42,7 @@ export default defineEventHandler(async (event) => {
         theme,
         reducedMotion,
         fontSize,
+        palette: validPalette,
       },
       create: {
         userId,
@@ -53,10 +59,11 @@ export default defineEventHandler(async (event) => {
         theme,
         reducedMotion,
         fontSize,
+        palette: validPalette ?? "contrastful",
       },
     });
 
-    return sendSuccess(event, prefs);
+    return sendSuccess(event, { ...prefs, palette: prefs.palette ?? "classic" });
   } catch (error) {
     console.error("Error saving preferences:", error);
     return sendError(event, serverT(event, "server.preferencesSaveError"), 500);

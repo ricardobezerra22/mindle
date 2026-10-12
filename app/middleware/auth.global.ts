@@ -9,7 +9,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const isPublicPage = to.path === "/landing";
 
   if (!user.value && !isAuthPage && !isPublicPage) {
-    return navigateTo("/auth/login");
+    return navigateTo("/auth/welcome");
   }
 
   if (user.value && isAuthPage) {

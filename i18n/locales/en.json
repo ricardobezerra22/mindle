@@ -448,6 +448,12 @@
         "small": "Small",
         "normal": "Normal",
         "large": "Large"
+      },
+      "palette": "Color palette",
+      "paletteHint": "Interface colors and typography",
+      "palettes": {
+        "contrastful": "Contrastful (high contrast, Lexend)",
+        "classic": "Classic (Inter)"
       }
     },
     "notifications": {
@@ -890,7 +896,7 @@
       "emailLabel": "Email",
       "emailPlaceholder": "your{'@'}email.com",
       "passwordLabel": "Password",
-      "passwordPlaceholder": "••••••••",
+      "passwordPlaceholder": "Your password",
       "rememberMe": "Remember me",
       "forgotPassword": "Forgot password?",
       "signIn": "Sign in",
@@ -955,7 +961,45 @@
     },
     "connectionError": "Connection error. Please try again.",
     "tagline": "Clarity, focus and calm.",
-    "googleAuthError": "Error authenticating with Google. Please try again."
+    "googleAuthError": "Error authenticating with Google. Please try again.",
+    "hero": {
+      "headlineTop": "One thing",
+      "headlineAccent": "at a time.",
+      "body": "Mindle turns big tasks into small steps. Breathe, pick one, begin.",
+      "phrase1": "No rush. Your pace is the right one.",
+      "phrase2": "A small step still counts.",
+      "phrase3": "You made it. That already counts as starting.",
+      "sceneLabel": "A breathing circle at the center, with small steps orbiting around it"
+    },
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "continueWithGoogle": "Continue with Google",
+    "signUpWithGoogle": "Sign up with Google",
+    "progressSaved": "Your progress is saved. Nothing gets lost.",
+    "back": "Back",
+    "welcome": {
+      "breatheIn": "Breathe in…",
+      "breatheOut": "Breathe out…",
+      "orbLabel": "A circle breathing slowly",
+      "title1": "Hi! Let's go",
+      "title2": "slowly.",
+      "subtitle": "Here, nothing is urgent until you decide it is.",
+      "start": "Start",
+      "step1": "Step 1 of 2",
+      "step2": "Step 2 of 2",
+      "splitTitle1": "Big task?",
+      "splitTitle2": "Make it a small step.",
+      "splitLabel": "A big task splits into three small steps, and one of them is highlighted and completed",
+      "bigTask": "Plan the move",
+      "task1": "Box up the books",
+      "task2": "Set up the internet",
+      "task3": "Tell the bank",
+      "cap0": "Break the task into steps.",
+      "cap1": "Just this one now. The others can wait.",
+      "cap2": "Done. One step is already progress.",
+      "createFirst": "Create my first task",
+      "haveAccount": "I already have an account"
+    }
   },
   "planner": {
     "overview": "Overview",

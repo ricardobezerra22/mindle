@@ -10,11 +10,11 @@ export default defineEventHandler(async (event) => {
 
     if (!prefs) {
       prefs = await prisma.userPreferences.create({
-        data: { userId },
+        data: { userId, palette: "contrastful" },
       });
     }
 
-    return sendSuccess(event, prefs);
+    return sendSuccess(event, { ...prefs, palette: prefs.palette ?? "classic" });
   } catch (error) {
     console.error("Error fetching preferences:", error);
     return sendError(event, serverT(event, "server.preferencesFetchError"), 500);

@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-card">
+  <div>
     <h2 class="auth-title">
       {{ $t("auth.register.title") }}
     </h2>
@@ -9,159 +9,72 @@
 
     <div
       v-if="errorMessage"
-      class="alert alert-error"
+      class="alert"
+      role="alert"
     >
       <Icon
         name="lucide:alert-circle"
-        size="16"
+        size="18"
       />
       <span>{{ errorMessage }}</span>
     </div>
 
     <form
       class="auth-form"
+      novalidate
       @submit.prevent="handleRegister"
     >
-      <div class="form-group">
-        <label
-          for="name"
-          class="form-label"
-        >
-          {{ $t("auth.register.nameLabel") }}
-        </label>
-        <div
-          :class="['input-wrapper', { focused: nameFocused, error: nameError }]"
-        >
-          <Icon
-            name="lucide:user"
-            size="18"
-            class="input-icon"
-          />
-          <input
-            id="name"
-            v-model="name"
-            type="text"
-            :placeholder="$t('auth.register.namePlaceholder')"
-            autocomplete="name"
-            @focus="nameFocused = true"
-            @blur="
-              nameFocused = false;
-              validateName();
-            "
-          />
-        </div>
-        <span
-          v-if="nameError"
-          class="field-error"
-        >
-          {{ nameError }}
-        </span>
-      </div>
+      <AuthField
+        id="name"
+        v-model="name"
+        icon="lucide:user"
+        :label="$t('auth.register.nameLabel')"
+        :placeholder="$t('auth.register.namePlaceholder')"
+        :error="nameError"
+        autocomplete="name"
+        @blur="validateName"
+      />
 
-      <div class="form-group">
-        <label
-          for="email"
-          class="form-label"
-        >
-          {{ $t("auth.register.emailLabel") }}
-        </label>
-        <div
-          :class="[
-            'input-wrapper',
-            { focused: emailFocused, error: emailError },
-          ]"
-        >
-          <Icon
-            name="lucide:mail"
-            size="18"
-            class="input-icon"
-          />
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            :placeholder="$t('auth.register.emailPlaceholder')"
-            autocomplete="email"
-            @focus="emailFocused = true"
-            @blur="
-              emailFocused = false;
-              validateEmail();
-            "
-          />
-        </div>
-        <span
-          v-if="emailError"
-          class="field-error"
-        >
-          {{ emailError }}
-        </span>
-      </div>
+      <AuthField
+        id="email"
+        v-model="email"
+        type="email"
+        icon="lucide:mail"
+        :label="$t('auth.register.emailLabel')"
+        :placeholder="$t('auth.register.emailPlaceholder')"
+        :error="emailError"
+        autocomplete="email"
+        @blur="validateEmail"
+      />
 
-      <div class="form-group">
-        <label
-          for="password"
-          class="form-label"
-        >
-          {{ $t("auth.register.passwordLabel") }}
-        </label>
-        <div
-          :class="[
-            'input-wrapper',
-            { focused: passwordFocused, error: passwordError },
-          ]"
-        >
-          <Icon
-            name="lucide:lock"
-            size="18"
-            class="input-icon"
-          />
-          <input
-            id="password"
-            v-model="password"
-            :type="showPassword ? 'text' : 'password'"
-            :placeholder="$t('auth.register.passwordPlaceholder')"
-            autocomplete="new-password"
-            @focus="passwordFocused = true"
-            @blur="
-              passwordFocused = false;
-              validatePassword();
-            "
-            @input="updateStrength"
-          />
-          <button
-            type="button"
-            class="toggle-password"
-            tabindex="-1"
-            @click="showPassword = !showPassword"
-          >
-            <Icon
-              :name="showPassword ? 'lucide:eye-off' : 'lucide:eye'"
-              size="18"
-            />
-          </button>
-        </div>
-        <span
-          v-if="passwordError"
-          class="field-error"
-        >
-          {{ passwordError }}
-        </span>
-        <div
-          v-if="password && !passwordError"
-          class="strength-bar"
-        >
+      <div class="password-block">
+        <AuthField
+          id="password"
+          v-model="password"
+          icon="lucide:lock"
+          toggleable
+          type="password"
+          :label="$t('auth.register.passwordLabel')"
+          :placeholder="$t('auth.register.passwordPlaceholder')"
+          :error="passwordError"
+          autocomplete="new-password"
+          @blur="validatePassword"
+          @input="updateStrength"
+        />
+        <template v-if="password && !passwordError">
           <div
-            class="strength-fill"
-            :style="{ width: strengthPercent + '%' }"
-            :class="strengthClass"
-          />
-        </div>
-        <span
-          v-if="password && !passwordError"
-          :class="['strength-text', strengthClass]"
-        >
-          {{ strengthLabel }}
-        </span>
+            class="strength-bar"
+            aria-hidden="true"
+          >
+            <div
+              :class="['strength-fill', strengthClass]"
+              :style="{ width: strengthPercent + '%' }"
+            />
+          </div>
+          <span :class="['strength-text', strengthClass]">
+            {{ strengthLabel }}
+          </span>
+        </template>
       </div>
 
       <label class="checkbox-label">
@@ -169,60 +82,44 @@
           v-model="acceptTerms"
           type="checkbox"
         />
-        <span class="checkbox-text">
-          {{ $t("auth.register.agreeTerms") }}
-        </span>
+        {{ $t("auth.register.agreeTerms") }}
       </label>
 
-      <button
+      <AuthButton
         type="submit"
-        class="submit-btn"
-        :disabled="submitting || !acceptTerms || googleLoading"
+        :loading="submitting"
+        :disabled="!acceptTerms || googleLoading"
       >
-        <Icon
-          v-if="submitting"
-          name="lucide:loader-2"
-          size="18"
-          class="spinning"
-        />
         {{
           submitting
             ? $t("auth.register.signingUp")
             : $t("auth.register.signUp")
         }}
-      </button>
-
-      <div class="divider">
-        <span>{{ $t("shared.or") }}</span>
-      </div>
-
-      <div class="google-btn-wrapper">
-        <ClientOnly>
-          <div
-            v-if="!googleLoading"
-            ref="googleButtonContainer"
-            class="google-button-container"
-          />
-          <div
-            v-if="googleLoading"
-            class="google-loading"
-          >
-            <Icon
-              name="lucide:loader-2"
-              size="18"
-              class="spinning"
-            />
-            <span>{{ $t("auth.register.signingUpGoogle") }}</span>
-          </div>
-        </ClientOnly>
-      </div>
+        <Icon
+          v-if="!submitting"
+          name="lucide:arrow-right"
+          size="20"
+        />
+      </AuthButton>
     </form>
+
+    <div class="divider">
+      <span>{{ $t("shared.or") }}</span>
+    </div>
+
+    <AuthGoogleButton
+      mode="signup"
+      :label="$t('auth.signUpWithGoogle')"
+      :loading-label="$t('auth.register.signingUpGoogle')"
+      :loading="googleLoading"
+      @success="handleGoogleSuccess"
+    />
 
     <p class="auth-footer">
       {{ $t("auth.register.haveAccount") }}
       <NuxtLink
         to="/auth/login"
-        class="auth-link"
+        class="auth-link strong"
       >
         {{ $t("auth.register.signIn") }}
       </NuxtLink>
@@ -231,26 +128,21 @@
 </template>
 
 <script setup lang="ts">
-import { useGoogleAuth } from "@/composables/useGoogleAuth";
-
-definePageMeta({ layout: "auth" });
+definePageMeta({
+  layout: "auth",
+  pageTransition: { name: "auth-page", mode: "out-in" },
+});
 
 const { t } = useI18n();
 const { register, googleLogin } = useAuth();
-const { googleButtonContainer, initializeGoogleButton } = useGoogleAuth();
 
 const name = ref("");
 const email = ref("");
 const password = ref("");
-const showPassword = ref(false);
 const acceptTerms = ref(false);
 const submitting = ref(false);
 const googleLoading = ref(false);
 const errorMessage = ref("");
-
-const nameFocused = ref(false);
-const emailFocused = ref(false);
-const passwordFocused = ref(false);
 const nameError = ref("");
 const emailError = ref("");
 const passwordError = ref("");
@@ -344,14 +236,11 @@ const handleRegister = async () => {
   }
 };
 
-const handleGoogleSuccess = async (e: {
-  credential: string;
-  claims: Record<string, unknown>;
-}) => {
+const handleGoogleSuccess = async (credential: string) => {
   errorMessage.value = "";
   googleLoading.value = true;
   try {
-    const response = await googleLogin(e.credential);
+    const response = await googleLogin(credential);
     if (response.success) {
       navigateTo("/");
     } else {
@@ -364,311 +253,62 @@ const handleGoogleSuccess = async (e: {
     googleLoading.value = false;
   }
 };
-
-onMounted(() => {
-  initializeGoogleButton(googleButtonContainer, handleGoogleSuccess, {
-    text: "signup_with",
-    theme: "filled_blue",
-    size: "large",
-    shape: "pill",
-    width: 200,
-  });
-});
 </script>
 
-<style scoped lang="css">
-.auth-card {
-  background: var(--color-surface);
-  border: 2px solid var(--color-border);
-  border-radius: 24px;
-  padding: var(--spacing-xl);
-}
-
-.auth-title {
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0;
-  text-align: center;
-}
-
-.auth-subtitle {
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  margin: var(--spacing-xs) 0 var(--spacing-lg) 0;
-  text-align: center;
-}
-
-.alert {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: 12px;
-  font-size: 13px;
-  margin-bottom: var(--spacing-md);
-}
-
-.alert-error {
-  background: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
-}
-
-.auth-form {
+<style scoped>
+.password-block {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.form-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--color-text-primary);
-}
-
-.input-wrapper {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  border: 2px solid var(--color-border);
-  border-radius: 12px;
-  padding: 0 var(--spacing-md);
-  height: 48px;
-  background: var(--color-background);
-  transition: all 0.2s ease;
-}
-
-.input-wrapper.focused {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(111, 175, 142, 0.12);
-}
-
-.input-wrapper.error {
-  border-color: #dc2626;
-}
-
-.input-icon {
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-}
-
-.input-wrapper.focused .input-icon {
-  color: var(--color-primary);
-}
-
-.input-wrapper input {
-  flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 15px;
-  font-family: inherit;
-  color: var(--color-text-primary);
-  min-width: 0;
-}
-
-.input-wrapper input::placeholder {
-  color: var(--color-text-secondary);
-  opacity: 0.6;
-}
-
-.toggle-password {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--color-text-secondary);
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  transition: color 0.2s ease;
-}
-
-.toggle-password:hover {
-  color: var(--color-text-primary);
-}
-
-.field-error {
-  font-size: 12px;
-  color: #dc2626;
-  margin-top: 2px;
+  gap: 8px;
 }
 
 .strength-bar {
-  height: 4px;
-  background: var(--color-border);
-  border-radius: 2px;
-  margin-top: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--auth-line);
   overflow: hidden;
 }
 
 .strength-fill {
   height: 100%;
-  border-radius: 2px;
-  transition:
-    width 0.3s ease,
-    background 0.3s ease;
+  border-radius: 3px;
+  transition: all 0.2s ease;
 }
 
 .strength-fill.weak {
   background: #dc2626;
 }
+
 .strength-fill.fair {
   background: #f59e0b;
 }
+
 .strength-fill.good {
-  background: #3b82f6;
+  background: #4e8f73;
 }
+
 .strength-fill.strong {
-  background: #16a34a;
+  background: #10b981;
 }
 
 .strength-text {
-  font-size: 11px;
-  margin-top: 2px;
-}
-
-.strength-text.weak {
-  color: #dc2626;
-}
-.strength-text.fair {
-  color: #f59e0b;
-}
-.strength-text.good {
-  color: #3b82f6;
-}
-.strength-text.strong {
-  color: #16a34a;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-sm);
-  cursor: pointer;
-}
-
-.checkbox-label input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--color-primary);
-  cursor: pointer;
-  margin-top: 2px;
-  flex-shrink: 0;
-}
-
-.checkbox-text {
   font-size: 13px;
-  color: var(--color-text-secondary);
-  line-height: 1.4;
-}
-
-.terms-link {
-  color: var(--color-primary);
-  text-decoration: none;
-}
-
-.terms-link:hover {
-  text-decoration: underline;
-}
-
-.submit-btn {
-  width: 100%;
-  height: 48px;
-  border: none;
-  border-radius: 12px;
-  background: var(--color-primary);
-  color: white;
-  font-size: 15px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-sm);
-}
-
-.submit-btn:hover:not(:disabled) {
-  background: var(--color-primary-dark);
-}
-
-.submit-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.spinning {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.divider {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.divider::before,
-.divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--color-border);
-}
-
-.divider span {
-  font-size: 13px;
-  color: var(--color-text-secondary);
-  white-space: nowrap;
-}
-
-.google-btn-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-sm);
-  min-height: 100%;
-}
-
-.google-loading {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-size: 13px;
-  color: var(--color-text-secondary);
-}
-
-.auth-footer {
-  text-align: center;
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  margin: var(--spacing-lg) 0 0 0;
-}
-
-.auth-link {
-  color: var(--color-primary);
-  text-decoration: none;
   font-weight: 500;
 }
 
-.auth-link:hover {
-  text-decoration: underline;
+.strength-text.weak {
+  color: #b91c1c;
+}
+
+.strength-text.fair {
+  color: #92400e;
+}
+
+.strength-text.good {
+  color: #2f6b52;
+}
+
+.strength-text.strong {
+  color: #065f46;
 }
 </style>

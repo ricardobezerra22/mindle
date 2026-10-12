@@ -8,6 +8,7 @@ useHead({
     lang: "pt",
   },
 });
+usePalette();
 const { t } = useI18n();
 const title = computed(() => t("app.title"));
 const description = computed(() => t("app.description"));

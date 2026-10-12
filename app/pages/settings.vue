@@ -343,6 +343,30 @@
           <div class="setting-row">
             <div class="setting-info">
               <span class="setting-label">{{
+                $t("settings.appearance.palette")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.appearance.paletteHint")
+              }}</span>
+            </div>
+            <select
+              v-model="preferences.palette"
+              class="setting-select"
+              :aria-label="$t('settings.appearance.palette')"
+            >
+              <option
+                v-for="opt in paletteOptions"
+                :key="opt.value"
+                :value="opt.value"
+              >
+                {{ opt.label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-label">{{
                 $t("settings.appearance.fontSize")
               }}</span>
               <span class="setting-description">{{
@@ -554,8 +578,7 @@
               <label
                 for="feedback-subject"
                 class="feedback-label"
-                >{{ $t("settings.support.subjectLabel") }}</label
-              >
+              >{{ $t("settings.support.subjectLabel") }}</label>
               <input
                 id="feedback-subject"
                 v-model="feedbackSubject"
@@ -570,8 +593,7 @@
               <label
                 for="feedback-message"
                 class="feedback-label"
-                >{{ $t("settings.support.messageLabel") }}</label
-              >
+              >{{ $t("settings.support.messageLabel") }}</label>
               <textarea
                 id="feedback-message"
                 v-model="feedbackMessage"
@@ -633,8 +655,12 @@
         </section>
 
         <section class="about-section">
-          <p class="app-name">Mindle</p>
-          <p class="app-version">v1.0.0</p>
+          <p class="app-name">
+            Mindle
+          </p>
+          <p class="app-version">
+            v1.0.0
+          </p>
           <p class="app-philosophy">
             {{ $t("settings.about.desc") }}
           </p>
@@ -676,6 +702,11 @@ const themeOptions = computed(() => [
   { label: t("settings.appearance.themes.light"), value: "light" },
   { label: t("settings.appearance.themes.dark"), value: "dark" },
   { label: t("settings.appearance.themes.system"), value: "system" },
+]);
+
+const paletteOptions = computed(() => [
+  { label: t("settings.appearance.palettes.contrastful"), value: "contrastful" },
+  { label: t("settings.appearance.palettes.classic"), value: "classic" },
 ]);
 
 const fontSizeOptions = computed(() => [
