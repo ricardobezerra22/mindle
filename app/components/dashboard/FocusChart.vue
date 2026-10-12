@@ -57,6 +57,7 @@ const props = defineProps<Props>();
 const { t } = useI18n();
 
 const chartData = computed(() => {
+  const { locale } = useI18n();
   const entries = Object.entries(props.dailyData).sort(([a], [b]) =>
     a.localeCompare(b),
   );
@@ -65,7 +66,7 @@ const chartData = computed(() => {
   return {
     labels: entries.map(([date]) => {
       const d = new Date(date + "T12:00:00");
-      return d.toLocaleDateString("pt-BR", {
+      return d.toLocaleDateString(locale.value, {
         day: "2-digit",
         month: "2-digit",
       });

@@ -147,7 +147,8 @@
                     <span
                       v-if="task.proposedCategoryName"
                       class="new-badge"
-                    >{{ $t("voice.newBadge") }}</span>
+                      >{{ $t("voice.newBadge") }}</span
+                    >
                   </span>
                   <span
                     v-if="task.dueDate"
@@ -398,7 +399,8 @@ function priorityLabel(p: string): string {
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("pt-BR", {
+  const { locale } = useI18n();
+  return new Date(iso).toLocaleDateString(locale.value, {
     day: "2-digit",
     month: "short",
   });

@@ -5,21 +5,25 @@
         :class="['tasks-tab-btn', { active: activeTasksTab === 'active' }]"
         @click="activeTasksTab = 'active'"
       >
-        {{ $t('tasks.title') }}
+        {{ $t("tasks.title") }}
       </button>
       <button
         :class="['tasks-tab-btn', { active: activeTasksTab === 'done' }]"
-        @click="activeTasksTab = 'done'; fetchDoneTasks()"
+        @click="
+          activeTasksTab = 'done';
+          fetchDoneTasks();
+        "
       >
         <Icon
           name="lucide:check-circle-2"
           size="14"
         />
-        {{ $t('tasks.completed') }}
+        {{ $t("tasks.completed") }}
         <span
           v-if="doneTasks.length > 0"
           class="tasks-tab-badge"
-        >{{ doneTasks.length }}</span>
+          >{{ doneTasks.length }}</span
+        >
       </button>
     </div>
 
@@ -46,7 +50,7 @@
 
       <UiButton @click="openCreateModal">
         <Icon name="lucide:plus" />
-        {{ $t('tasks.newTask') }}
+        {{ $t("tasks.newTask") }}
       </UiButton>
     </div>
 
@@ -54,28 +58,46 @@
       <div class="done-tasks-header">
         <div class="done-date-filters">
           <button
-            :class="['done-filter-pill', { active: doneFilterMode === 'today' }]"
-            @click="doneFilterMode = 'today'; fetchDoneTasks()"
+            :class="[
+              'done-filter-pill',
+              { active: doneFilterMode === 'today' },
+            ]"
+            @click="
+              doneFilterMode = 'today';
+              fetchDoneTasks();
+            "
           >
-            {{ $t('tasks.filters.today') }}
+            {{ $t("tasks.filters.today") }}
           </button>
           <button
             :class="['done-filter-pill', { active: doneFilterMode === 'week' }]"
-            @click="doneFilterMode = 'week'; fetchDoneTasks()"
+            @click="
+              doneFilterMode = 'week';
+              fetchDoneTasks();
+            "
           >
-            {{ $t('tasks.filters.thisWeek') }}
+            {{ $t("tasks.filters.thisWeek") }}
           </button>
           <button
-            :class="['done-filter-pill', { active: doneFilterMode === 'month' }]"
-            @click="doneFilterMode = 'month'; fetchDoneTasks()"
+            :class="[
+              'done-filter-pill',
+              { active: doneFilterMode === 'month' },
+            ]"
+            @click="
+              doneFilterMode = 'month';
+              fetchDoneTasks();
+            "
           >
-            {{ $t('tasks.filters.thisMonth') }}
+            {{ $t("tasks.filters.thisMonth") }}
           </button>
           <button
-            :class="['done-filter-pill', { active: doneFilterMode === 'custom' }]"
+            :class="[
+              'done-filter-pill',
+              { active: doneFilterMode === 'custom' },
+            ]"
             @click="doneFilterMode = 'custom'"
           >
-            {{ $t('tasks.filters.custom') }}
+            {{ $t("tasks.filters.custom") }}
           </button>
         </div>
         <div
@@ -138,10 +160,10 @@
           size="48"
         />
         <h3 class="empty-title">
-          {{ $t('tasks.empty.noCompleted') }}
+          {{ $t("tasks.empty.noCompleted") }}
         </h3>
         <p class="empty-text">
-          {{ $t('tasks.empty.noCompletedSub') }}
+          {{ $t("tasks.empty.noCompletedSub") }}
         </p>
       </div>
 
@@ -167,14 +189,17 @@
                 v-if="task.category"
                 class="done-task-cat"
                 :style="{ color: task.category.color }"
-              >{{ task.category.name }}</span>
+                >{{ task.category.name }}</span
+              >
               <span
                 v-if="task.doneAt"
                 class="done-task-date"
-              >{{ formatDoneDate(task.doneAt) }}</span>
+                >{{ formatDoneDate(task.doneAt) }}</span
+              >
               <span
                 :class="['done-task-priority', task.priority.toLowerCase()]"
-              >{{ priorityLabel(task.priority) }}</span>
+                >{{ priorityLabel(task.priority) }}</span
+              >
             </div>
           </div>
         </div>
@@ -450,14 +475,14 @@
             />
           </div>
           <h3 class="view-empty-title">
-            {{ $t('tasks.empty.noByCategory') }}
+            {{ $t("tasks.empty.noByCategory") }}
           </h3>
           <p class="view-empty-description">
-            {{ $t('tasks.empty.noByCategorySub') }}
+            {{ $t("tasks.empty.noByCategorySub") }}
           </p>
           <UiButton @click="openCreateModal">
             <Icon name="lucide:plus" />
-            {{ $t('tasks.newTask') }}
+            {{ $t("tasks.newTask") }}
           </UiButton>
         </div>
 
@@ -550,7 +575,9 @@
                 class="category-color-dot"
                 :style="{ backgroundColor: '#94a3b8' }"
               />
-              <span class="category-header-name">{{ $t('tasks.columns.noCategory') }}</span>
+              <span class="category-header-name">{{
+                $t("tasks.columns.noCategory")
+              }}</span>
               <span class="category-task-count">{{
                 uncategorizedTasks.length
               }}</span>
@@ -593,7 +620,10 @@
 
     <TasksTaskCreateModal
       v-model="showCreateModal"
-      @created="fetchTasks(); fetchCategories()"
+      @created="
+        fetchTasks();
+        fetchCategories();
+      "
     />
 
     <div
@@ -603,7 +633,7 @@
     >
       <div class="modal-content delete-modal">
         <div class="modal-header">
-          <h2>{{ $t('tasks.deleteModal.title') }}</h2>
+          <h2>{{ $t("tasks.deleteModal.title") }}</h2>
           <button
             class="close-btn"
             @click="showDeleteModal = false"
@@ -617,13 +647,13 @@
             <Icon name="lucide:alert-triangle" />
           </div>
           <h3 class="delete-title">
-            {{ $t('tasks.deleteModal.heading') }}
+            {{ $t("tasks.deleteModal.heading") }}
           </h3>
           <p class="delete-message">
-            {{ $t('tasks.deleteModal.body') }}
+            {{ $t("tasks.deleteModal.body") }}
           </p>
           <p class="delete-warning">
-            {{ $t('shared.actionUndone') }}
+            {{ $t("shared.actionUndone") }}
           </p>
         </div>
 
@@ -634,7 +664,7 @@
             class="action-button"
             @click="showDeleteModal = false"
           >
-            {{ $t('shared.cancel') }}
+            {{ $t("shared.cancel") }}
           </UiButton>
           <UiButton
             type="button"
@@ -642,7 +672,7 @@
             @click="handleDelete"
           >
             <Icon name="lucide:trash-2" />
-            {{ $t('shared.delete') }}
+            {{ $t("shared.delete") }}
           </UiButton>
         </div>
       </div>
@@ -681,7 +711,9 @@ const searchQuery = ref("");
 const dateFilter = ref("");
 const categoryFilter = ref("");
 const favoriteFilter = ref(false);
-const sortBy = ref<"HIGHEST_PRIORITY" | "LOWEST_PRIORITY" | "">("HIGHEST_PRIORITY");
+const sortBy = ref<"HIGHEST_PRIORITY" | "LOWEST_PRIORITY" | "">(
+  "HIGHEST_PRIORITY",
+);
 
 const activeTasksTab = ref<"active" | "done">("active");
 const doneTasks = ref<Task[]>([]);
@@ -715,7 +747,11 @@ const getDoneDateRange = () => {
     end.setHours(23, 59, 59, 999);
     return { doneFrom: start.toISOString(), doneTo: end.toISOString() };
   }
-  if (doneFilterMode.value === "custom" && doneCustomFrom.value && doneCustomTo.value) {
+  if (
+    doneFilterMode.value === "custom" &&
+    doneCustomFrom.value &&
+    doneCustomTo.value
+  ) {
     return {
       doneFrom: new Date(doneCustomFrom.value).toISOString(),
       doneTo: new Date(doneCustomTo.value + "T23:59:59").toISOString(),
@@ -728,9 +764,12 @@ const fetchDoneTasks = async () => {
   doneLoading.value = true;
   try {
     const range = getDoneDateRange();
-    const response = await $fetch<{ success: boolean; data: Task[] }>("/api/tasks", {
-      query: { status: "DONE", ...range },
-    });
+    const response = await $fetch<{ success: boolean; data: Task[] }>(
+      "/api/tasks",
+      {
+        query: { status: "DONE", ...range },
+      },
+    );
     if (response.success) {
       doneTasks.value = response.data;
     }
@@ -742,7 +781,8 @@ const fetchDoneTasks = async () => {
 };
 
 const formatDoneDate = (date: Date | string) => {
-  return new Date(date).toLocaleDateString("pt-BR", {
+  const { locale } = useI18n();
+  return new Date(date).toLocaleDateString(locale.value, {
     day: "2-digit",
     month: "short",
     hour: "2-digit",
@@ -767,9 +807,9 @@ const filteredTasks = computed(() => {
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
     filtered = filtered.filter(
-      t =>
-        t.title.toLowerCase().includes(query)
-        || (t.description && t.description.toLowerCase().includes(query)),
+      (t) =>
+        t.title.toLowerCase().includes(query) ||
+        (t.description && t.description.toLowerCase().includes(query)),
     );
   }
 
@@ -782,22 +822,28 @@ const filteredTasks = computed(() => {
   }
 
   if (categoryFilter.value) {
-    filtered = filtered.filter(t => t.categoryId === categoryFilter.value);
+    filtered = filtered.filter((t) => t.categoryId === categoryFilter.value);
   }
 
   if (favoriteFilter.value) {
-    filtered = filtered.filter(t => t.isFavorite);
+    filtered = filtered.filter((t) => t.isFavorite);
   }
 
   if (!preferences.value.showCompleted) {
-    filtered = filtered.filter(t => t.status !== "DONE");
+    filtered = filtered.filter((t) => t.status !== "DONE");
   }
 
   if (sortBy.value) {
-    const priorityWeight: Record<string, number> = { HIGH: 3, MEDIUM: 2, LOW: 1 };
+    const priorityWeight: Record<string, number> = {
+      HIGH: 3,
+      MEDIUM: 2,
+      LOW: 1,
+    };
     const direction = sortBy.value === "HIGHEST_PRIORITY" ? -1 : 1;
     filtered = [...filtered].sort(
-      (a, b) => direction * ((priorityWeight[a.priority] || 0) - (priorityWeight[b.priority] || 0)),
+      (a, b) =>
+        direction *
+        ((priorityWeight[a.priority] || 0) - (priorityWeight[b.priority] || 0)),
     );
   }
 
@@ -807,12 +853,12 @@ const filteredTasks = computed(() => {
 const tasksByStatus = computed(() => {
   return {
     NOT_STARTED: filteredTasks.value.filter(
-      t => t.status === TaskStatus.NOT_STARTED,
+      (t) => t.status === TaskStatus.NOT_STARTED,
     ),
     IN_PROGRESS: filteredTasks.value.filter(
-      t => t.status === TaskStatus.IN_PROGRESS,
+      (t) => t.status === TaskStatus.IN_PROGRESS,
     ),
-    DONE: filteredTasks.value.filter(t => t.status === TaskStatus.DONE),
+    DONE: filteredTasks.value.filter((t) => t.status === TaskStatus.DONE),
   };
 });
 
@@ -863,7 +909,7 @@ const statusCategoryGroups = computed(() => {
 const tasksByCategory = computed(() => {
   const groups: Groups[] = [];
   for (const cat of categories.value) {
-    const catTasks = filteredTasks.value.filter(t => t.categoryId === cat.id);
+    const catTasks = filteredTasks.value.filter((t) => t.categoryId === cat.id);
     if (catTasks.length > 0) {
       groups.push({
         id: cat.id,
@@ -878,7 +924,7 @@ const tasksByCategory = computed(() => {
 });
 
 const uncategorizedTasks = computed(() => {
-  return filteredTasks.value.filter(t => !t.categoryId);
+  return filteredTasks.value.filter((t) => !t.categoryId);
 });
 
 const toggleCategoryAccordion = (id: string) => {
@@ -985,22 +1031,27 @@ const handleUpdatePriority = async (id: string, priority: Priority) => {
 const handleUpdateCategory = async (id: string, categoryId: string | null) => {
   try {
     const category = categoryId
-      ? categories.value.find(c => c.id === categoryId) || undefined
+      ? categories.value.find((c) => c.id === categoryId) || undefined
       : undefined;
     await updateTask(id, {
       categoryId: categoryId ?? undefined,
       category,
     });
     toast.success({
-      title: categoryId ? t("tasks.toasts.categoryUpdated") : t("tasks.toasts.categoryRemoved"),
+      title: categoryId
+        ? t("tasks.toasts.categoryUpdated")
+        : t("tasks.toasts.categoryRemoved"),
     });
   } catch {
     toast.error({ title: t("tasks.toasts.categoryError") });
   }
 };
 
-const preserveExpandedOnStatusChange = (taskId: string, newStatus: TaskStatus) => {
-  const task = tasks.value.find(t => t.id === taskId);
+const preserveExpandedOnStatusChange = (
+  taskId: string,
+  newStatus: TaskStatus,
+) => {
+  const task = tasks.value.find((t) => t.id === taskId);
   if (!task) return;
 
   const oldStatus = task.status;
@@ -1025,7 +1076,7 @@ const handleUpdateStatus = async (id: string, status: TaskStatus) => {
 };
 
 const handleDrop = async (taskId: string, newStatus: TaskStatus) => {
-  const task = tasks.value.find(t => t.id === taskId);
+  const task = tasks.value.find((t) => t.id === taskId);
   if (task && task.status !== newStatus) {
     preserveExpandedOnStatusChange(taskId, newStatus);
     try {
@@ -1051,12 +1102,12 @@ function shouldMoveToInProgress(done: boolean, task?: Task): task is Task {
 }
 
 const handleToggleSubTask = async (subTaskId: string, done: boolean) => {
-  const desiredTask = tasks.value.find(task =>
-    task.subTasks?.find(st => st.id === subTaskId),
+  const desiredTask = tasks.value.find((task) =>
+    task.subTasks?.find((st) => st.id === subTaskId),
   );
   if (!desiredTask) return;
 
-  const subTask = desiredTask.subTasks?.find(st => st.id === subTaskId);
+  const subTask = desiredTask.subTasks?.find((st) => st.id === subTaskId);
   if (!subTask) return;
 
   const previousDone = subTask.done;
@@ -1503,7 +1554,6 @@ onMounted(() => {
   .filters-section > :first-child {
     grid-column: unset;
   }
-
 }
 
 @media (min-width: 1024px) {
