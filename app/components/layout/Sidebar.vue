@@ -23,10 +23,36 @@
         :title="$t('nav.menu')"
         @click="isExpanded = !isExpanded"
       >
-        <Icon
-          name="lucide:brain"
+        <svg
+          viewBox="0 0 96 96"
+          width="40"
+          height="40"
           class="brand-icon"
-        />
+          aria-hidden="true"
+        >
+          <rect
+            width="96"
+            height="96"
+            rx="28"
+            fill="var(--color-primary)"
+          />
+          <g
+            fill="none"
+            stroke="#F4F7F4"
+            stroke-width="9"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M28 68 V46 C28 34 48 34 48 46 V68" />
+            <path d="M48 46 C48 34 68 34 68 46 V68" />
+          </g>
+          <circle
+            cx="68"
+            cy="21"
+            r="6.5"
+            fill="#F4A261"
+          />
+        </svg>
       </button>
       <Transition name="fade">
         <span
@@ -54,7 +80,7 @@
         @click="closeMobile"
       >
         <Icon name="lucide:layout-dashboard" />
-        <Transition name="fade"><span v-if="isExpanded">{{ $t('nav.home') }}</span></Transition>
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.home") }}</span></Transition>
       </NuxtLink>
       <NuxtLink
         to="/metrics"
@@ -64,7 +90,7 @@
         @click="closeMobile"
       >
         <Icon name="lucide:bar-chart-2" />
-        <Transition name="fade"><span v-if="isExpanded">{{ $t('nav.metrics') }}</span></Transition>
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.metrics") }}</span></Transition>
       </NuxtLink>
       <NuxtLink
         to="/tasks"
@@ -74,14 +100,14 @@
         @click="closeMobile"
       >
         <Icon name="lucide:home" />
-        <Transition name="fade"><span v-if="isExpanded">{{ $t('nav.tasks') }}</span></Transition>
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.tasks") }}</span></Transition>
       </NuxtLink>
 
       <div
         v-if="isExpanded"
         class="nav-group"
       >
-        <span class="nav-group-title">{{ $t('nav.planner') }}</span>
+        <span class="nav-group-title">{{ $t("nav.planner") }}</span>
         <NuxtLink
           to="/planner/week"
           class="nav-item"
@@ -89,7 +115,7 @@
           @click="closeMobile"
         >
           <Icon name="lucide:calendar-days" />
-          <span>{{ $t('nav.plannerWeek') }}</span>
+          <span>{{ $t("nav.plannerWeek") }}</span>
         </NuxtLink>
         <NuxtLink
           to="/planner/month"
@@ -98,7 +124,7 @@
           @click="closeMobile"
         >
           <Icon name="lucide:calendar" />
-          <span>{{ $t('nav.plannerMonth') }}</span>
+          <span>{{ $t("nav.plannerMonth") }}</span>
         </NuxtLink>
       </div>
       <template v-else>
@@ -130,7 +156,7 @@
         @click="closeMobile"
       >
         <Icon name="lucide:target" />
-        <Transition name="fade"><span v-if="isExpanded">{{ $t('nav.focus') }}</span></Transition>
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.focus") }}</span></Transition>
       </NuxtLink>
 
       <NuxtLink
@@ -141,7 +167,7 @@
         @click="closeMobile"
       >
         <Icon name="lucide:heart" />
-        <Transition name="fade"><span v-if="isExpanded">{{ $t('nav.habits') }}</span></Transition>
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.habits") }}</span></Transition>
       </NuxtLink>
 
       <NuxtLink
@@ -152,7 +178,7 @@
         @click="closeMobile"
       >
         <Icon name="lucide:wallet" />
-        <Transition name="fade"><span v-if="isExpanded">{{ $t('nav.finance') }}</span></Transition>
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.finance") }}</span></Transition>
       </NuxtLink>
       <NuxtLink
         to="/projects"
@@ -162,7 +188,7 @@
         @click="closeMobile"
       >
         <Icon name="lucide:folder-kanban" />
-        <Transition name="fade"><span v-if="isExpanded">{{ $t('nav.projects') }}</span></Transition>
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.projects") }}</span></Transition>
       </NuxtLink>
       <NuxtLink
         to="/goals"
@@ -172,7 +198,7 @@
         @click="closeMobile"
       >
         <Icon name="lucide:target" />
-        <Transition name="fade"><span v-if="isExpanded">{{ $t('nav.goals') }}</span></Transition>
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.goals") }}</span></Transition>
       </NuxtLink>
     </nav>
 
@@ -211,7 +237,7 @@
         @click="closeMobile"
       >
         <Icon name="lucide:settings" />
-        <Transition name="fade"><span v-if="isExpanded">{{ $t('nav.settings') }}</span></Transition>
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.settings") }}</span></Transition>
       </NuxtLink>
 
       <div
@@ -391,9 +417,9 @@ onUnmounted(() => {
 }
 
 .brand-icon {
-  width: 26px;
-  height: 26px;
-  color: var(--color-primary);
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
 }
 
 .brand-text {
