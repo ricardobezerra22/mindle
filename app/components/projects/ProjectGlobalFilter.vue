@@ -166,7 +166,7 @@ useClickOutside(categoryRef, () => {
 const selectedCategory = computed(() => {
   if (!props.modelValue.categoryId) return null;
   return (
-    props.categories.find((c) => c.id === props.modelValue.categoryId) || null
+    props.categories.find(c => c.id === props.modelValue.categoryId) || null
   );
 });
 
