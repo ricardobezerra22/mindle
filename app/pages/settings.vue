@@ -723,11 +723,21 @@ const getFeatureTags = (featureKey: string): string[] => {
   const { locale, messages } = useI18n();
   const currentLocale = locale.value as string;
   const localeMessages = messages[currentLocale] as Record<string, unknown>;
+  if (!localeMessages) return [];
+
   const settings = localeMessages.settings as Record<string, unknown>;
+  if (!settings) return [];
+
   const guide = settings.guide as Record<string, unknown>;
+  if (!guide) return [];
+
   const features = guide.features as Record<string, Record<string, unknown>>;
+  if (!features) return [];
+
   const feature = features[featureKey];
-  const tags = feature?.tags;
+  if (!feature) return [];
+
+  const tags = feature.tags;
   return Array.isArray(tags) ? tags : [];
 };
 
