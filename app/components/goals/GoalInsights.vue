@@ -4,8 +4,13 @@
     class="insights-card"
   >
     <div class="insights-header">
-      <Icon name="lucide:lightbulb" size="16" />
-      <h3 class="insights-title">Insights</h3>
+      <Icon
+        name="lucide:lightbulb"
+        size="16"
+      />
+      <h3 class="insights-title">
+        {{ $t('goals.insights.title') }}
+      </h3>
     </div>
     <div class="insights-list">
       <div
@@ -13,8 +18,13 @@
         :key="i"
         :class="['insight-item', insight.type]"
       >
-        <Icon :name="insight.icon" size="16" />
-        <p class="insight-text">{{ insight.text }}</p>
+        <Icon
+          :name="insight.icon"
+          size="16"
+        />
+        <p class="insight-text">
+          {{ insight.text }}
+        </p>
       </div>
     </div>
   </div>
@@ -28,6 +38,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { t } = useI18n();
 
 interface Insight {
   icon: string;
@@ -42,7 +53,7 @@ const insights = computed(() => {
   if (g.progress === 100) {
     list.push({
       icon: "lucide:trophy",
-      text: "Meta concluída! Parabéns pelo seu progresso.",
+      text: t("goals.insights.done"),
       type: "positive",
     });
     return list;
@@ -56,13 +67,13 @@ const insights = computed(() => {
     if (daysSince > 10) {
       list.push({
         icon: "lucide:alert-circle",
-        text: `Você não avançou nesta meta nos últimos ${daysSince} dias.`,
+        text: t("goals.insights.noActivity", { days: daysSince }),
         type: "warning",
       });
     } else if (daysSince <= 3 && g.progress > 0) {
       list.push({
         icon: "lucide:zap",
-        text: "Excelente consistência. Continue nesse ritmo.",
+        text: t("goals.insights.excellent"),
         type: "positive",
       });
     }
@@ -76,26 +87,26 @@ const insights = computed(() => {
     if (daysLeft < 0) {
       list.push({
         icon: "lucide:alert-triangle",
-        text: `O prazo desta meta expirou há ${Math.abs(daysLeft)} dias.`,
+        text: t("goals.insights.expired", { days: Math.abs(daysLeft) }),
         type: "warning",
       });
     } else if (daysLeft <= 14) {
       list.push({
         icon: "lucide:clock",
-        text: `Faltam ${daysLeft} dias para concluir esta meta.`,
+        text: t("goals.insights.daysLeft", { days: daysLeft }),
         type: "warning",
       });
     }
 
     if (daysLeft > 0 && g.progress > 0) {
       const expectedProgress = Math.min(100, Math.round(
-        ((Date.now() - new Date(g.createdAt).getTime()) /
-        (new Date(g.deadline).getTime() - new Date(g.createdAt).getTime())) * 100,
+        ((Date.now() - new Date(g.createdAt).getTime())
+          / (new Date(g.deadline).getTime() - new Date(g.createdAt).getTime())) * 100,
       ));
       if (g.progress < expectedProgress - 15) {
         list.push({
           icon: "lucide:trending-down",
-          text: `Progresso está abaixo do esperado para o prazo (${g.progress}% vs ${expectedProgress}% esperado).`,
+          text: t("goals.insights.behindSchedule", { progress: g.progress, expected: expectedProgress }),
           type: "warning",
         });
       }
@@ -105,7 +116,7 @@ const insights = computed(() => {
   if (g.projectCount === 0) {
     list.push({
       icon: "lucide:folder-plus",
-      text: "Vincule projetos a esta meta para acompanhar o progresso.",
+      text: t("goals.insights.noProjects"),
       type: "neutral",
     });
   }
@@ -113,7 +124,7 @@ const insights = computed(() => {
   if (g.totalTasks === 0 && g.projectCount > 0) {
     list.push({
       icon: "lucide:list-plus",
-      text: "Seus projetos ainda não possuem tarefas. Adicione tarefas para medir o progresso.",
+      text: t("goals.insights.noProjectTasks"),
       type: "neutral",
     });
   }
@@ -121,7 +132,7 @@ const insights = computed(() => {
   if (g.clarityScore < 50) {
     list.push({
       icon: "lucide:compass",
-      text: "Defina prazo, vincule projetos e crie tarefas para aumentar a clareza desta meta.",
+      text: t("goals.insights.lowClarity"),
       type: "neutral",
     });
   }
@@ -129,7 +140,7 @@ const insights = computed(() => {
   if (list.length === 0) {
     list.push({
       icon: "lucide:sparkles",
-      text: "Tudo certo! Continue trabalhando em direção à sua meta.",
+      text: t("goals.insights.good"),
       type: "positive",
     });
   }

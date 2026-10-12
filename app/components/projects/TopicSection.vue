@@ -40,17 +40,23 @@
         <div class="topic-actions">
           <button
             class="action-btn"
-            title="Adicionar subtópico"
+            :title="$t('projects.topic.addSubtopic')"
             @click.stop="showAddSubtopic = true"
           >
-            <Icon name="lucide:plus" size="14" />
+            <Icon
+              name="lucide:plus"
+              size="14"
+            />
           </button>
           <button
             class="action-btn danger"
-            title="Excluir tópico"
+            :title="$t('projects.topic.delete')"
             @click.stop="$emit('delete', topic.id)"
           >
-            <Icon name="lucide:trash-2" size="14" />
+            <Icon
+              name="lucide:trash-2"
+              size="14"
+            />
           </button>
         </div>
       </div>
@@ -78,7 +84,7 @@
           ref="newSubtopicInput"
           v-model="newSubtopicTitle"
           class="add-input"
-          placeholder="Novo subtópico..."
+          :placeholder="$t('projects.topic.newSubtopicPlaceholder')"
           @keydown.enter="addSubtopic"
           @keydown.escape="cancelAdd"
           @blur="addSubtopic"
@@ -107,7 +113,7 @@
           ref="newTopicTaskInput"
           v-model="newTopicTaskTitle"
           class="add-input"
-          placeholder="Nova tarefa..."
+          :placeholder="$t('projects.card.newTaskPlaceholder')"
           @keydown.enter="addTopicTask"
           @keydown.escape="cancelAddTopicTask"
           @blur="addTopicTask"
@@ -120,16 +126,22 @@
           class="add-btn"
           @click="showAddTopicTask = true"
         >
-          <Icon name="lucide:plus" size="14" />
-          Tarefa
+          <Icon
+            name="lucide:plus"
+            size="14"
+          />
+          {{ $t("projects.card.task") }}
         </button>
         <button
           v-if="!showAddSubtopic"
           class="add-btn"
           @click="showAddSubtopic = true"
         >
-          <Icon name="lucide:plus" size="14" />
-          Subtópico
+          <Icon
+            name="lucide:plus"
+            size="14"
+          />
+          {{ $t("projects.topic.subtopic") }}
         </button>
       </div>
     </div>
@@ -179,9 +191,9 @@ const totalTasks = computed(() => {
 });
 
 const doneTasks = computed(() => {
-  let count = props.topic.tasks?.filter((t) => t.done).length ?? 0;
+  let count = props.topic.tasks?.filter(t => t.done).length ?? 0;
   for (const sub of props.topic.subtopics || []) {
-    count += sub.tasks?.filter((t) => t.done).length ?? 0;
+    count += sub.tasks?.filter(t => t.done).length ?? 0;
   }
   return count;
 });

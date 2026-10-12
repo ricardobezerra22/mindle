@@ -52,7 +52,7 @@ function extractSystemText(instruction: unknown): string {
   if (typeof instruction === "string") return instruction;
   const c = instruction as ContentLike;
   if (c.text) return c.text;
-  return (c.parts ?? []).map((p) => p.text ?? "").join("");
+  return (c.parts ?? []).map(p => p.text ?? "").join("");
 }
 
 type ContentItem = { role?: string; parts?: Part[] };
@@ -60,12 +60,12 @@ type ContentItem = { role?: string; parts?: Part[] };
 function contentsToMessages(contents: ContentItem[]): OAIMessage[] {
   const messages: OAIMessage[] = [];
   for (const content of contents) {
-    const role =
-      content.role === "model" ? "assistant" : (content.role ?? "user");
+    const role
+      = content.role === "model" ? "assistant" : (content.role ?? "user");
     const parts = content.parts ?? [];
-    const textParts = parts.filter((p) => p.text != null);
-    const funcCalls = parts.filter((p) => p.functionCall != null);
-    const funcResponses = parts.filter((p) => p.functionResponse != null);
+    const textParts = parts.filter(p => p.text != null);
+    const funcCalls = parts.filter(p => p.functionCall != null);
+    const funcResponses = parts.filter(p => p.functionResponse != null);
 
     if (funcResponses.length > 0) {
       for (const p of funcResponses) {
@@ -90,11 +90,11 @@ function contentsToMessages(contents: ContentItem[]): OAIMessage[] {
       });
       messages.push({
         role: "assistant",
-        content: textParts.map((p) => p.text).join("") || null,
+        content: textParts.map(p => p.text).join("") || null,
         tool_calls: toolCalls,
       });
     } else {
-      const text = textParts.map((p) => p.text).join("");
+      const text = textParts.map(p => p.text).join("");
       messages.push({ role: role as "user" | "assistant", content: text });
     }
   }
@@ -137,7 +137,7 @@ class OpenRouterLlm extends BaseLlm {
 
   static override readonly supportedModels = [/.*/];
 
-  async *generateContentAsync(
+  async* generateContentAsync(
     request: LlmRequest,
   ): AsyncGenerator<LlmResponse, void> {
     const messages: OAIMessage[] = [];
@@ -162,7 +162,7 @@ class OpenRouterLlm extends BaseLlm {
     if (!choice) return;
     const msg = choice.message;
     if (msg.tool_calls && msg.tool_calls.length > 0) {
-      const parts: Part[] = (msg.tool_calls as FnToolCall[]).map((tc) => ({
+      const parts: Part[] = (msg.tool_calls as FnToolCall[]).map(tc => ({
         functionCall: {
           id: tc.id,
           name: tc.function.name,
@@ -212,6 +212,7 @@ export async function runPreviewAgent(
   userId: string,
   rawText: string,
   sessionId: string,
+  fallbackSummary = "Não consegui interpretar as tarefas com segurança. Tente novamente com mais detalhes.",
 ): Promise<AgentPreviewResult> {
   const text = sanitizeInput(rawText);
   const llm = new OpenRouterLlm();
@@ -299,7 +300,7 @@ export async function runPreviewAgent(
     result = {
       tasks: [],
       newCategories: [],
-      summary: "Não consegui interpretar as tarefas com segurança. Tente novamente com mais detalhes.",
+      summary: fallbackSummary,
     };
   }
 

@@ -17,6 +17,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, sessions);
   } catch (error) {
     console.error("Error fetching focus sessions:", error);
-    return sendError(event, "Failed to fetch focus sessions", 500);
+    return sendError(event, serverT(event, "server.failedToFetchFocusSessions"), 500);
   }
 });

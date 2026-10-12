@@ -3,12 +3,19 @@
     <div class="goals-container">
       <div class="page-header">
         <div class="header-left">
-          <h1 class="page-title">Metas</h1>
-          <p class="page-subtitle">Sua visão estratégica de evolução</p>
+          <h1 class="page-title">
+            {{ $t('pages.goals') }}
+          </h1>
+          <p class="page-subtitle">
+            {{ $t('goals.subtitle') }}
+          </p>
         </div>
         <UiButton @click="showCreateModal = true">
-          <Icon name="lucide:plus" size="16" />
-          Nova Meta
+          <Icon
+            name="lucide:plus"
+            size="16"
+          />
+          {{ $t('goals.newGoal') }}
         </UiButton>
       </div>
 
@@ -38,13 +45,30 @@
             class="skeleton-goal-card"
           >
             <div class="skeleton-goal-header">
-              <UiSkeleton variant="circle" width="12px" height="12px" />
-              <UiSkeleton height="16px" :width="['65%', '50%', '75%'][i - 1]" />
+              <UiSkeleton
+                variant="circle"
+                width="12px"
+                height="12px"
+              />
+              <UiSkeleton
+                height="16px"
+                :width="['65%', '50%', '75%'][i - 1]"
+              />
             </div>
-            <UiSkeleton height="8px" width="100%" radius="4px" />
+            <UiSkeleton
+              height="8px"
+              width="100%"
+              radius="4px"
+            />
             <div class="skeleton-goal-footer">
-              <UiSkeleton height="12px" width="80px" />
-              <UiSkeleton height="12px" width="60px" />
+              <UiSkeleton
+                height="12px"
+                width="80px"
+              />
+              <UiSkeleton
+                height="12px"
+                width="60px"
+              />
             </div>
           </div>
         </div>
@@ -55,23 +79,26 @@
         class="empty-state"
       >
         <div class="empty-icon">
-          <Icon name="lucide:target" size="40" />
+          <Icon
+            name="lucide:target"
+            size="40"
+          />
         </div>
         <h2 class="empty-title">
-          {{ activeFilter === 'all' ? 'Nenhuma meta criada' : 'Nenhuma meta neste filtro' }}
+          {{ activeFilter === 'all' ? $t('goals.empty.title') : $t('goals.empty.titleFilter') }}
         </h2>
         <p class="empty-text">
-          {{ activeFilter === 'all'
-            ? 'Crie sua primeira meta para dar direção aos seus projetos.'
-            : 'Tente outro filtro ou crie uma nova meta.'
-          }}
+          {{ activeFilter === 'all' ? $t('goals.empty.desc') : $t('goals.empty.descFilter') }}
         </p>
         <UiButton
           v-if="activeFilter === 'all'"
           @click="showCreateModal = true"
         >
-          <Icon name="lucide:plus" size="16" />
-          Criar primeira meta
+          <Icon
+            name="lucide:plus"
+            size="16"
+          />
+          {{ $t('goals.empty.create') }}
         </UiButton>
       </div>
 
@@ -98,14 +125,15 @@
 
 <script setup lang="ts">
 const { goals, loading, activeGoals, completedGoals, fetchGoals } = useGoals();
+const { t } = useI18n();
 
 const showCreateModal = ref(false);
 const activeFilter = ref<"all" | "active" | "done">("all");
 
 const filters = computed(() => [
-  { label: "Todas", value: "all" as const, count: goals.value.length },
-  { label: "Em andamento", value: "active" as const, count: activeGoals.value.length },
-  { label: "Concluídas", value: "done" as const, count: completedGoals.value.length },
+  { label: t("goals.filters.all"), value: "all" as const, count: goals.value.length },
+  { label: t("goals.filters.active"), value: "active" as const, count: activeGoals.value.length },
+  { label: t("goals.filters.done"), value: "done" as const, count: completedGoals.value.length },
 ]);
 
 const filteredGoals = computed(() => {

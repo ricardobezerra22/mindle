@@ -1,0 +1,36 @@
+schema: spec-driven
+
+context: |
+  Stack: Nuxt 4 + Vue 3 Composition API + TypeScript, MongoDB via Prisma ORM, JWT auth with Google OAuth.
+  UI text and toast messages must be in Portuguese (pt-BR). Code (variables, functions, types) in English. No comments in code.
+  New features always follow this order: Types → Composable → API routes → Components → Page → Sidebar nav → title mapping.
+  Hard rules that apply to every change:
+    - No `any` type — use `unknown` and narrow
+    - No `<div>` for interactive elements — use `<button>` or `<a>`
+    - All shared types go in app/types/index.ts only — check for duplicates before adding
+    - Never hardcode colors or spacing — use CSS custom properties from app/assets/css/main.css
+    - <style scoped> on every component
+    - No SCSS, no additional UI component libraries
+    - Never manually import Nuxt auto-imports: ref, computed, watch, onMounted, useState, useRoute, navigateTo, definePageMeta, useToast, $fetch, Icon, defineStore
+    - Every server route must use sendSuccess / sendError from server/utils/response.ts
+    - Every Prisma query must be scoped to userId from event.context.userId
+
+rules:
+  proposal:
+    - State which step of the feature checklist each deliverable maps to (Types / Composable / API / Components / Page / Sidebar / Title)
+    - Call out any new Prisma model required and note that npx prisma db push is needed (no migrations)
+    - Flag if the change needs a new entry in app/types/index.ts
+  tasks:
+    - One task per checklist step when building a new feature end-to-end
+    - Each task must be completable and testable independently
+    - Server-side tasks (API routes) must mention userId scoping explicitly
+
+operations:
+  apply:
+    guidance:
+      - Run pnpm run typecheck after implementation; fix all type errors before marking done
+      - Run pnpm run lint:fix after implementation
+      - Verify no manual imports were added for auto-imported APIs
+  archive:
+    guidance:
+      - Confirm npx prisma db push was run if the change included schema changes

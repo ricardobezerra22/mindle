@@ -3,7 +3,7 @@
     <button
       v-if="!hasExpandedItems"
       class="reset-view-btn"
-      title="Expandir todos os cards"
+      :title="$t('tasks.actions.expandAll')"
       @click="emit('expandAll')"
     >
       <Icon name="lucide:maximize-2" />
@@ -11,7 +11,7 @@
     <button
       v-else
       class="reset-view-btn"
-      title="Fechar todos os cards"
+      :title="$t('tasks.actions.collapseAll')"
       @click="emit('resetView')"
     >
       <Icon name="lucide:minimize-2" />
@@ -20,14 +20,14 @@
     <div class="view-toggle">
       <button
         :class="['toggle-btn', { active: modelValue === 'kanban' }]"
-        title="Kanban"
+        :title="$t('tasks.actions.kanban')"
         @click="emit('update:modelValue', 'kanban')"
       >
         <Icon name="lucide:columns-3" />
       </button>
       <button
         :class="['toggle-btn', { active: modelValue === 'categories' }]"
-        title="Por Categoria"
+        :title="$t('tasks.actions.byCategory')"
         @click="emit('update:modelValue', 'categories')"
       >
         <Icon name="lucide:folder-tree" />
@@ -46,8 +46,8 @@ defineProps<Props>();
 
 const emit = defineEmits<{
   "update:modelValue": [value: "kanban" | "categories"];
-  expandAll: [];
-  resetView: [];
+  "expandAll": [];
+  "resetView": [];
 }>();
 </script>
 

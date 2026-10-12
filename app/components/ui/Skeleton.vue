@@ -7,26 +7,26 @@
 
 <script setup lang="ts">
 interface Props {
-  variant?: 'line' | 'circle' | 'rect'
-  width?: string
-  height?: string
-  radius?: string
+  variant?: "line" | "circle" | "rect";
+  width?: string;
+  height?: string;
+  radius?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  variant: 'line',
+  variant: "line",
   width: undefined,
   height: undefined,
   radius: undefined,
-})
+});
 
 const customStyle = computed(() => {
-  const style: Record<string, string> = {}
-  if (props.width) style.width = props.width
-  if (props.height) style.height = props.height
-  if (props.radius) style.borderRadius = props.radius
-  return style
-})
+  const style: Record<string, string> = {};
+  if (props.width) style.width = props.width;
+  if (props.height) style.height = props.height;
+  if (props.radius) style.borderRadius = props.radius;
+  return style;
+});
 </script>
 
 <style scoped>

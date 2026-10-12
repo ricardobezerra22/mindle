@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   try {
     const userId = await getAuthUser(event);
     if (!userId) {
-      return sendError(event, "Não autorizado", 401);
+      return sendError(event, serverT(event, "server.unauthorized"), 401);
     }
 
     const user = await prisma.user.findUnique({
@@ -14,12 +14,12 @@ export default defineEventHandler(async (event) => {
     });
 
     if (!user) {
-      return sendError(event, "Usuário não encontrado", 404);
+      return sendError(event, serverT(event, "server.userNotFound"), 404);
     }
 
     return sendSuccess(event, user);
   } catch (error) {
     console.error("Error fetching user:", error);
-    return sendError(event, "Erro ao buscar usuário", 500);
+    return sendError(event, serverT(event, "server.userFetchError"), 500);
   }
 });

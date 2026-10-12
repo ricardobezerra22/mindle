@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const { id, title, content, position } = body;
 
-    if (!id) return sendError(event, "Topic ID is required", 400);
+    if (!id) return sendError(event, serverT(event, "server.topicIdIsRequired"), 400);
 
     const topic = await prisma.topic.update({
       where: { id },
@@ -27,6 +27,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, topic);
   } catch (error) {
     console.error("Error updating topic:", error);
-    return sendError(event, "Failed to update topic", 500);
+    return sendError(event, serverT(event, "server.failedToUpdateTopic"), 500);
   }
 });

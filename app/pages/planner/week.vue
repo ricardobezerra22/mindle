@@ -5,7 +5,7 @@
         <div class="week-header-top">
           <div>
             <h1 class="page-title">
-              Esta semana
+              {{ $t('pages.plannerWeek') }}
             </h1>
             <p class="date-range">
               {{ weekDateRange }}
@@ -13,7 +13,7 @@
           </div>
           <UiButton @click="showCreateModal = true">
             <Icon name="lucide:plus" />
-            Nova Tarefa
+            {{ $t('tasks.newTask') }}
           </UiButton>
         </div>
 
@@ -49,7 +49,7 @@
             :name="showOverview ? 'lucide:chevron-up' : 'lucide:chevron-down'"
             size="18"
           />
-          Visão geral
+          {{ $t("planner.overview") }}
         </button>
       </div>
 
@@ -58,13 +58,13 @@
         class="weekly-overview"
       >
         <div class="overview-card">
-          <h4>Tarefas planejadas</h4>
+          <h4>{{ $t("planner.plannedTasks") }}</h4>
           <p class="overview-value">
             {{ totalPlannedTasks }}
           </p>
         </div>
         <div class="overview-card">
-          <h4>Concluídas</h4>
+          <h4>{{ $t("planner.completed") }}</h4>
           <p class="overview-value">
             {{ completedTasks }}
           </p>
@@ -82,8 +82,14 @@
             class="skeleton-day-column"
           >
             <div class="skeleton-day-header">
-              <UiSkeleton height="16px" :width="['50%', '60%', '45%', '55%', '50%', '60%', '40%'][i - 1]" />
-              <UiSkeleton height="12px" width="40%" />
+              <UiSkeleton
+                height="16px"
+                :width="['50%', '60%', '45%', '55%', '50%', '60%', '40%'][i - 1]"
+              />
+              <UiSkeleton
+                height="12px"
+                width="40%"
+              />
             </div>
             <div class="skeleton-day-tasks">
               <div
@@ -91,10 +97,20 @@
                 :key="j"
                 class="skeleton-task"
               >
-                <UiSkeleton variant="circle" width="20px" height="20px" />
+                <UiSkeleton
+                  variant="circle"
+                  width="20px"
+                  height="20px"
+                />
                 <div class="skeleton-task-lines">
-                  <UiSkeleton height="12px" width="85%" />
-                  <UiSkeleton height="10px" width="50%" />
+                  <UiSkeleton
+                    height="12px"
+                    width="85%"
+                  />
+                  <UiSkeleton
+                    height="10px"
+                    width="50%"
+                  />
                 </div>
               </div>
             </div>
@@ -109,7 +125,7 @@
         <div
           v-for="day in weekDays"
           :key="day.date"
-          :class="['day-column', { today: day.isToday, 'drag-over': dragOverDay === day.date }]"
+          :class="['day-column', { 'today': day.isToday, 'drag-over': dragOverDay === day.date }]"
           @dragover.prevent="handleDragOver(day.date)"
           @dragleave="handleDragLeave"
           @drop.prevent="handleDrop(day.date)"
@@ -127,7 +143,7 @@
             v-if="getTasksForDay(day.date).length === 0"
             class="empty-day"
           >
-            <p>Nada planejado ainda.</p>
+            <p>{{ $t("planner.nothingPlanned") }}</p>
           </div>
 
           <div
@@ -174,13 +190,7 @@
                     class="priority-badge"
                     :class="`priority-${task.priority.toLowerCase()}`"
                   >
-                    {{
-                      task.priority === "HIGH"
-                        ? "Alta"
-                        : task.priority === "MEDIUM"
-                          ? "Média"
-                          : "Baixa"
-                    }}
+                    {{ $t(`shared.priorities.${task.priority.toLowerCase()}`) }}
                   </span>
                 </div>
               </div>
@@ -199,6 +209,8 @@
 
 <script setup lang="ts">
 const toast = useToast();
+const { t, te, locale } = useI18n();
+const dateLocale = computed(() => (locale.value === "pt" ? "pt-PT" : "en-US"));
 const { playDone } = useSound();
 const { preferences } = usePreferences();
 
@@ -241,17 +253,17 @@ const weekDays = computed(() => {
 
     let label = "";
     if (isToday) {
-      label = "Hoje";
+      label = t("planner.today");
     } else if (isTomorrow) {
-      label = "Amanhã";
+      label = t("planner.tomorrow");
     } else {
-      label = date.toLocaleDateString("pt-PT", { weekday: "long" });
+      label = date.toLocaleDateString(dateLocale.value, { weekday: "long" });
       label = label.charAt(0).toUpperCase() + label.slice(1);
     }
 
     days.push({
       date: dateStr,
-      dateFormatted: date.toLocaleDateString("pt-PT", {
+      dateFormatted: date.toLocaleDateString(dateLocale.value, {
         day: "2-digit",
         month: "short",
       }),
@@ -304,7 +316,7 @@ const getTaskCardStyle = (task: any) => {
   return {
     backgroundColor: `${color}12`,
     borderLeftColor: color,
-    borderLeftWidth: '3px',
+    borderLeftWidth: "3px",
   };
 };
 
@@ -379,7 +391,7 @@ const handleDrop = async (targetDate: string) => {
   } catch (error) {
     tasks.value[index] = { ...tasks.value[index], dueDate: oldDueDate };
     console.error("Error moving task:", error);
-    toast.error({ title: "Erro ao mover tarefa" });
+    toast.error({ title: t("planner.toasts.moveError") });
   }
 };
 
@@ -410,7 +422,7 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
 
   if (newStatus === "DONE") {
     playDone();
-    toast.success({ title: "Tarefa concluída" });
+    toast.success({ title: t("planner.toasts.taskDone") });
   }
 
   const version = (toggleVersions.get(taskId) || 0) + 1;
@@ -442,7 +454,7 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
       }
     } catch (error) {
       console.error("Error updating task status:", error);
-      toast.error({ title: "Erro ao atualizar tarefa" });
+      toast.error({ title: t("planner.toasts.updateError") });
     } finally {
       toggleInFlight.delete(taskId);
       toggleVersions.delete(taskId);
@@ -453,12 +465,8 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
 };
 
 const getStatusLabel = (status: string) => {
-  const labels: Record<string, string> = {
-    NOT_STARTED: "Não iniciado",
-    IN_PROGRESS: "Em progresso",
-    DONE: "Concluído",
-  };
-  return labels[status] || status;
+  const key = `planner.status.${status}`;
+  return te(key) ? t(key) : status;
 };
 
 onMounted(() => {

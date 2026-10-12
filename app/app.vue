@@ -8,9 +8,9 @@ useHead({
     lang: "pt",
   },
 });
-const title = "Mindle - Gestão de Tarefas e Produtividade";
-const description
-  = "Sistema completo de gestão de tarefas, planner, foco e bem-estar.";
+const { t } = useI18n();
+const title = computed(() => t("app.title"));
+const description = computed(() => t("app.description"));
 
 useSeoMeta({
   title,

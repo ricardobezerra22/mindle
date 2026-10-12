@@ -35,7 +35,7 @@
         <TasksTaskSortFilter v-model="sortBy" />
         <UiButton @click="showCreateModal = true">
           <Icon name="lucide:plus" />
-          Nova Tarefa
+          {{ $t('tasks.newTask') }}
         </UiButton>
       </div>
 
@@ -58,19 +58,19 @@
 
       <div class="monthly-overview">
         <div class="overview-card">
-          <h4>Tarefas do mês</h4>
+          <h4>{{ $t("planner.monthTasks") }}</h4>
           <p class="overview-value">
             {{ monthlyTasksCount }}
           </p>
         </div>
         <div class="overview-card">
-          <h4>Concluídas</h4>
+          <h4>{{ $t("planner.completed") }}</h4>
           <p class="overview-value">
             {{ completedTasksCount }}
           </p>
         </div>
         <div class="overview-card">
-          <h4>Pendentes</h4>
+          <h4>{{ $t("planner.pending") }}</h4>
           <p class="overview-value">
             {{ pendingTasksCount }}
           </p>
@@ -96,7 +96,10 @@
               :key="i"
               class="skeleton-calendar-cell"
             >
-              <UiSkeleton height="14px" width="20px" />
+              <UiSkeleton
+                height="14px"
+                width="20px"
+              />
               <UiSkeleton
                 v-if="i % 3 !== 0"
                 height="10px"
@@ -190,6 +193,7 @@
 
 <script setup lang="ts">
 const toast = useToast();
+const { t, locale } = useI18n();
 const { playDone } = useSound();
 
 const loading = ref(false);
@@ -205,10 +209,10 @@ const draggedTaskId = ref<string | null>(null);
 const dragSourceDay = ref<string | null>(null);
 const dragOverDay = ref<string | null>(null);
 
-const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+const weekDays = computed(() => t("planner.weekDaysShort").split(","));
 
 const currentMonthName = computed(() => {
-  return currentDate.value.toLocaleDateString("pt-PT", { month: "long" });
+  return currentDate.value.toLocaleDateString(locale.value === "pt" ? "pt-PT" : "en-US", { month: "long" });
 });
 
 const currentYear = computed(() => {
@@ -294,8 +298,8 @@ const getTaskItemStyle = (task: any) => {
   return {
     backgroundColor: `${color}15`,
     borderLeftColor: color,
-    borderLeftWidth: '2px',
-    borderLeftStyle: 'solid',
+    borderLeftWidth: "2px",
+    borderLeftStyle: "solid",
   };
 };
 
@@ -370,7 +374,7 @@ const handleDrop = async (targetDate: string) => {
   } catch (error) {
     tasks.value[index] = { ...tasks.value[index], dueDate: oldDueDate };
     console.error("Error moving task:", error);
-    toast.error({ title: "Erro ao mover tarefa" });
+    toast.error({ title: t("planner.toasts.moveError") });
   }
 };
 
@@ -401,7 +405,7 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
 
   if (newStatus === "DONE") {
     playDone();
-    toast.success({ title: "Tarefa concluída" });
+    toast.success({ title: t("planner.toasts.taskDone") });
   }
 
   const version = (toggleVersions.get(taskId) || 0) + 1;
@@ -433,7 +437,7 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
       }
     } catch (error) {
       console.error("Error updating task status:", error);
-      toast.error({ title: "Erro ao atualizar tarefa" });
+      toast.error({ title: t("planner.toasts.updateError") });
     } finally {
       toggleInFlight.delete(taskId);
       toggleVersions.delete(taskId);

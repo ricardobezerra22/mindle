@@ -2,9 +2,9 @@
 const route = useRoute();
 
 const sections = [
-  { label: "Privacidade", path: "/privacidade" },
-  { label: "Termos de Serviço", path: "/termos" },
-  { label: "Cookies", path: "/cookies" },
+  { label: "legal.privacy", path: "/privacidade" },
+  { label: "legal.terms", path: "/termos" },
+  { label: "legal.cookies", path: "/cookies" },
 ];
 
 const isActive = (path: string) => route.path === path;
@@ -14,8 +14,15 @@ const isActive = (path: string) => route.path === path;
   <div class="legal-layout">
     <nav class="legal-navbar">
       <div class="navbar-container">
-        <NuxtLink to="/" class="navbar-logo">
-          <img src="/mindle-logo.png" alt="Mindle" class="logo-img" />
+        <NuxtLink
+          to="/"
+          class="navbar-logo"
+        >
+          <img
+            src="/mindle-logo.png"
+            alt="Mindle"
+            class="logo-img"
+          />
           <span>Mindle</span>
         </NuxtLink>
       </div>
@@ -24,7 +31,7 @@ const isActive = (path: string) => route.path === path;
     <div class="legal-container">
       <aside class="legal-sidebar">
         <div class="sidebar-header">
-          <h3>Documentos Legais</h3>
+          <h3>{{ $t("legal.documentosLegais") }}</h3>
         </div>
         <nav class="sidebar-nav">
           <NuxtLink
@@ -33,7 +40,7 @@ const isActive = (path: string) => route.path === path;
             :to="section.path"
             :class="['sidebar-link', { active: isActive(section.path) }]"
           >
-            {{ section.label }}
+            {{ $t(section.label) }}
           </NuxtLink>
         </nav>
       </aside>
@@ -45,9 +52,9 @@ const isActive = (path: string) => route.path === path;
 
     <footer class="legal-footer">
       <div class="footer-container">
-        <p>&copy; 2025 Mindle Inc. Todos os direitos reservados.</p>
+        <p>{{ $t("legal.copyright") }}</p>
         <div class="footer-links">
-          <NuxtLink to="/">Voltar para Home</NuxtLink>
+          <NuxtLink to="/">{{ $t("legal.voltarParaHome") }}</NuxtLink>
         </div>
       </div>
     </footer>

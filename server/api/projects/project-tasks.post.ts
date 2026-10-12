@@ -5,9 +5,9 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const { title, projectId, topicId, subtopicId } = body;
 
-    if (!title?.trim()) return sendError(event, "Title is required", 400);
+    if (!title?.trim()) return sendError(event, serverT(event, "server.titleIsRequired"), 400);
     if (!projectId && !topicId && !subtopicId) {
-      return sendError(event, "projectId, topicId or subtopicId is required", 400);
+      return sendError(event, serverT(event, "server.projectidTopicidOrSubtopicidIsRequired"), 400);
     }
 
     const where: Record<string, string> = {};
@@ -30,6 +30,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, task, 201);
   } catch (error) {
     console.error("Error creating project task:", error);
-    return sendError(event, "Failed to create project task", 500);
+    return sendError(event, serverT(event, "server.failedToCreateProjectTask"), 500);
   }
 });

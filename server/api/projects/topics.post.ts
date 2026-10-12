@@ -6,14 +6,14 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const { title, projectId } = body;
 
-    if (!title?.trim()) return sendError(event, "Title is required", 400);
-    if (!projectId) return sendError(event, "Project ID is required", 400);
+    if (!title?.trim()) return sendError(event, serverT(event, "server.titleIsRequired"), 400);
+    if (!projectId) return sendError(event, serverT(event, "server.projectIdIsRequired"), 400);
 
     const project = await prisma.project.findFirst({
       where: { id: projectId, userId },
     });
 
-    if (!project) return sendError(event, "Project not found", 404);
+    if (!project) return sendError(event, serverT(event, "server.projectNotFound"), 404);
 
     const count = await prisma.topic.count({ where: { projectId } });
 
@@ -29,6 +29,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, topic, 201);
   } catch (error) {
     console.error("Error creating topic:", error);
-    return sendError(event, "Failed to create topic", 500);
+    return sendError(event, serverT(event, "server.failedToCreateTopic"), 500);
   }
 });

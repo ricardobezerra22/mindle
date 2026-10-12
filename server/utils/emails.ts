@@ -91,11 +91,11 @@ export const dailyTrackingTemplate = (data: DailyTrackingData) => {
     );
   }
 
-  const urgentSection =
-    urgentItems.length > 0
+  const urgentSection
+    = urgentItems.length > 0
       ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
         <tr><td style="padding:14px 18px;background:#fef3c7;border-radius:8px;border-left:4px solid #f59e0b;">
-          ${urgentItems.map((item) => `<p style="margin:4px 0;font-size:14px;color:#92400e;">${item}</p>`).join("")}
+          ${urgentItems.map(item => `<p style="margin:4px 0;font-size:14px;color:#92400e;">${item}</p>`).join("")}
         </td></tr>
       </table>`
       : "";

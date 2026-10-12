@@ -1,7 +1,7 @@
 <template>
   <div
-    class="inline-dropdown"
     ref="wrapperRef"
+    class="inline-dropdown"
     @click.stop
   >
     <span
@@ -49,24 +49,21 @@ const emit = defineEmits<{
 
 const isOpen = ref(false);
 const wrapperRef = ref<HTMLElement | null>(null);
+const { t } = useI18n();
 
 useClickOutside(wrapperRef, () => {
   isOpen.value = false;
 });
 
-const priorityOptions = [
-  { value: "HIGH" as Priority, label: "Alta", dotColor: "#991b1b" },
-  { value: "MEDIUM" as Priority, label: "Média", dotColor: "#92400e" },
-  { value: "LOW" as Priority, label: "Baixa", dotColor: "#065f46" },
-];
+const priorityOptions = computed(() => [
+  { value: "HIGH" as Priority, label: t("shared.priorities.high"), dotColor: "#991b1b" },
+  { value: "MEDIUM" as Priority, label: t("shared.priorities.medium"), dotColor: "#92400e" },
+  { value: "LOW" as Priority, label: t("shared.priorities.low"), dotColor: "#065f46" },
+]);
 
 const priorityLabel = computed(() => {
-  const labels: Record<string, string> = {
-    LOW: "Baixa",
-    MEDIUM: "Média",
-    HIGH: "Alta",
-  };
-  return labels[props.priority] || props.priority;
+  const opt = priorityOptions.value.find(o => o.value === props.priority);
+  return opt?.label || props.priority;
 });
 
 const toggleDropdown = () => {

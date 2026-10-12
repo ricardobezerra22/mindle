@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+import handler from "../../server/api/agent/voice-tasks/preview.post.ts";
+
 const mockRunPreviewAgent = vi.hoisted(() => vi.fn());
 const mockSessionCache = vi.hoisted(() => new Map<string, { userId: string; expiresAt: number }>());
 
@@ -8,8 +10,6 @@ vi.mock("../../server/services/agentService", () => ({
   sanitizeInput: (t: string) => t.trim(),
   sessionCache: mockSessionCache,
 }));
-
-import handler from "../../server/api/agent/voice-tasks/preview.post.ts";
 
 const makeEvent = (body: unknown, userId = "u1") => ({ context: { userId }, _body: body });
 

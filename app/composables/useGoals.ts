@@ -6,6 +6,7 @@ interface APIResponse<T> {
 }
 
 export const useGoals = () => {
+  const { $i18n } = useNuxtApp();
   const goals = useState<GoalWithProgress[]>("goals", () => []);
   const loading = useState<boolean>("goals-loading", () => false);
   const error = useState<string | null>("goals-error", () => null);
@@ -19,7 +20,7 @@ export const useGoals = () => {
         goals.value = response.data;
       }
     } catch (err: any) {
-      error.value = err?.data?.error || "Erro ao carregar metas";
+      error.value = err?.data?.error || $i18n.t("goals.toasts.loadError");
     } finally {
       loading.value = false;
     }

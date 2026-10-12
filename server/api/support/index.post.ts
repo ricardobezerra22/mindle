@@ -14,7 +14,7 @@ export default defineEventHandler(async (event: H3Event) => {
   const body = await readBody<SupportBody>(event);
 
   if (!body.subject?.trim() || !body.message?.trim()) {
-    return sendError(event, "Assunto e mensagem são obrigatórios", 400);
+    return sendError(event, serverT(event, "server.subjectMessageRequired"), 400);
   }
 
   const user = await prisma.user.findUnique({
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event: H3Event) => {
   });
 
   if (!user) {
-    return sendError(event, "Usuário não encontrado", 404);
+    return sendError(event, serverT(event, "server.userNotFound"), 404);
   }
 
   try {
@@ -45,6 +45,6 @@ export default defineEventHandler(async (event: H3Event) => {
     return sendSuccess(event, { sent: true }, 201);
   } catch (err) {
     console.error("[support] Error sending email:", err);
-    return sendError(event, "Erro ao enviar feedback", 500);
+    return sendError(event, serverT(event, "server.feedbackError"), 500);
   }
 });

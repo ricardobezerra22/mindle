@@ -22,6 +22,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, mood);
   } catch (error) {
     console.error("Error fetching today mood:", error);
-    return sendError(event, "Failed to fetch today mood", 500);
+    return sendError(event, serverT(event, "server.failedToFetchTodayMood"), 500);
   }
 });

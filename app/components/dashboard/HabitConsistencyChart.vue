@@ -2,10 +2,15 @@
   <div class="chart-card">
     <div class="chart-header">
       <div class="chart-title-row">
-        <Icon name="lucide:heart" size="16" />
-        <h3 class="chart-title">Consistência dos Hábitos</h3>
+        <Icon
+          name="lucide:heart"
+          size="16"
+        />
+        <h3 class="chart-title">
+          {{ $t("dashboard.habitConsistency") }}
+        </h3>
       </div>
-      <span class="chart-subtitle">% de dias cumpridos no período</span>
+      <span class="chart-subtitle">{{ $t("dashboard.habitConsistencySubtitle") }}</span>
     </div>
     <div class="chart-body">
       <div
@@ -37,13 +42,19 @@
             v-if="habit.streak > 0"
             class="habit-streak"
           >
-            <Icon name="lucide:flame" size="12" />
+            <Icon
+              name="lucide:flame"
+              size="12"
+            />
             {{ habit.streak }}d
           </span>
         </div>
       </div>
-      <div v-else class="chart-empty">
-        <span>Sem hábitos cadastrados</span>
+      <div
+        v-else
+        class="chart-empty"
+      >
+        <span>{{ $t("dashboard.noHabits") }}</span>
       </div>
     </div>
   </div>

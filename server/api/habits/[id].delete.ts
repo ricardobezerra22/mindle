@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     const id = getRouterParam(event, "id");
 
     if (!id) {
-      return sendError(event, "ID is required", 400);
+      return sendError(event, serverT(event, "server.idIsRequired"), 400);
     }
 
     await prisma.habitLog.deleteMany({
@@ -19,6 +19,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, { deleted: true });
   } catch (error) {
     console.error("Error deleting habit:", error);
-    return sendError(event, "Failed to delete habit", 500);
+    return sendError(event, serverT(event, "server.failedToDeleteHabit"), 500);
   }
 });

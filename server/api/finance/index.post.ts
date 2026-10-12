@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     const { title, amount, category, status, dueDate, note } = body;
 
     if (!title || amount === undefined) {
-      return sendError(event, "Title and amount are required", 400);
+      return sendError(event, serverT(event, "server.titleAndAmountAreRequired"), 400);
     }
 
     const entry = await prisma.financeEntry.create({
@@ -26,6 +26,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, entry);
   } catch (error) {
     console.error("Error creating finance entry:", error);
-    return sendError(event, "Failed to create finance entry", 500);
+    return sendError(event, serverT(event, "server.failedToCreateFinanceEntry"), 500);
   }
 });

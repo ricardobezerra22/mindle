@@ -24,22 +24,24 @@ onMounted(() => {
   initTheme();
 });
 
+const { t } = useI18n();
+
 const pageTitle = computed(() => {
-  const titles: Record<string, string> = {
-    "/": "Início",
-    "/metrics": "Métricas",
-    "/tasks": "Tarefas",
-    "/projects": "Projetos",
-    "/planner/week": "Planner Semanal",
-    "/planner/month": "Planner Mensal",
-    "/focus": "Foco",
-    "/habits": "Hábitos",
-    "/finance": "Finanças",
-    "/goals": "Metas",
-    "/settings": "Configurações",
+  const map: Record<string, string> = {
+    "/": t("pages.home"),
+    "/metrics": t("pages.metrics"),
+    "/tasks": t("pages.tasks"),
+    "/projects": t("pages.projects"),
+    "/planner/week": t("pages.plannerWeek"),
+    "/planner/month": t("pages.plannerMonth"),
+    "/focus": t("pages.focus"),
+    "/habits": t("pages.habits"),
+    "/finance": t("pages.finance"),
+    "/goals": t("pages.goals"),
+    "/settings": t("pages.settings"),
   };
-  if (titles[route.path]) return titles[route.path];
-  if (route.path.startsWith("/goals/")) return "Metas";
+  if (map[route.path]) return map[route.path];
+  if (route.path.startsWith("/goals/")) return t("pages.goals");
   return "Mindle";
 });
 </script>

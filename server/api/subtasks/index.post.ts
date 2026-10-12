@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     const { title, taskId } = body;
 
     if (!title || !taskId) {
-      return sendError(event, "Title and taskId are required", 400);
+      return sendError(event, serverT(event, "server.titleAndTaskidAreRequired"), 400);
     }
 
     const subTask = await prisma.subTask.create({
@@ -16,6 +16,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, subTask, 201);
   } catch (error) {
     console.error("Error creating subtask:", error);
-    return sendError(event, "Failed to create subtask", 500);
+    return sendError(event, serverT(event, "server.failedToCreateSubtask"), 500);
   }
 });

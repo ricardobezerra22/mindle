@@ -58,7 +58,7 @@ export const useGoogleAuth = () => {
 
     if (window.google?.accounts?.id) {
       renderGoogleButton();
-    } else if (!document.querySelector('script[src*="accounts.google.com"]')) {
+    } else if (!document.querySelector("script[src*=\"accounts.google.com\"]")) {
       const script = document.createElement("script");
       script.src = "https://accounts.google.com/gsi/client";
       script.async = true;

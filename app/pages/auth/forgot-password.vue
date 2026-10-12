@@ -2,10 +2,10 @@
   <div class="auth-card">
     <div v-if="!sent">
       <h2 class="auth-title">
-        Recuperar senha
+        {{ $t("auth.forgotPassword.title") }}
       </h2>
       <p class="auth-subtitle">
-        Informe seu email e enviaremos instruções para redefinir sua senha
+        {{ $t("auth.forgotPassword.subtitle") }}
       </p>
 
       <div
@@ -27,7 +27,9 @@
           <label
             for="email"
             class="form-label"
-          >Email</label>
+          >
+            {{ $t("auth.forgotPassword.emailLabel") }}
+          </label>
           <div
             :class="[
               'input-wrapper',
@@ -43,7 +45,7 @@
               id="email"
               v-model="email"
               type="email"
-              placeholder="seu@email.com"
+              :placeholder="$t('auth.forgotPassword.emailPlaceholder')"
               autocomplete="email"
               @focus="emailFocused = true"
               @blur="
@@ -55,7 +57,9 @@
           <span
             v-if="emailError"
             class="field-error"
-          >{{ emailError }}</span>
+          >
+            {{ emailError }}
+          </span>
         </div>
 
         <button
@@ -69,7 +73,11 @@
             size="18"
             class="spinning"
           />
-          {{ submitting ? "Enviando..." : "Enviar instruções" }}
+          {{
+            submitting
+              ? $t("auth.forgotPassword.sending")
+              : $t("auth.forgotPassword.sendReset")
+          }}
         </button>
       </form>
     </div>
@@ -85,11 +93,10 @@
         />
       </div>
       <h2 class="auth-title">
-        Email enviado
+        {{ $t("auth.forgotPassword.emailSent") }}
       </h2>
       <p class="auth-subtitle">
-        Se existe uma conta com esse email, você receberá instruções para
-        redefinir sua senha em breve.
+        {{ $t("auth.forgotPassword.emailSentMessage") }}
       </p>
     </div>
 
@@ -102,7 +109,7 @@
           name="lucide:arrow-left"
           size="14"
         />
-        Voltar para login
+        {{ $t("auth.forgotPassword.backToLogin") }}
       </NuxtLink>
     </p>
   </div>
@@ -110,6 +117,8 @@
 
 <script setup lang="ts">
 definePageMeta({ layout: "auth" });
+
+const { t } = useI18n();
 
 const email = ref("");
 const submitting = ref(false);
@@ -120,11 +129,11 @@ const emailError = ref("");
 
 const validateEmail = () => {
   if (!email.value) {
-    emailError.value = "Email é obrigatório";
+    emailError.value = t("auth.forgotPassword.emailRequired");
     return false;
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-    emailError.value = "Email inválido";
+    emailError.value = t("auth.forgotPassword.emailInvalid");
     return false;
   }
   emailError.value = "";
@@ -140,7 +149,7 @@ const handleSubmit = async () => {
     await new Promise(resolve => setTimeout(resolve, 1500));
     sent.value = true;
   } catch {
-    errorMessage.value = "Erro de conexão. Tente novamente.";
+    errorMessage.value = t("auth.forgotPassword.resetError");
   } finally {
     submitting.value = false;
   }

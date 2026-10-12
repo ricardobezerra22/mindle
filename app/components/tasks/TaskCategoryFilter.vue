@@ -1,8 +1,8 @@
 <template>
   <div
     v-if="categories.length > 0"
-    class="category-filter"
     ref="wrapperRef"
+    class="category-filter"
     @click="isOpen = !isOpen"
   >
     <span
@@ -15,7 +15,7 @@
       name="lucide:tag"
     />
     <span class="filter-label">
-      {{ selectedCategory ? selectedCategory.name : "Todas categorias" }}
+      {{ selectedCategory ? selectedCategory.name : $t('taskForm.allCategories') }}
     </span>
     <Icon
       name="lucide:chevron-down"
@@ -34,7 +34,7 @@
         @click="handleSelect('')"
       >
         <Icon name="lucide:layers" />
-        <span>Todas categorias</span>
+        <span>{{ $t("taskForm.allCategories") }}</span>
       </div>
       <div
         v-for="cat in categories"
@@ -76,7 +76,7 @@ useClickOutside(wrapperRef, () => {
 
 const selectedCategory = computed(() => {
   if (!props.modelValue) return null;
-  return props.categories.find((c) => c.id === props.modelValue) || null;
+  return props.categories.find(c => c.id === props.modelValue) || null;
 });
 
 const handleSelect = (value: string) => {

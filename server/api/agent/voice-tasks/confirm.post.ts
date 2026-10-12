@@ -38,10 +38,10 @@ export default defineEventHandler(async (event) => {
   }
 
   if (!Array.isArray(tasks) || tasks.length === 0) {
-    return sendError(event, "tasks array is required", 400);
+    return sendError(event, serverT(event, "server.tasksArrayIsRequired"), 400);
   }
   if (tasks.length > 50) {
-    return sendError(event, "Máximo de 50 tarefas por vez", 400);
+    return sendError(event, serverT(event, "server.maxTasks"), 400);
   }
 
   const incomingTitles = (tasks as PreviewTask[])
@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
     (t, i) => incomingTitles.indexOf(t) !== i,
   );
   if (duplicateInBatch) {
-    return sendError(event, `Títulos duplicados na lista: "${duplicateInBatch}"`, 400);
+    return sendError(event, serverT(event, "server.duplicateTitles", { title: duplicateInBatch }), 400);
   }
 
   const existingTitles = await prisma.task.findMany({
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
     select: { title: true },
   });
   if (existingTitles.length > 0) {
-    return sendError(event, `Já existe uma tarefa com o título: "${existingTitles[0]!.title}"`, 409);
+    return sendError(event, serverT(event, "server.taskTitleExists", { title: existingTitles[0]!.title }), 409);
   }
 
   const existingCategories = await prisma.taskCategory.findMany({
@@ -136,7 +136,7 @@ export default defineEventHandler(async (event) => {
         }
 
         if (!categoryId) {
-          catError = `Tarefa "${title}" não tem categoria válida`;
+          catError = serverT(event, "server.taskNoCategory", { title });
           throw new Error("category_validation");
         }
 

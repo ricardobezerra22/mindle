@@ -5,10 +5,13 @@
         <button
           v-if="isMobile"
           class="menu-toggle"
-          aria-label="Abrir menu"
+          :aria-label="$t('nav.openMenu')"
           @click="openSidebar"
         >
-          <Icon name="lucide:menu" size="22" />
+          <Icon
+            name="lucide:menu"
+            size="22"
+          />
         </button>
         <div class="header-title">
           <slot name="title">

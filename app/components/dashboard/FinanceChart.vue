@@ -2,10 +2,15 @@
   <div class="chart-card">
     <div class="chart-header">
       <div class="chart-title-row">
-        <Icon name="lucide:wallet" size="16" />
-        <h3 class="chart-title">Finanças por Status</h3>
+        <Icon
+          name="lucide:wallet"
+          size="16"
+        />
+        <h3 class="chart-title">
+          {{ $t("dashboard.financeByStatus") }}
+        </h3>
       </div>
-      <span class="chart-subtitle">Distribuição de valores</span>
+      <span class="chart-subtitle">{{ $t("dashboard.financeDistribution") }}</span>
     </div>
     <div class="chart-body">
       <Doughnut
@@ -13,8 +18,11 @@
         :data="chartData"
         :options="chartOptions"
       />
-      <div v-else class="chart-empty">
-        <span>Sem registros financeiros</span>
+      <div
+        v-else
+        class="chart-empty"
+      >
+        <span>{{ $t("dashboard.noFinanceData") }}</span>
       </div>
     </div>
     <div
@@ -23,12 +31,12 @@
     >
       <div class="legend-item">
         <span class="legend-dot paid" />
-        <span class="legend-label">Pago</span>
+        <span class="legend-label">{{ $t("dashboard.finance.paid") }}</span>
         <span class="legend-value">{{ formatCurrency(totalPaid) }}</span>
       </div>
       <div class="legend-item">
         <span class="legend-dot pending" />
-        <span class="legend-label">Pendente</span>
+        <span class="legend-label">{{ $t("dashboard.finance.pending") }}</span>
         <span class="legend-value">{{ formatCurrency(totalPending) }}</span>
       </div>
     </div>
@@ -51,6 +59,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { t } = useI18n();
 
 const hasData = computed(() => props.totalPaid + props.totalPending > 0);
 
@@ -58,7 +67,7 @@ const formatCurrency = (val: number) =>
   val.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const chartData = computed(() => ({
-  labels: ["Pago", "Pendente"],
+  labels: [t("dashboard.finance.paid"), t("dashboard.finance.pending")],
   datasets: [
     {
       data: [props.totalPaid, props.totalPending],

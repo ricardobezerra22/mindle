@@ -1,7 +1,11 @@
 <template>
   <div class="auth-card">
-    <h2 class="auth-title">Criar sua conta</h2>
-    <p class="auth-subtitle">Comece a organizar o que importa</p>
+    <h2 class="auth-title">
+      {{ $t("auth.register.title") }}
+    </h2>
+    <p class="auth-subtitle">
+      {{ $t("auth.register.subtitle") }}
+    </p>
 
     <div
       v-if="errorMessage"
@@ -22,8 +26,9 @@
         <label
           for="name"
           class="form-label"
-          >Nome</label
         >
+          {{ $t("auth.register.nameLabel") }}
+        </label>
         <div
           :class="['input-wrapper', { focused: nameFocused, error: nameError }]"
         >
@@ -36,7 +41,7 @@
             id="name"
             v-model="name"
             type="text"
-            placeholder="Seu nome"
+            :placeholder="$t('auth.register.namePlaceholder')"
             autocomplete="name"
             @focus="nameFocused = true"
             @blur="
@@ -48,16 +53,18 @@
         <span
           v-if="nameError"
           class="field-error"
-          >{{ nameError }}</span
         >
+          {{ nameError }}
+        </span>
       </div>
 
       <div class="form-group">
         <label
           for="email"
           class="form-label"
-          >Email</label
         >
+          {{ $t("auth.register.emailLabel") }}
+        </label>
         <div
           :class="[
             'input-wrapper',
@@ -73,7 +80,7 @@
             id="email"
             v-model="email"
             type="email"
-            placeholder="seu@email.com"
+            :placeholder="$t('auth.register.emailPlaceholder')"
             autocomplete="email"
             @focus="emailFocused = true"
             @blur="
@@ -85,16 +92,18 @@
         <span
           v-if="emailError"
           class="field-error"
-          >{{ emailError }}</span
         >
+          {{ emailError }}
+        </span>
       </div>
 
       <div class="form-group">
         <label
           for="password"
           class="form-label"
-          >Senha</label
         >
+          {{ $t("auth.register.passwordLabel") }}
+        </label>
         <div
           :class="[
             'input-wrapper',
@@ -110,7 +119,7 @@
             id="password"
             v-model="password"
             :type="showPassword ? 'text' : 'password'"
-            placeholder="Mínimo 6 caracteres"
+            :placeholder="$t('auth.register.passwordPlaceholder')"
             autocomplete="new-password"
             @focus="passwordFocused = true"
             @blur="
@@ -134,8 +143,9 @@
         <span
           v-if="passwordError"
           class="field-error"
-          >{{ passwordError }}</span
         >
+          {{ passwordError }}
+        </span>
         <div
           v-if="password && !passwordError"
           class="strength-bar"
@@ -160,18 +170,7 @@
           type="checkbox"
         />
         <span class="checkbox-text">
-          Concordo com os
-          <a
-            href="#"
-            class="terms-link"
-            >Termos de Uso</a
-          >
-          e
-          <a
-            href="#"
-            class="terms-link"
-            >Política de Privacidade</a
-          >
+          {{ $t("auth.register.agreeTerms") }}
         </span>
       </label>
 
@@ -186,11 +185,15 @@
           size="18"
           class="spinning"
         />
-        {{ submitting ? "Criando conta..." : "Criar conta" }}
+        {{
+          submitting
+            ? $t("auth.register.signingUp")
+            : $t("auth.register.signUp")
+        }}
       </button>
 
       <div class="divider">
-        <span>ou</span>
+        <span>{{ $t("shared.or") }}</span>
       </div>
 
       <div class="google-btn-wrapper">
@@ -209,19 +212,20 @@
               size="18"
               class="spinning"
             />
-            <span>Criando conta com Google...</span>
+            <span>{{ $t("auth.register.signingUpGoogle") }}</span>
           </div>
         </ClientOnly>
       </div>
     </form>
 
     <p class="auth-footer">
-      Já tem uma conta?
+      {{ $t("auth.register.haveAccount") }}
       <NuxtLink
         to="/auth/login"
         class="auth-link"
-        >Entrar</NuxtLink
       >
+        {{ $t("auth.register.signIn") }}
+      </NuxtLink>
     </p>
   </div>
 </template>
@@ -231,9 +235,9 @@ import { useGoogleAuth } from "@/composables/useGoogleAuth";
 
 definePageMeta({ layout: "auth" });
 
+const { t } = useI18n();
 const { register, googleLogin } = useAuth();
-const { googleReady, googleButtonContainer, initializeGoogleButton } =
-  useGoogleAuth();
+const { googleButtonContainer, initializeGoogleButton } = useGoogleAuth();
 
 const name = ref("");
 const email = ref("");
@@ -261,10 +265,10 @@ const strengthClass = computed(() => {
   return "strong";
 });
 const strengthLabel = computed(() => {
-  if (strength.value <= 1) return "Fraca";
-  if (strength.value <= 2) return "Razoável";
-  if (strength.value <= 3) return "Boa";
-  return "Forte";
+  if (strength.value <= 1) return t("auth.register.passwordStrengthWeak");
+  if (strength.value <= 2) return t("auth.register.passwordStrengthFair");
+  if (strength.value <= 3) return t("auth.register.passwordStrengthGood");
+  return t("auth.register.passwordStrengthStrong");
 });
 
 const updateStrength = () => {
@@ -279,7 +283,7 @@ const updateStrength = () => {
 
 const validateName = () => {
   if (!name.value.trim()) {
-    nameError.value = "Nome é obrigatório";
+    nameError.value = t("auth.register.nameRequired");
     return false;
   }
   nameError.value = "";
@@ -288,11 +292,11 @@ const validateName = () => {
 
 const validateEmail = () => {
   if (!email.value) {
-    emailError.value = "Email é obrigatório";
+    emailError.value = t("auth.register.emailRequired");
     return false;
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-    emailError.value = "Email inválido";
+    emailError.value = t("auth.register.emailInvalid");
     return false;
   }
   emailError.value = "";
@@ -301,11 +305,11 @@ const validateEmail = () => {
 
 const validatePassword = () => {
   if (!password.value) {
-    passwordError.value = "Senha é obrigatória";
+    passwordError.value = t("auth.register.passwordRequired");
     return false;
   }
   if (password.value.length < 6) {
-    passwordError.value = "Mínimo de 6 caracteres";
+    passwordError.value = t("auth.register.passwordTooShort");
     return false;
   }
   passwordError.value = "";
@@ -320,7 +324,7 @@ const handleRegister = async () => {
   if (!validName || !validEmail || !validPassword) return;
 
   if (!acceptTerms.value) {
-    errorMessage.value = "Aceite os termos para continuar";
+    errorMessage.value = t("auth.register.acceptTermsRequired");
     return;
   }
 
@@ -330,16 +334,20 @@ const handleRegister = async () => {
     if (response.success) {
       navigateTo("/");
     } else {
-      errorMessage.value = response.error || "Erro ao criar conta";
+      errorMessage.value
+        = response.error || t("auth.register.registrationError");
     }
   } catch {
-    errorMessage.value = "Erro de conexão. Tente novamente.";
+    errorMessage.value = t("auth.connectionError");
   } finally {
     submitting.value = false;
   }
 };
 
-const handleGoogleSuccess = async (e: { credential: string; claims: any }) => {
+const handleGoogleSuccess = async (e: {
+  credential: string;
+  claims: Record<string, unknown>;
+}) => {
   errorMessage.value = "";
   googleLoading.value = true;
   try {
@@ -347,17 +355,14 @@ const handleGoogleSuccess = async (e: { credential: string; claims: any }) => {
     if (response.success) {
       navigateTo("/");
     } else {
-      errorMessage.value = response.error || "Erro ao criar conta com Google";
+      errorMessage.value
+        = response.error || t("auth.register.googleRegistrationError");
     }
   } catch {
-    errorMessage.value = "Erro de conexão. Tente novamente.";
+    errorMessage.value = t("auth.connectionError");
   } finally {
     googleLoading.value = false;
   }
-};
-
-const handleGoogleError = () => {
-  errorMessage.value = "Erro ao autenticar com Google. Tente novamente.";
 };
 
 onMounted(() => {

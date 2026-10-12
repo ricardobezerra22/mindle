@@ -2,18 +2,19 @@
   <div class="finance-page">
     <div class="finance-container">
       <div class="overview-section">
-        <h1 class="page-title">Finanças</h1>
+        <h1 class="page-title">
+          {{ $t('finance.title') }}
+        </h1>
         <div class="monthly-summary">
           <p class="summary-text">
-            {{ pendingCount }}
-            {{ pendingCount === 1 ? "item pendente" : "itens pendentes" }} ·
-            {{ paidCount }} {{ paidCount === 1 ? "pago" : "pagos" }}
+            {{ $t('finance.pendingItems', pendingCount) }} ·
+            {{ $t('finance.paidItems', paidCount) }}
           </p>
           <p
             v-if="totalAmount > 0"
             class="total-amount"
           >
-            Total: {{ formatCurrency(totalAmount) }}
+            {{ $t('finance.total', { amount: formatCurrency(totalAmount) }) }}
           </p>
         </div>
       </div>
@@ -24,7 +25,7 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Buscar por título, categoria ou nota..."
+            :placeholder="$t('finance.searchPlaceholder')"
             class="search-input"
           />
           <button
@@ -38,7 +39,7 @@
 
         <div class="date-filters">
           <div class="date-field">
-            <label>De</label>
+            <label>{{ $t('shared.from') }}</label>
             <input
               v-model="dateFrom"
               type="date"
@@ -46,7 +47,7 @@
             />
           </div>
           <div class="date-field">
-            <label>Até</label>
+            <label>{{ $t('shared.to') }}</label>
             <input
               v-model="dateTo"
               type="date"
@@ -65,7 +66,7 @@
               name="lucide:x"
               size="14"
             />
-            Limpar datas
+            {{ $t('shared.clearDates') }}
           </button>
         </div>
       </div>
@@ -75,13 +76,13 @@
           :class="['filter-btn', { active: !showArchived }]"
           @click="showArchived = false"
         >
-          Ativos
+          {{ $t('finance.tabs.active') }}
         </button>
         <button
           :class="['filter-btn', { active: showArchived }]"
           @click="showArchived = true"
         >
-          Arquivados
+          {{ $t('finance.tabs.archived') }}
         </button>
       </div>
 
@@ -96,16 +97,37 @@
             class="skeleton-entry"
           >
             <div class="skeleton-entry-header">
-              <UiSkeleton height="16px" :width="['60%', '45%', '70%'][i - 1]" />
-              <UiSkeleton height="12px" width="60px" radius="12px" />
+              <UiSkeleton
+                height="16px"
+                :width="['60%', '45%', '70%'][i - 1]"
+              />
+              <UiSkeleton
+                height="12px"
+                width="60px"
+                radius="12px"
+              />
             </div>
             <div class="skeleton-entry-body">
-              <UiSkeleton height="12px" width="80px" />
-              <UiSkeleton height="20px" width="90px" />
+              <UiSkeleton
+                height="12px"
+                width="80px"
+              />
+              <UiSkeleton
+                height="20px"
+                width="90px"
+              />
             </div>
             <div class="skeleton-entry-actions">
-              <UiSkeleton height="32px" width="140px" radius="8px" />
-              <UiSkeleton height="32px" width="36px" radius="8px" />
+              <UiSkeleton
+                height="32px"
+                width="140px"
+                radius="8px"
+              />
+              <UiSkeleton
+                height="32px"
+                width="36px"
+                radius="8px"
+              />
             </div>
           </div>
         </div>
@@ -119,8 +141,8 @@
         <p>
           {{
             showArchived
-              ? "Nenhum item arquivado"
-              : "Nenhum item financeiro ainda"
+              ? $t('finance.empty.noArchived')
+              : $t('finance.empty.noItems')
           }}
         </p>
       </div>
@@ -141,8 +163,7 @@
             <span
               v-if="entry.category"
               class="entry-category"
-              >{{ entry.category }}</span
-            >
+            >{{ entry.category }}</span>
           </div>
 
           <div class="entry-details">
@@ -185,7 +206,7 @@
               @click="markAsPaid(entry.id)"
             >
               <Icon name="lucide:check" />
-              Marcar como pago
+              {{ $t('finance.markPaid') }}
             </button>
 
             <button
@@ -218,7 +239,7 @@
           name="lucide:plus"
           size="24"
         />
-        Adicionar item
+        {{ $t('finance.addItem') }}
       </button>
     </div>
 
@@ -229,7 +250,7 @@
     >
       <div class="modal-content">
         <div class="modal-header">
-          <h2>{{ editingEntry ? "Editar item" : "Novo item financeiro" }}</h2>
+          <h2>{{ editingEntry ? $t('finance.modal.edit') : $t('finance.modal.new') }}</h2>
           <button
             class="close-btn"
             @click="closeModal"
@@ -243,19 +264,19 @@
           @submit.prevent="saveEntry"
         >
           <div class="form-group">
-            <label for="title">Título *</label>
+            <label for="title">{{ $t('finance.modal.titleLabel') }}</label>
             <input
               id="title"
               v-model="formData.title"
               type="text"
-              placeholder="ex: Conta de luz"
+              :placeholder="$t('finance.modal.titlePlaceholder')"
               required
             />
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="amount">Valor *</label>
+              <label for="amount">{{ $t('finance.modal.valueLabel') }}</label>
               <input
                 id="amount"
                 v-model.number="formData.amount"
@@ -267,18 +288,18 @@
             </div>
 
             <div class="form-group">
-              <label for="category">Categoria</label>
+              <label for="category">{{ $t('finance.modal.categoryLabel') }}</label>
               <input
                 id="category"
                 v-model="formData.category"
                 type="text"
-                placeholder="ex: Contas"
+                :placeholder="$t('finance.modal.categoryPlaceholder')"
               />
             </div>
           </div>
 
           <div class="form-group">
-            <label for="dueDate">Data de vencimento</label>
+            <label for="dueDate">{{ $t('finance.modal.dueDateLabel') }}</label>
             <input
               id="dueDate"
               v-model="formData.dueDate"
@@ -287,24 +308,30 @@
           </div>
 
           <div class="form-group">
-            <label for="status">Status</label>
+            <label for="status">{{ $t('finance.modal.statusLabel') }}</label>
             <select
               id="status"
               v-model="formData.status"
             >
-              <option value="NOT_STARTED">Não iniciado</option>
-              <option value="PENDING">Pendente</option>
-              <option value="PAID">Pago</option>
+              <option value="NOT_STARTED">
+                {{ $t('finance.status.notStarted') }}
+              </option>
+              <option value="PENDING">
+                {{ $t('finance.status.pending') }}
+              </option>
+              <option value="PAID">
+                {{ $t('finance.status.paid') }}
+              </option>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="note">Nota (opcional)</label>
+            <label for="note">{{ $t('finance.modal.noteLabel') }}</label>
             <textarea
               id="note"
               v-model="formData.note"
               rows="3"
-              placeholder="Adicione uma nota..."
+              :placeholder="$t('finance.modal.notePlaceholder')"
             />
           </div>
 
@@ -314,7 +341,7 @@
               class="btn-secondary"
               @click="closeModal"
             >
-              Cancelar
+              {{ $t('shared.cancel') }}
             </button>
             <button
               type="submit"
@@ -328,10 +355,10 @@
               />
               {{
                 isSaving
-                  ? "Salvando..."
+                  ? $t('shared.saving')
                   : editingEntry
-                    ? "Atualizar"
-                    : "Adicionar"
+                    ? $t('shared.update')
+                    : $t('shared.add')
               }}
             </button>
           </div>
@@ -343,6 +370,7 @@
 
 <script setup lang="ts">
 const toast = useToast();
+const { t } = useI18n();
 const { preferences } = usePreferences();
 
 const showAddModal = ref(false);
@@ -369,7 +397,7 @@ const entries = ref<any[]>([]);
 
 const filteredEntries = computed(() => {
   return entries.value
-    .filter((entry) => entry.archived === showArchived.value)
+    .filter(entry => entry.archived === showArchived.value)
     .sort((a, b) => {
       if (a.status === "PENDING" && b.status !== "PENDING") return -1;
       if (a.status !== "PENDING" && b.status === "PENDING") return 1;
@@ -382,18 +410,18 @@ const filteredEntries = computed(() => {
 const pendingCount = computed(
   () =>
     entries.value.filter(
-      (e) =>
+      e =>
         !e.archived && (e.status === "PENDING" || e.status === "NOT_STARTED"),
     ).length,
 );
 
 const paidCount = computed(
-  () => entries.value.filter((e) => !e.archived && e.status === "PAID").length,
+  () => entries.value.filter(e => !e.archived && e.status === "PAID").length,
 );
 
 const totalAmount = computed(() =>
   entries.value
-    .filter((e) => !e.archived && e.status !== "PAID")
+    .filter(e => !e.archived && e.status !== "PAID")
     .reduce((sum, e) => sum + e.amount, 0),
 );
 
@@ -445,7 +473,7 @@ const saveEntry = async () => {
       });
       if (response.success) {
         const index = entries.value.findIndex(
-          (e) => e.id === editingEntry.value.id,
+          e => e.id === editingEntry.value.id,
         );
         if (index !== -1) {
           entries.value[index] = response.data;
@@ -462,14 +490,14 @@ const saveEntry = async () => {
     }
     closeModal();
     toast.success({
-      title: editingEntry.value ? "Item atualizado" : "Item adicionado",
-      message: "Parabéns!",
+      title: editingEntry.value ? t("finance.toasts.updated") : t("finance.toasts.added"),
+      message: t("finance.toasts.congrats"),
     });
   } catch (error) {
     console.error("Error saving entry:", error);
     toast.error({
-      title: "Erro ao salvar item",
-      message: "Tente novamente mais tarde",
+      title: t("finance.toasts.saveError"),
+      message: t("shared.error"),
     });
   } finally {
     isSaving.value = false;
@@ -490,21 +518,21 @@ const markAsPaid = async (id: string) => {
       body,
     });
     if (response.success) {
-      const index = entries.value.findIndex((e) => e.id === id);
+      const index = entries.value.findIndex(e => e.id === id);
       if (index !== -1) {
         entries.value[index] = response.data;
       }
       toast.success(
         preferences.value.autoArchivePaid
-          ? "Pago e arquivado"
-          : "Marcado como pago",
+          ? t("finance.toasts.paidAndArchived")
+          : t("finance.toasts.markedPaid"),
       );
     }
   } catch (error) {
     console.error("Error marking as paid:", error);
     toast.error({
-      title: "Erro ao marcar como pago",
-      message: "Tente novamente mais tarde",
+      title: t("finance.toasts.paidError"),
+      message: t("shared.error"),
     });
   }
 };
@@ -516,17 +544,17 @@ const toggleArchive = async (id: string, currentArchived: boolean) => {
       body: { archived: !currentArchived },
     });
     if (response.success) {
-      const index = entries.value.findIndex((e) => e.id === id);
+      const index = entries.value.findIndex(e => e.id === id);
       if (index !== -1) {
         entries.value[index] = response.data;
       }
-      toast.success(currentArchived ? "Item restaurado" : "Item arquivado");
+      toast.success(currentArchived ? t("finance.toasts.restored") : t("finance.toasts.archived"));
     }
   } catch (error) {
     console.error("Error toggling archive:", error);
     toast.error({
-      title: "Erro ao arquivar item",
-      message: "Tente novamente mais tarde",
+      title: t("finance.toasts.archiveError"),
+      message: t("shared.error"),
     });
   }
 };
@@ -574,9 +602,9 @@ const formatDate = (date: string) => {
 
 const getStatusLabel = (status: string) => {
   const labels: Record<string, string> = {
-    NOT_STARTED: "Não iniciado",
-    PENDING: "Pendente",
-    PAID: "Pago",
+    NOT_STARTED: t("finance.status.notStarted"),
+    PENDING: t("finance.status.pending"),
+    PAID: t("finance.status.paid"),
   };
   return labels[status] || status;
 };

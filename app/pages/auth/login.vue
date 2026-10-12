@@ -1,7 +1,11 @@
 <template>
   <div class="auth-card">
-    <h2 class="auth-title">Bem-vindo de volta</h2>
-    <p class="auth-subtitle">Entre para continuar de onde parou</p>
+    <h2 class="auth-title">
+      {{ $t("auth.login.title") }}
+    </h2>
+    <p class="auth-subtitle">
+      {{ $t("auth.login.subtitle") }}
+    </p>
 
     <div
       v-if="errorMessage"
@@ -22,8 +26,9 @@
         <label
           for="email"
           class="form-label"
-          >Email</label
         >
+          {{ $t("auth.login.emailLabel") }}
+        </label>
         <div
           :class="[
             'input-wrapper',
@@ -39,7 +44,7 @@
             id="email"
             v-model="email"
             type="email"
-            placeholder="seu@email.com"
+            :placeholder="$t('auth.login.emailPlaceholder')"
             autocomplete="email"
             @focus="emailFocused = true"
             @blur="
@@ -51,16 +56,18 @@
         <span
           v-if="emailError"
           class="field-error"
-          >{{ emailError }}</span
         >
+          {{ emailError }}
+        </span>
       </div>
 
       <div class="form-group">
         <label
           for="password"
           class="form-label"
-          >Senha</label
         >
+          {{ $t("auth.login.passwordLabel") }}
+        </label>
         <div
           :class="[
             'input-wrapper',
@@ -76,7 +83,7 @@
             id="password"
             v-model="password"
             :type="showPassword ? 'text' : 'password'"
-            placeholder="••••••••"
+            :placeholder="$t('auth.login.passwordPlaceholder')"
             autocomplete="current-password"
             @focus="passwordFocused = true"
             @blur="
@@ -99,8 +106,9 @@
         <span
           v-if="passwordError"
           class="field-error"
-          >{{ passwordError }}</span
         >
+          {{ passwordError }}
+        </span>
       </div>
 
       <div class="form-row">
@@ -109,13 +117,13 @@
             v-model="rememberMe"
             type="checkbox"
           />
-          <span class="checkbox-text">Lembrar de mim</span>
+          <span class="checkbox-text">{{ $t("auth.login.rememberMe") }}</span>
         </label>
         <NuxtLink
           to="/auth/forgot-password"
           class="forgot-link"
         >
-          Esqueceu a senha?
+          {{ $t("auth.login.forgotPassword") }}
         </NuxtLink>
       </div>
 
@@ -130,11 +138,11 @@
           size="18"
           class="spinning"
         />
-        {{ submitting ? "Entrando..." : "Entrar" }}
+        {{ submitting ? $t("auth.login.signingIn") : $t("auth.login.signIn") }}
       </button>
 
       <div class="divider">
-        <span>ou</span>
+        <span>{{ $t("shared.or") }}</span>
       </div>
 
       <div class="google-btn-wrapper">
@@ -153,42 +161,43 @@
               size="18"
               class="spinning"
             />
-            <span>Entrando com Google...</span>
+            <span>{{ $t("auth.login.signingInGoogle") }}</span>
           </div>
         </ClientOnly>
       </div>
     </form>
 
     <p class="auth-footer">
-      Não tem uma conta?
+      {{ $t("auth.login.noAccount") }}
       <NuxtLink
         to="/auth/register"
         class="auth-link"
-        >Criar conta</NuxtLink
-      >
+      >{{ $t("auth.login.createAccount") }}</NuxtLink>
     </p>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useGoogleAuth } from "@/composables/useGoogleAuth";
+
 definePageMeta({ layout: "auth" });
 
+const { t } = useI18n();
 const { login, googleLogin } = useAuth();
-const { googleReady, googleButtonContainer, initializeGoogleButton } =
-  useGoogleAuth();
+const { googleReady, googleButtonContainer, initializeGoogleButton }
+  = useGoogleAuth();
 
 const ERROR_MESSAGES: Record<number, string> = {
-  400: "Dados inválidos. Verifique os dados e tente novamente.",
-  401: "Email ou senha incorretos.",
-  429: "Muitas tentativas. Aguarde 1 minuto e tente novamente.",
-  500: "Erro interno do servidor. Tente novamente.",
+  400: t("auth.login.invalidCredentials"),
+  401: t("auth.login.invalidCredentials"),
+  429: t("auth.login.tooManyAttempts"),
+  500: t("auth.login.serverError"),
 };
 
 const resolveError = (statusCode?: number, fallback?: string) =>
-  (statusCode !== undefined ? ERROR_MESSAGES[statusCode] : undefined) ??
-  fallback ??
-  "Erro ao processar. Tente novamente.";
+  (statusCode !== undefined ? ERROR_MESSAGES[statusCode] : undefined)
+  ?? fallback
+  ?? t("auth.login.invalidCredentials");
 
 const email = ref("");
 const showPassword = ref(false);
@@ -204,11 +213,11 @@ const passwordError = ref("");
 
 const validateEmail = () => {
   if (!email.value) {
-    emailError.value = "Email é obrigatório";
+    emailError.value = t("auth.login.emailRequired");
     return false;
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-    emailError.value = "Email inválido";
+    emailError.value = t("auth.login.emailInvalid");
     return false;
   }
   emailError.value = "";
@@ -217,7 +226,7 @@ const validateEmail = () => {
 
 const validatePassword = () => {
   if (!password.value) {
-    passwordError.value = "Senha é obrigatória";
+    passwordError.value = t("auth.login.passwordRequired");
     return false;
   }
   passwordError.value = "";
@@ -239,12 +248,15 @@ const handleLogin = async () => {
       errorMessage.value = resolveError(response.statusCode, response.error);
     }
   } catch {
-    errorMessage.value = "Erro de conexão. Tente novamente.";
+    errorMessage.value = t("auth.connectionError");
   } finally {
     submitting.value = false;
   }
 };
-const handleGoogleSuccess = async (e: { credential: string; claims: any }) => {
+const handleGoogleSuccess = async (e: {
+  credential: string;
+  claims: Record<string, unknown>;
+}) => {
   errorMessage.value = "";
   googleLoading.value = true;
   try {
@@ -255,7 +267,7 @@ const handleGoogleSuccess = async (e: { credential: string; claims: any }) => {
       errorMessage.value = resolveError(response.statusCode, response.error);
     }
   } catch {
-    errorMessage.value = "Erro de conexão. Tente novamente.";
+    errorMessage.value = t("auth.connectionError");
   } finally {
     googleLoading.value = false;
   }
@@ -264,7 +276,7 @@ const handleGoogleSuccess = async (e: { credential: string; claims: any }) => {
 const handleGoogleError = () => {
   errorMessage.value = resolveError(
     undefined,
-    "Erro ao autenticar com Google. Tente novamente.",
+    t("auth.googleAuthError"),
   );
 };
 

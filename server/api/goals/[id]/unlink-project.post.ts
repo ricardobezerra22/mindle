@@ -7,17 +7,17 @@ export default defineEventHandler(async (event) => {
     const { projectId } = body;
 
     if (!projectId) {
-      return sendError(event, "Project ID is required", 400);
+      return sendError(event, serverT(event, "server.projectIdIsRequired"), 400);
     }
 
     const project = await unlinkProjectFromGoal(projectId, userId);
     if (!project) {
-      return sendError(event, "Project not found", 404);
+      return sendError(event, serverT(event, "server.projectNotFound"), 404);
     }
 
     return sendSuccess(event, project);
   } catch (error) {
     console.error("Error unlinking project from goal:", error);
-    return sendError(event, "Failed to unlink project", 500);
+    return sendError(event, serverT(event, "server.failedToUnlinkProject"), 500);
   }
 });

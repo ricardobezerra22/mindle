@@ -6,17 +6,17 @@ export default defineEventHandler(async (event) => {
     const id = getRouterParam(event, "id");
 
     if (!id) {
-      return sendError(event, "ID is required", 400);
+      return sendError(event, serverT(event, "server.idIsRequired"), 400);
     }
 
     const deleted = await deleteGoal(id, userId);
     if (!deleted) {
-      return sendError(event, "Goal not found", 404);
+      return sendError(event, serverT(event, "server.goalNotFound"), 404);
     }
 
     return sendSuccess(event, { deleted: true });
   } catch (error) {
     console.error("Error deleting goal:", error);
-    return sendError(event, "Failed to delete goal", 500);
+    return sendError(event, serverT(event, "server.failedToDeleteGoal"), 500);
   }
 });

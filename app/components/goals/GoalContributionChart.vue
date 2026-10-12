@@ -4,8 +4,13 @@
     class="contribution-card"
   >
     <div class="contribution-header">
-      <Icon name="lucide:pie-chart" size="16" />
-      <h3 class="contribution-title">Contribuição dos projetos</h3>
+      <Icon
+        name="lucide:pie-chart"
+        size="16"
+      />
+      <h3 class="contribution-title">
+        {{ $t("goals.chart.title") }}
+      </h3>
     </div>
 
     <div class="segmented-bar">
@@ -30,7 +35,7 @@
         />
         <span class="legend-name">{{ seg.title }}</span>
         <span class="legend-pct">{{ seg.percent }}%</span>
-        <span class="legend-progress">{{ seg.progress }}% concluído</span>
+        <span class="legend-progress">{{ $t("goals.chart.completed", { pct: seg.progress }) }}</span>
       </div>
     </div>
   </div>

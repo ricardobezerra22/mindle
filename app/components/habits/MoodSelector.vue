@@ -1,6 +1,8 @@
 <template>
   <div class="mood-selector">
-    <h2 class="section-title">Como você está hoje?</h2>
+    <h2 class="section-title">
+      {{ $t('mood.question') }}
+    </h2>
     <div class="mood-options">
       <button
         v-for="option in moodOptions"
@@ -16,7 +18,7 @@
       v-if="modelValue"
       class="mood-feedback"
     >
-      Obrigado por compartilhar.
+      {{ $t('mood.thanks') }}
     </p>
   </div>
 </template>
@@ -34,14 +36,16 @@ const emit = defineEmits<{
   "update:modelValue": [value: Mood];
 }>();
 
-const moodOptions = [
-  { value: Mood.HAPPY, label: "Feliz", icon: "lucide:smile" },
-  { value: Mood.CALMLY, label: "Calmo", icon: "lucide:cloud-sun" },
-  { value: Mood.OK, label: "Ok", icon: "lucide:meh" },
-  { value: Mood.SAD, label: "Triste", icon: "lucide:cloud-rain" },
-  { value: Mood.TIRED, label: "Cansado", icon: "lucide:moon" },
-  { value: Mood.OVERWHELMED, label: "Sobrecarregado", icon: "lucide:zap" },
-];
+const { t } = useI18n();
+
+const moodOptions = computed(() => [
+  { value: Mood.HAPPY, label: t("mood.options.happy"), icon: "lucide:smile" },
+  { value: Mood.CALMLY, label: t("mood.options.calmly"), icon: "lucide:cloud-sun" },
+  { value: Mood.OK, label: t("mood.options.ok"), icon: "lucide:meh" },
+  { value: Mood.SAD, label: t("mood.options.sad"), icon: "lucide:cloud-rain" },
+  { value: Mood.TIRED, label: t("mood.options.tired"), icon: "lucide:moon" },
+  { value: Mood.OVERWHELMED, label: t("mood.options.overwhelmed"), icon: "lucide:zap" },
+]);
 </script>
 
 <style scoped>

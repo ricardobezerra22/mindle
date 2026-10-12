@@ -186,7 +186,7 @@ const getProjectMetrics = async (userId: string, _range: DateRange) => {
   const active = projects.filter(p => !p.archived);
   const archived = projects.filter(p => p.archived);
 
-  const projectProgress = projects.map(p => {
+  const projectProgress = projects.map((p) => {
     let totalTasks = 0;
     let doneTasks = 0;
     for (const topic of p.topics) {
@@ -232,7 +232,7 @@ const getProjectMetrics = async (userId: string, _range: DateRange) => {
   };
 };
 
-const getPlannerMetrics = async (userId: string, range: DateRange) => {
+const getPlannerMetrics = async (userId: string, range: DateRange, dayLabels: string[]) => {
   const entries = await prisma.plannerEntry.findMany({
     where: {
       userId,
@@ -256,7 +256,6 @@ const getPlannerMetrics = async (userId: string, range: DateRange) => {
     dayMap.set(day, existing);
   }
 
-  const dayLabels = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
   const byWeekday = dayLabels.map((label, i) => ({
     label,
     planned: dayMap.get(i)?.planned || 0,
@@ -283,7 +282,7 @@ const getHabitMetrics = async (userId: string, range: DateRange) => {
 
   const days = Math.max(1, Math.ceil((range.endDate.getTime() - range.startDate.getTime()) / 86400000));
 
-  const habitStats = habits.map(h => {
+  const habitStats = habits.map((h) => {
     const habitLogs = logs.filter(l => l.habitId === h.id);
     const consistency = Math.round((habitLogs.length / days) * 100);
 
@@ -453,14 +452,14 @@ const getMoodMetrics = async (userId: string, range: DateRange) => {
   };
 };
 
-export const getDashboardMetrics = async (userId: string, startDate: Date, endDate: Date) => {
+export const getDashboardMetrics = async (userId: string, startDate: Date, endDate: Date, dayLabels: string[]) => {
   const range: DateRange = { startDate, endDate };
 
   const [focus, tasks, projects, planner, habits, finance, mood] = await Promise.all([
     getFocusMetrics(userId, range),
     getTaskMetrics(userId, range),
     getProjectMetrics(userId, range),
-    getPlannerMetrics(userId, range),
+    getPlannerMetrics(userId, range, dayLabels),
     getHabitMetrics(userId, range),
     getFinanceMetrics(userId, range),
     getMoodMetrics(userId, range),

@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from "@tailwindcss/vite";
+
 export default defineNuxtConfig({
   modules: [
     "@nuxt/eslint",
@@ -8,6 +9,7 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "nuxt-google-auth",
     "@vue-email/nuxt",
+    "@nuxtjs/i18n",
   ],
 
   devtools: {
@@ -16,9 +18,6 @@ export default defineNuxtConfig({
     timeline: {
       enabled: true,
     },
-  },
-  vite: {
-    plugins: [tailwindcss()],
   },
   css: ["~/assets/css/main.css"],
 
@@ -34,6 +33,9 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: "2025-01-15",
+  vite: {
+    plugins: [tailwindcss()],
+  },
 
   eslint: {
     config: {
@@ -59,6 +61,16 @@ export default defineNuxtConfig({
     promptOneTap: true,
 
     enableServerVerify: true,
+  },
+
+  i18n: {
+    defaultLocale: "pt",
+    strategy: "no_prefix",
+    langDir: "locales/",
+    locales: [
+      { code: "pt", file: "pt.json", name: "Português" },
+      { code: "en", file: "en.json", name: "English" },
+    ],
   },
 
   pinia: {

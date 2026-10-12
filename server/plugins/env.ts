@@ -8,10 +8,10 @@ const REQUIRED = [
 const OPTIONAL = ["OPENROUTER_MODEL", "NUXT_RESEND_API_KEY"] as const;
 
 export default defineNitroPlugin(() => {
-  const missing = REQUIRED.filter((k) => !process.env[k]);
+  const missing = REQUIRED.filter(k => !process.env[k]);
 
   if (missing.length > 0) {
-    const list = missing.map((k) => `  - ${k}`).join("\n");
+    const list = missing.map(k => `  - ${k}`).join("\n");
     console.error(`[env] Missing required environment variables:\n${list}`);
   }
 

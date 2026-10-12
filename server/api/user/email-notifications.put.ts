@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
     const { enabled } = body;
 
     if (typeof enabled !== "boolean") {
-      return sendError(event, "Campo 'enabled' é obrigatório", 400);
+      return sendError(event, serverT(event, "server.enabledRequired"), 400);
     }
 
     const user = await prisma.user.update({
@@ -19,6 +19,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, user);
   } catch (error) {
     console.error("Error updating email notifications:", error);
-    return sendError(event, "Erro ao atualizar notificações", 500);
+    return sendError(event, serverT(event, "server.notificationsUpdateError"), 500);
   }
 });

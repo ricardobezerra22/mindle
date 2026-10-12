@@ -59,6 +59,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, prefs);
   } catch (error) {
     console.error("Error saving preferences:", error);
-    return sendError(event, "Erro ao salvar preferências", 500);
+    return sendError(event, serverT(event, "server.preferencesSaveError"), 500);
   }
 });

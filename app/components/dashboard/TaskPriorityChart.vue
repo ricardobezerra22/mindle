@@ -2,10 +2,17 @@
   <div class="chart-card">
     <div class="chart-header">
       <div class="chart-title-row">
-        <Icon name="lucide:list-checks" size="16" />
-        <h3 class="chart-title">Tarefas por Prioridade</h3>
+        <Icon
+          name="lucide:list-checks"
+          size="16"
+        />
+        <h3 class="chart-title">
+          {{ $t("dashboard.tasksByPriority") }}
+        </h3>
       </div>
-      <span class="chart-subtitle">Criadas vs concluídas</span>
+      <span class="chart-subtitle">{{
+        $t("dashboard.createdVsCompleted")
+      }}</span>
     </div>
     <div class="chart-body">
       <Bar
@@ -13,8 +20,11 @@
         :data="chartData"
         :options="chartOptions"
       />
-      <div v-else class="chart-empty">
-        <span>Sem tarefas no período</span>
+      <div
+        v-else
+        class="chart-empty"
+      >
+        <span>{{ $t("dashboard.noTasksData") }}</span>
       </div>
     </div>
   </div>
@@ -43,6 +53,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { t } = useI18n();
 
 const hasData = computed(() => {
   const p = props.byPriority;
@@ -50,18 +61,30 @@ const hasData = computed(() => {
 });
 
 const chartData = computed(() => ({
-  labels: ["Alta", "Média", "Baixa"],
+  labels: [
+    t("shared.priorities.high"),
+    t("shared.priorities.medium"),
+    t("shared.priorities.low"),
+  ],
   datasets: [
     {
-      label: "Total",
-      data: [props.byPriority.HIGH.total, props.byPriority.MEDIUM.total, props.byPriority.LOW.total],
+      label: t("dashboard.totalTasks"),
+      data: [
+        props.byPriority.HIGH.total,
+        props.byPriority.MEDIUM.total,
+        props.byPriority.LOW.total,
+      ],
       backgroundColor: ["#fca5a5", "#fcd34d", "#86efac"],
       borderRadius: 6,
       barPercentage: 0.6,
     },
     {
-      label: "Concluídas",
-      data: [props.byPriority.HIGH.done, props.byPriority.MEDIUM.done, props.byPriority.LOW.done],
+      label: t("dashboard.completedTasks"),
+      data: [
+        props.byPriority.HIGH.done,
+        props.byPriority.MEDIUM.done,
+        props.byPriority.LOW.done,
+      ],
       backgroundColor: ["#dc2626", "#f59e0b", "#10b981"],
       borderRadius: 6,
       barPercentage: 0.6,

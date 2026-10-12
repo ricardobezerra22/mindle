@@ -6,7 +6,7 @@
           Mindle
         </h1>
         <p class="brand-tagline">
-          Clareza, foco e calma.
+          {{ $t("auth.tagline") }}
         </p>
       </div>
       <slot />

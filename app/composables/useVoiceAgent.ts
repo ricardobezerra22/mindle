@@ -4,14 +4,14 @@ import type {
   NewCategory,
 } from "~/types/index";
 
-export type VoiceAgentState =
-  | "idle"
-  | "listening"
-  | "processing"
-  | "preview"
-  | "confirming"
-  | "done"
-  | "error";
+export type VoiceAgentState
+  = | "idle"
+    | "listening"
+    | "processing"
+    | "preview"
+    | "confirming"
+    | "done"
+    | "error";
 
 export type { PreviewTask };
 
@@ -43,6 +43,7 @@ interface SRErrorEvent {
 }
 
 export function useVoiceAgent() {
+  const { t } = useI18n();
   const toast = useToast();
   const state = ref<VoiceAgentState>("idle");
   const transcript = ref("");
@@ -57,8 +58,8 @@ export function useVoiceAgent() {
   function initRecognition(): SR | null {
     if (typeof window === "undefined") return null;
     const win = window as unknown as Record<string, new () => SR>;
-    const SpeechRecognition =
-      win["SpeechRecognition"] || win["webkitSpeechRecognition"];
+    const SpeechRecognition
+      = win["SpeechRecognition"] || win["webkitSpeechRecognition"];
     if (!SpeechRecognition) return null;
     const r = new SpeechRecognition();
     r.lang = "pt-BR";
@@ -80,13 +81,11 @@ export function useVoiceAgent() {
     r.onerror = (e: SRErrorEvent) => {
       if (e.error === "no-speech" || e.error === "aborted") return;
       if (e.error === "not-allowed" || e.error === "permission-denied") {
-        error.value = "Permissão do microfone negada. Use a entrada de texto.";
+        error.value = t("voice.micDenied");
       } else if (e.error === "network") {
-        error.value =
-          "Erro de rede no reconhecimento de voz. Use a entrada de texto.";
+        error.value = t("voice.networkError");
       } else {
-        error.value =
-          "Reconhecimento de voz indisponível. Use a entrada de texto.";
+        error.value = t("voice.unavailable");
       }
       state.value = "error";
     };
@@ -105,7 +104,7 @@ export function useVoiceAgent() {
     interimTranscript.value = "";
     recognition = initRecognition();
     if (!recognition) {
-      error.value = "Seu navegador não suporta reconhecimento de voz.";
+      error.value = t("voice.notSupported");
       state.value = "error";
       return;
     }

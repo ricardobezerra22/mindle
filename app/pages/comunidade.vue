@@ -3,12 +3,14 @@ definePageMeta({
   layout: false,
 });
 
+const { t } = useI18n();
+
 useHead({
-  title: "Comunidade - Mindle",
+  title: computed(() => t("community.metaTitle")),
   meta: [
     {
       name: "description",
-      content: "Conecte-se com outras pessoas que usam Mindle e compartilhe experiências.",
+      content: computed(() => t("community.metaDescription")),
     },
   ],
 });
@@ -17,42 +19,34 @@ useHead({
 <template>
   <div class="community-page">
     <div class="container py-12">
-      <h1 class="text-4xl font-bold mb-8">Comunidade Mindle</h1>
+      <h1 class="text-4xl font-bold mb-8">{{ $t("community.comunidadeMindle") }}</h1>
 
       <div class="community-content max-w-4xl">
         <div class="section mb-12">
-          <h2>Junte-se à Nossa Comunidade</h2>
+          <h2>{{ $t("community.junteSeANossa") }}</h2>
+          <p>{{ $t("community.aComunidadeMindleE") }}</p>
+        </div>
+
+        <div class="section mb-12">
+          <h2>{{ $t("community.discord") }}</h2>
+          <p>{{ $t("community.conecteSeComOutros") }}</p>
           <p>
-            A comunidade Mindle é um espaço seguro e acolhedor para pessoas neurodiversas compartilharem suas
-            experiências, dicas e apoio mútuo.
+            <a
+              href="https://discord.gg/mindle"
+              target="_blank"
+              class="btn-link"
+            >{{ $t("community.entrarNoDiscord") }}</a>
           </p>
         </div>
 
         <div class="section mb-12">
-          <h2>Discord</h2>
-          <p>
-            Conecte-se com outros usuários do Mindle em nosso servidor Discord. Compartilhe dicas, faça perguntas e
-            celebre suas vitórias juntos.
-          </p>
-          <p>
-            <a href="https://discord.gg/mindle" target="_blank" class="btn-link">Entrar no Discord</a>
-          </p>
-        </div>
-
-        <div class="section mb-12">
-          <h2>Fórum</h2>
-          <p>
-            Nosso fórum é um lugar para discussões mais profundas sobre produtividade, ADHD e bem-estar. Faça
-            perguntas, compartilhe recursos e aprenda com a comunidade.
-          </p>
+          <h2>{{ $t("community.forum") }}</h2>
+          <p>{{ $t("community.nossoForumEUm") }}</p>
         </div>
 
         <div class="section">
-          <h2>Eventos</h2>
-          <p>
-            Participamos regularmente de webinars, workshops e encontros da comunidade. Fique atento para as próximas
-            datas!
-          </p>
+          <h2>{{ $t("community.eventos") }}</h2>
+          <p>{{ $t("community.participamosRegularmenteDeWebinars") }}</p>
         </div>
       </div>
     </div>

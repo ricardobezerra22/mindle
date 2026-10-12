@@ -37,6 +37,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, projects);
   } catch (error) {
     console.error("Error fetching archived projects:", error);
-    return sendError(event, "Failed to fetch archived projects", 500);
+    return sendError(event, serverT(event, "server.failedToFetchArchivedProjects"), 500);
   }
 });

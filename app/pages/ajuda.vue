@@ -3,12 +3,14 @@ definePageMeta({
   layout: false,
 });
 
+const { t } = useI18n();
+
 useHead({
-  title: "Central de Ajuda - Mindle",
+  title: computed(() => t("help.metaTitle")),
   meta: [
     {
       name: "description",
-      content: "Encontre respostas para suas dúvidas sobre o Mindle.",
+      content: computed(() => t("help.metaDescription")),
     },
   ],
 });
@@ -17,55 +19,37 @@ useHead({
 <template>
   <div class="help-page">
     <div class="container py-12">
-      <h1 class="text-4xl font-bold mb-8">Central de Ajuda</h1>
+      <h1 class="text-4xl font-bold mb-8">{{ $t("help.centralDeAjuda") }}</h1>
 
       <div class="help-content max-w-4xl">
         <div class="faq-item mb-8">
-          <h2>Como faço para criar uma tarefa?</h2>
-          <p>
-            Clique no botão "Nova Tarefa" na página de tarefas. Preencha o título, descrição, prioridade e data de
-            vencimento. Você também pode adicionar subtarefas e categorias.
-          </p>
+          <h2>{{ $t("help.comoFacoParaCriar") }}</h2>
+          <p>{{ $t("help.cliqueNoBotaoNova") }}</p>
         </div>
 
         <div class="faq-item mb-8">
-          <h2>Como funciona o modo Foco?</h2>
-          <p>
-            O modo Foco bloqueia distrações e permite que você se concentre em uma única tarefa. Use o timer integrado
-            para sessões de Pomodoro e rastreie seu progresso.
-          </p>
+          <h2>{{ $t("help.comoFuncionaOModo") }}</h2>
+          <p>{{ $t("help.oModoFocoBloqueia") }}</p>
         </div>
 
         <div class="faq-item mb-8">
-          <h2>Como posso rastrear meus hábitos?</h2>
-          <p>
-            Na seção de Hábitos, crie novos hábitos que deseja desenvolver. Marque como concluído diariamente e veja
-            sua sequência crescer. O Mindle fornece feedback visual para motivá-lo.
-          </p>
+          <h2>{{ $t("help.comoPossoRastrearMeus") }}</h2>
+          <p>{{ $t("help.naSecaoDeHabitos") }}</p>
         </div>
 
         <div class="faq-item mb-8">
-          <h2>Como funciona o Planner?</h2>
-          <p>
-            O Planner permite que você visualize suas tarefas em um calendário. Você pode arrastar e soltar tarefas
-            para reorganizar sua semana e planejar com antecedência.
-          </p>
+          <h2>{{ $t("help.comoFuncionaOPlanner") }}</h2>
+          <p>{{ $t("help.oPlannerPermiteQue") }}</p>
         </div>
 
         <div class="faq-item mb-8">
-          <h2>Posso sincronizar com outros aplicativos?</h2>
-          <p>
-            Atualmente, o Mindle funciona como um sistema independente. Estamos trabalhando em integrações com outros
-            aplicativos populares.
-          </p>
+          <h2>{{ $t("help.possoSincronizarComOutros") }}</h2>
+          <p>{{ $t("help.atualmenteOMindleFunciona") }}</p>
         </div>
 
         <div class="faq-item">
-          <h2>Preciso de mais ajuda?</h2>
-          <p>
-            Entre em contato conosco em
-            <a href="mailto:support@mindle.space">support@mindle.space</a> ou visite nossa comunidade no Discord.
-          </p>
+          <h2>{{ $t("help.precisoDeMaisAjuda") }}</h2>
+          <p> {{ $t("help.entreEmContatoConosco") }} <a href="mailto:support@mindle.space">support@mindle.space</a> {{ $t("help.ouVisiteNossaComunidade") }} </p>
         </div>
       </div>
     </div>

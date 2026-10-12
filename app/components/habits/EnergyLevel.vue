@@ -1,6 +1,6 @@
 <template>
   <div class="energy-level">
-    <label class="energy-label">Nível de energia</label>
+    <label class="energy-label">{{ $t('energy.label') }}</label>
     <div class="energy-bar">
       <button
         v-for="level in levels"
@@ -27,11 +27,13 @@ const emit = defineEmits<{
   "update:modelValue": [value: EnergyLevel];
 }>();
 
-const levels = [
-  { value: EnergyLevel.LOW, label: "Baixa", class: "low" },
-  { value: EnergyLevel.MEDIUM, label: "Média", class: "medium" },
-  { value: EnergyLevel.HIGH, label: "Alta", class: "high" },
-];
+const { t } = useI18n();
+
+const levels = computed(() => [
+  { value: EnergyLevel.LOW, label: t("energy.levels.low"), class: "low" },
+  { value: EnergyLevel.MEDIUM, label: t("energy.levels.medium"), class: "medium" },
+  { value: EnergyLevel.HIGH, label: t("energy.levels.high"), class: "high" },
+]);
 
 const energyRank: Record<string, number> = {
   LOW: 1,

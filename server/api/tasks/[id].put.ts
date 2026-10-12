@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
 
     if (!id) {
-      return sendError(event, "Task ID is required", 400);
+      return sendError(event, serverT(event, "server.taskIdIsRequired"), 400);
     }
 
     const { title, description, status, priority, dueDate, color, categoryId, isFavorite, position } = body;
@@ -33,6 +33,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, task);
   } catch (error) {
     console.error("Error updating task:", error);
-    return sendError(event, "Failed to update task", 500);
+    return sendError(event, serverT(event, "server.failedToUpdateTask"), 500);
   }
 });

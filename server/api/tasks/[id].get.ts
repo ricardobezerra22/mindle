@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     const id = getRouterParam(event, "id");
 
     if (!id) {
-      return sendError(event, "Task ID is required", 400);
+      return sendError(event, serverT(event, "server.taskIdIsRequired"), 400);
     }
 
     const task = await prisma.task.findUnique({
@@ -16,12 +16,12 @@ export default defineEventHandler(async (event) => {
     });
 
     if (!task) {
-      return sendError(event, "Task not found", 404);
+      return sendError(event, serverT(event, "server.taskNotFound"), 404);
     }
 
     return sendSuccess(event, task);
   } catch (error) {
     console.error("Error fetching task:", error);
-    return sendError(event, "Failed to fetch task", 500);
+    return sendError(event, serverT(event, "server.failedToFetchTask"), 500);
   }
 });

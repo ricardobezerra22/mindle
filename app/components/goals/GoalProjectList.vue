@@ -2,15 +2,21 @@
   <div class="project-list">
     <div class="list-header">
       <h2 class="list-title">
-        <Icon name="lucide:folder" size="18" />
-        Projetos vinculados
+        <Icon
+          name="lucide:folder"
+          size="18"
+        />
+        {{ $t("goals.linkedProjects") }}
       </h2>
       <button
         class="link-btn"
         @click="emit('linkProject')"
       >
-        <Icon name="lucide:plus" size="16" />
-        Vincular projeto
+        <Icon
+          name="lucide:plus"
+          size="16"
+        />
+        {{ $t("goals.linkProject.title") }}
       </button>
     </div>
 
@@ -18,11 +24,20 @@
       v-if="projects.length === 0"
       class="empty-state"
     >
-      <Icon name="lucide:folder-open" size="32" />
-      <p>Nenhum projeto vinculado a esta meta.</p>
-      <button class="empty-btn" @click="emit('linkProject')">
-        <Icon name="lucide:plus" size="14" />
-        Vincular projeto
+      <Icon
+        name="lucide:folder-open"
+        size="32"
+      />
+      <p>{{ $t("goals.noLinkedProjects") }}</p>
+      <button
+        class="empty-btn"
+        @click="emit('linkProject')"
+      >
+        <Icon
+          name="lucide:plus"
+          size="14"
+        />
+        {{ $t("goals.linkProject.title") }}
       </button>
     </div>
 
@@ -44,14 +59,19 @@
               class="category-badge"
               :style="{ backgroundColor: `${project.category.color}18`, color: project.category.color }"
             >{{ project.category.name }}</span>
-            <h3 class="project-name">{{ project.title }}</h3>
+            <h3 class="project-name">
+              {{ project.title }}
+            </h3>
           </div>
           <button
             class="unlink-btn"
-            title="Desvincular"
+            :title="$t('goals.unlink')"
             @click.stop="emit('unlinkProject', project.id)"
           >
-            <Icon name="lucide:x" size="14" />
+            <Icon
+              name="lucide:x"
+              size="14"
+            />
           </button>
         </div>
 
@@ -63,10 +83,10 @@
 
         <div class="project-meta">
           <span class="contribution">
-            Contribuição: <strong>{{ getContribution(project) }}%</strong>
+            {{ $t("goals.contribution", { pct: getContribution(project) }) }}
           </span>
           <span class="task-count">
-            {{ getCompletedTasks(project) }}/{{ getTotalTasks(project) }} tarefas
+            {{ $t("goals.header.tasks", { done: getCompletedTasks(project), total: getTotalTasks(project) }) }}
           </span>
         </div>
 
@@ -75,8 +95,11 @@
             :to="`/projects?open=${project.id}`"
             class="view-link"
           >
-            Ver projeto
-            <Icon name="lucide:arrow-right" size="13" />
+            {{ $t("goals.viewProject") }}
+            <Icon
+              name="lucide:arrow-right"
+              size="13"
+            />
           </NuxtLink>
         </div>
       </div>

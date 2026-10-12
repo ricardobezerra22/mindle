@@ -3,12 +3,14 @@ definePageMeta({
   layout: "legal",
 });
 
+const { t } = useI18n();
+
 useHead({
-  title: "Política de Cookies - Mindle",
+  title: computed(() => t("cookies.metaTitle")),
   meta: [
     {
       name: "description",
-      content: "Saiba como usamos cookies e tecnologias similares.",
+      content: computed(() => t("cookies.metaDescription")),
     },
   ],
 });
@@ -16,41 +18,36 @@ useHead({
 
 <template>
   <div>
-    <h1>Política de Cookies</h1>
+    <h1>{{ $t("cookies.politicaDeCookies") }}</h1>
 
-    <h2>1. O que são Cookies?</h2>
-    <p>
-      Cookies são pequenos arquivos de texto armazenados no seu dispositivo que ajudam a melhorar sua experiência
-      no Mindle.
-    </p>
+    <h2>{{ $t("cookies.1OQueSao") }}</h2>
+    <p>{{ $t("cookies.cookiesSaoPequenosArquivos") }}</p>
 
-    <h2>2. Como Usamos Cookies</h2>
-    <p>Usamos cookies para:</p>
+    <h2>{{ $t("cookies.2ComoUsamosCookies") }}</h2>
+    <p>{{ $t("cookies.usamosCookiesPara") }}</p>
     <ul>
-      <li>Manter você conectado à sua conta</li>
-      <li>Lembrar suas preferências</li>
-      <li>Analisar como você usa o Mindle</li>
-      <li>Melhorar a funcionalidade do serviço</li>
+      <li>{{ $t("cookies.manterVoceConectadoA") }}</li>
+      <li>{{ $t("cookies.lembrarSuasPreferencias") }}</li>
+      <li>{{ $t("cookies.analisarComoVoceUsa") }}</li>
+      <li>{{ $t("cookies.melhorarAFuncionalidadeDo") }}</li>
     </ul>
 
-    <h2>3. Tipos de Cookies</h2>
+    <h2>{{ $t("cookies.3TiposDeCookies") }}</h2>
     <ul>
-      <li><strong>Cookies Essenciais:</strong> Necessários para o funcionamento do serviço</li>
-      <li><strong>Cookies de Análise:</strong> Ajudam-nos a entender como você usa o Mindle</li>
-      <li><strong>Cookies de Preferência:</strong> Lembram suas escolhas e configurações</li>
+      <li><strong>{{ $t("cookies.cookiesEssenciais") }}</strong> {{ $t("cookies.necessariosParaOFuncionamento") }}</li>
+      <li><strong>{{ $t("cookies.cookiesDeAnalise") }}</strong> {{ $t("cookies.ajudamNosAEntender") }}</li>
+      <li><strong>{{ $t("cookies.cookiesDePreferencia") }}</strong> {{ $t("cookies.lembramSuasEscolhasE") }}</li>
     </ul>
 
-    <h2>4. Controle de Cookies</h2>
-    <p>
-      Você pode controlar e/ou deletar cookies através das configurações do seu navegador. Para mais informações,
-      visite
-      <a href="https://www.allaboutcookies.org/" target="_blank">allaboutcookies.org</a>.
+    <h2>{{ $t("cookies.4ControleDeCookies") }}</h2>
+    <p> {{ $t("cookies.vocePodeControlarE") }} <a
+        href="https://www.allaboutcookies.org/"
+        target="_blank"
+      >allaboutcookies.org</a>.
     </p>
 
-    <h2>5. Contato</h2>
-    <p>
-      Se você tiver dúvidas sobre nossa Política de Cookies, entre em contato conosco em
-      <a href="mailto:privacy@mindle.space">privacy@mindle.space</a>.
+    <h2>{{ $t("cookies.5Contato") }}</h2>
+    <p> {{ $t("cookies.seVoceTiverDuvidas") }} <a href="mailto:privacy@mindle.space">privacy@mindle.space</a>.
     </p>
   </div>
 </template>

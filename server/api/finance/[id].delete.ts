@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     const id = getRouterParam(event, "id");
 
     if (!id) {
-      return sendError(event, "ID is required", 400);
+      return sendError(event, serverT(event, "server.idIsRequired"), 400);
     }
 
     await prisma.financeEntry.delete({
@@ -15,6 +15,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, { deleted: true });
   } catch (error) {
     console.error("Error deleting finance entry:", error);
-    return sendError(event, "Failed to delete finance entry", 500);
+    return sendError(event, serverT(event, "server.failedToDeleteFinanceEntry"), 500);
   }
 });

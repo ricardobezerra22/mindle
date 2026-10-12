@@ -3,10 +3,10 @@
     <div class="settings-container">
       <div class="settings-header">
         <h1 class="page-title">
-          Configurações
+          {{ $t('pages.settings') }}
         </h1>
         <p class="page-subtitle">
-          Personalize o Mindle ao seu ritmo.
+          {{ $t('settings.subtitle') }}
         </p>
       </div>
 
@@ -15,22 +15,31 @@
           :class="['settings-tab', { active: settingsTab === 'preferences' }]"
           @click="settingsTab = 'preferences'"
         >
-          <Icon name="lucide:sliders-horizontal" size="16" />
-          Preferências
+          <Icon
+            name="lucide:sliders-horizontal"
+            size="16"
+          />
+          {{ $t('settings.tabs.preferences') }}
         </button>
         <button
           :class="['settings-tab', { active: settingsTab === 'guidelines' }]"
           @click="settingsTab = 'guidelines'"
         >
-          <Icon name="lucide:book-open" size="16" />
-          Guia da plataforma
+          <Icon
+            name="lucide:book-open"
+            size="16"
+          />
+          {{ $t('settings.tabs.guide') }}
         </button>
         <button
           :class="['settings-tab', { active: settingsTab === 'assistance' }]"
           @click="settingsTab = 'assistance'"
         >
-          <Icon name="lucide:life-buoy" size="16" />
-          Assistência
+          <Icon
+            name="lucide:life-buoy"
+            size="16"
+          />
+          {{ $t('settings.tabs.support') }}
         </button>
       </div>
 
@@ -46,18 +55,18 @@
             />
             <div>
               <h2 class="section-title">
-                Foco
+                {{ $t('settings.focus.title') }}
               </h2>
               <p class="section-hint">
-                Sessões de concentração
+                {{ $t('settings.focus.subtitle') }}
               </p>
             </div>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">Duração padrão</span>
-              <span class="setting-description">Tempo de cada sessão</span>
+              <span class="setting-label">{{ $t('settings.focus.defaultDuration') }}</span>
+              <span class="setting-description">{{ $t('settings.focus.durationHint') }}</span>
             </div>
             <select
               v-model="preferences.focusDuration"
@@ -75,8 +84,8 @@
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">Pausa automática</span>
-              <span class="setting-description">Iniciar pausa ao terminar</span>
+              <span class="setting-label">{{ $t('settings.focus.autoPause') }}</span>
+              <span class="setting-description">{{ $t('settings.focus.autoPauseHint') }}</span>
             </div>
             <button
               :class="['toggle', { active: preferences.autoBreak }]"
@@ -88,8 +97,8 @@
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">Som ao concluir</span>
-              <span class="setting-description">Notificação sonora sutil</span>
+              <span class="setting-label">{{ $t('settings.focus.sound') }}</span>
+              <span class="setting-description">{{ $t('settings.focus.soundHint') }}</span>
             </div>
             <button
               :class="['toggle', { active: preferences.focusSound }]"
@@ -108,18 +117,18 @@
             />
             <div>
               <h2 class="section-title">
-                Planejamento
+                {{ $t('settings.planning.title') }}
               </h2>
               <p class="section-hint">
-                Organização da semana
+                {{ $t('settings.planning.subtitle') }}
               </p>
             </div>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">Início da semana</span>
-              <span class="setting-description">Qual dia começa</span>
+              <span class="setting-label">{{ $t('settings.planning.weekStart') }}</span>
+              <span class="setting-description">{{ $t('settings.planning.weekStartHint') }}</span>
             </div>
             <select
               v-model="preferences.weekStart"
@@ -137,8 +146,8 @@
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">Mostrar só hoje</span>
-              <span class="setting-description">Focar no dia atual</span>
+              <span class="setting-label">{{ $t('settings.planning.showTodayOnly') }}</span>
+              <span class="setting-description">{{ $t('settings.planning.showTodayOnlyHint') }}</span>
             </div>
             <button
               :class="['toggle', { active: preferences.showOnlyToday }]"
@@ -150,8 +159,8 @@
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">Mostrar concluídas</span>
-              <span class="setting-description">Exibir tarefas finalizadas</span>
+              <span class="setting-label">{{ $t('settings.planning.showCompleted') }}</span>
+              <span class="setting-description">{{ $t('settings.planning.showCompletedHint') }}</span>
             </div>
             <button
               :class="['toggle', { active: preferences.showCompleted }]"
@@ -170,18 +179,18 @@
             />
             <div>
               <h2 class="section-title">
-                Hábitos e bem-estar
+                {{ $t('settings.habitsWellbeing.title') }}
               </h2>
               <p class="section-hint">
-                Cuide de você, no seu ritmo
+                {{ $t('settings.habitsWellbeing.subtitle') }}
               </p>
             </div>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">Lembrete diário</span>
-              <span class="setting-description">Lembrar de fazer check-in</span>
+              <span class="setting-label">{{ $t('settings.habitsWellbeing.dailyReminder') }}</span>
+              <span class="setting-description">{{ $t('settings.habitsWellbeing.dailyReminderHint') }}</span>
             </div>
             <button
               :class="['toggle', { active: preferences.dailyReminder }]"
@@ -193,8 +202,8 @@
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">Mostrar insights</span>
-              <span class="setting-description">Estatísticas de hábitos</span>
+              <span class="setting-label">{{ $t('settings.habitsWellbeing.showInsights') }}</span>
+              <span class="setting-description">{{ $t('settings.habitsWellbeing.showInsightsHint') }}</span>
             </div>
             <button
               :class="['toggle', { active: preferences.showInsights }]"
@@ -213,24 +222,22 @@
             />
             <div>
               <h2 class="section-title">
-                Finanças
+                {{ $t('settings.finance.title') }}
               </h2>
               <p class="section-hint">
-                Controle sem pressão
+                {{ $t('settings.finance.subtitle') }}
               </p>
             </div>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">Lembrete no dashboard</span>
-              <span class="setting-description">Itens pendentes na tela inicial</span>
+              <span class="setting-label">{{ $t('settings.finance.dashboardReminder') }}</span>
+              <span class="setting-description">{{ $t('settings.finance.dashboardReminderHint') }}</span>
             </div>
             <button
               :class="['toggle', { active: preferences.financeReminder }]"
-              @click="
-                preferences.financeReminder = !preferences.financeReminder
-              "
+              @click="preferences.financeReminder = !preferences.financeReminder"
             >
               <span class="toggle-thumb" />
             </button>
@@ -238,14 +245,12 @@
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">Arquivar pagos</span>
-              <span class="setting-description">Mover pagos automaticamente</span>
+              <span class="setting-label">{{ $t('settings.finance.archivePaid') }}</span>
+              <span class="setting-description">{{ $t('settings.finance.archivePaidHint') }}</span>
             </div>
             <button
               :class="['toggle', { active: preferences.autoArchivePaid }]"
-              @click="
-                preferences.autoArchivePaid = !preferences.autoArchivePaid
-              "
+              @click="preferences.autoArchivePaid = !preferences.autoArchivePaid"
             >
               <span class="toggle-thumb" />
             </button>
@@ -260,18 +265,18 @@
             />
             <div>
               <h2 class="section-title">
-                Visual e conforto
+                {{ $t('settings.appearance.title') }}
               </h2>
               <p class="section-hint">
-                Aparência da interface
+                {{ $t('settings.appearance.subtitle') }}
               </p>
             </div>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">Tema</span>
-              <span class="setting-description">Modo de exibição</span>
+              <span class="setting-label">{{ $t('settings.appearance.theme') }}</span>
+              <span class="setting-description">{{ $t('settings.appearance.themeHint') }}</span>
             </div>
             <select
               v-model="preferences.theme"
@@ -289,8 +294,8 @@
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">Tamanho do texto</span>
-              <span class="setting-description">Ajuste para leitura</span>
+              <span class="setting-label">{{ $t('settings.appearance.fontSize') }}</span>
+              <span class="setting-description">{{ $t('settings.appearance.fontSizeHint') }}</span>
             </div>
             <select
               v-model="preferences.fontSize"
@@ -315,18 +320,18 @@
             />
             <div>
               <h2 class="section-title">
-                Notificações por email
+                {{ $t('settings.notifications.title') }}
               </h2>
               <p class="section-hint">
-                Controle o que chega na sua caixa
+                {{ $t('settings.notifications.subtitle') }}
               </p>
             </div>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">Resumo diário</span>
-              <span class="setting-description">Receber email às 7h com tarefas, metas e hábitos</span>
+              <span class="setting-label">{{ $t('settings.notifications.dailySummary') }}</span>
+              <span class="setting-description">{{ $t('settings.notifications.dailySummaryHint') }}</span>
             </div>
             <button
               :class="['toggle', { active: emailNotifications }]"
@@ -346,18 +351,18 @@
             />
             <div>
               <h2 class="section-title">
-                Dados e segurança
+                {{ $t('settings.data.title') }}
               </h2>
               <p class="section-hint">
-                Seus dados, seu controle
+                {{ $t('settings.data.subtitle') }}
               </p>
             </div>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">Exportar dados</span>
-              <span class="setting-description">Baixar tudo em JSON</span>
+              <span class="setting-label">{{ $t('settings.data.export') }}</span>
+              <span class="setting-description">{{ $t('settings.data.exportHint') }}</span>
             </div>
             <button
               class="action-btn"
@@ -369,14 +374,14 @@
                 size="16"
                 :class="{ spinning: exporting }"
               />
-              {{ exporting ? "Exportando..." : "Exportar" }}
+              {{ exporting ? $t('settings.data.exporting') : $t('settings.data.exportBtn') }}
             </button>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">Limpar cache local</span>
-              <span class="setting-description">Dados temporários do navegador</span>
+              <span class="setting-label">{{ $t('settings.data.clearCache') }}</span>
+              <span class="setting-description">{{ $t('settings.data.clearCacheHint') }}</span>
             </div>
             <button
               class="action-btn"
@@ -386,7 +391,7 @@
                 name="lucide:trash-2"
                 size="16"
               />
-              Limpar
+              {{ $t('settings.data.clearBtn') }}
             </button>
           </div>
         </section>
@@ -398,152 +403,56 @@
       >
         <div class="guide-hero">
           <div class="guide-hero-icon">
-            <Icon name="lucide:sparkles" size="28" />
+            <Icon
+              name="lucide:sparkles"
+              size="28"
+            />
           </div>
-          <h2 class="guide-hero-title">Bem-vindo ao Mindle</h2>
+          <h2 class="guide-hero-title">
+            {{ $t('settings.guide.welcome') }}
+          </h2>
           <p class="guide-hero-text">
-            Um espaço calmo e intuitivo para organizar sua vida.
-            Projetado para quem tem TDAH ou simplesmente quer clareza sem complexidade.
+            {{ $t('settings.guide.welcomeDesc') }}
           </p>
         </div>
 
         <div class="guide-grid">
-          <div class="guide-card">
-            <div class="guide-card-icon" style="background: #d1fae5; color: #059669">
-              <Icon name="lucide:check-square" size="22" />
+          <div
+            v-for="feat in guideFeatures"
+            :key="feat.key"
+            class="guide-card"
+          >
+            <div
+              class="guide-card-icon"
+              :style="{ background: feat.bg, color: feat.color }"
+            >
+              <Icon
+                :name="feat.icon"
+                size="22"
+              />
             </div>
-            <h3 class="guide-card-title">Tarefas</h3>
+            <h3 class="guide-card-title">
+              {{ $t(`settings.guide.features.${feat.key}.title`) }}
+            </h3>
             <p class="guide-card-text">
-              Organize com prioridades, categorias e datas. Visualize em kanban ou por categorias.
-              Arraste entre colunas, marque favoritas e acompanhe subtarefas.
+              {{ $t(`settings.guide.features.${feat.key}.desc`) }}
             </p>
             <div class="guide-card-tips">
-              <span class="guide-tip">Kanban visual</span>
-              <span class="guide-tip">Prioridades</span>
-              <span class="guide-tip">Subtarefas</span>
-            </div>
-          </div>
-
-          <div class="guide-card">
-            <div class="guide-card-icon" style="background: #e0e7ff; color: #4f46e5">
-              <Icon name="lucide:target" size="22" />
-            </div>
-            <h3 class="guide-card-title">Foco</h3>
-            <p class="guide-card-text">
-              Sessões de concentração com timer configurável. Vincule a uma tarefa
-              e acompanhe quanto tempo dedicou. Som ao concluir e pausa automática.
-            </p>
-            <div class="guide-card-tips">
-              <span class="guide-tip">Timer</span>
-              <span class="guide-tip">Vincula tarefas</span>
-              <span class="guide-tip">Estatísticas</span>
-            </div>
-          </div>
-
-          <div class="guide-card">
-            <div class="guide-card-icon" style="background: #fce7f3; color: #db2777">
-              <Icon name="lucide:heart" size="22" />
-            </div>
-            <h3 class="guide-card-title">Hábitos</h3>
-            <p class="guide-card-text">
-              Crie hábitos com meta semanal e acompanhe streaks.
-              Registre humor e energia diariamente. Exercícios de respiração integrados.
-            </p>
-            <div class="guide-card-tips">
-              <span class="guide-tip">Streaks</span>
-              <span class="guide-tip">Humor diário</span>
-              <span class="guide-tip">Respiração</span>
-            </div>
-          </div>
-
-          <div class="guide-card">
-            <div class="guide-card-icon" style="background: #fef3c7; color: #d97706">
-              <Icon name="lucide:calendar-days" size="22" />
-            </div>
-            <h3 class="guide-card-title">Planner</h3>
-            <p class="guide-card-text">
-              Planeje sua semana ou mês arrastando tarefas para os dias.
-              Visualize o que já foi feito e o que está pendente por período.
-            </p>
-            <div class="guide-card-tips">
-              <span class="guide-tip">Semana e mês</span>
-              <span class="guide-tip">Drag & drop</span>
-              <span class="guide-tip">Visual limpo</span>
-            </div>
-          </div>
-
-          <div class="guide-card">
-            <div class="guide-card-icon" style="background: #dbeafe; color: #2563eb">
-              <Icon name="lucide:folder-kanban" size="22" />
-            </div>
-            <h3 class="guide-card-title">Projetos</h3>
-            <p class="guide-card-text">
-              Estruture projetos com tópicos, subtópicos e tarefas em cada nível.
-              Defina prazos, acompanhe progresso e arquive quando concluir.
-            </p>
-            <div class="guide-card-tips">
-              <span class="guide-tip">Hierarquia</span>
-              <span class="guide-tip">Progresso %</span>
-              <span class="guide-tip">Arquivo</span>
-            </div>
-          </div>
-
-          <div class="guide-card">
-            <div class="guide-card-icon" style="background: #f3e8ff; color: #7c3aed">
-              <Icon name="lucide:trophy" size="22" />
-            </div>
-            <h3 class="guide-card-title">Metas</h3>
-            <p class="guide-card-text">
-              Defina metas de longo prazo e vincule projetos a elas.
-              Veja o progresso geral e mantenha a direção clara.
-            </p>
-            <div class="guide-card-tips">
-              <span class="guide-tip">Vincula projetos</span>
-              <span class="guide-tip">Progresso</span>
-              <span class="guide-tip">Deadlines</span>
-            </div>
-          </div>
-
-          <div class="guide-card">
-            <div class="guide-card-icon" style="background: #ccfbf1; color: #0d9488">
-              <Icon name="lucide:wallet" size="22" />
-            </div>
-            <h3 class="guide-card-title">Finanças</h3>
-            <p class="guide-card-text">
-              Registre pagamentos com categorias e datas de vencimento.
-              Acompanhe pendentes, pagos e vencidos sem complicação.
-            </p>
-            <div class="guide-card-tips">
-              <span class="guide-tip">Categorias</span>
-              <span class="guide-tip">Status</span>
-              <span class="guide-tip">Vencimentos</span>
-            </div>
-          </div>
-
-          <div class="guide-card">
-            <div class="guide-card-icon" style="background: #fee2e2; color: #dc2626">
-              <Icon name="lucide:bar-chart-3" size="22" />
-            </div>
-            <h3 class="guide-card-title">Métricas</h3>
-            <p class="guide-card-text">
-              Dashboard completo com KPIs, gráficos e insights automáticos.
-              Humor, energia, hábitos, foco, tarefas e finanças — tudo num só lugar.
-            </p>
-            <div class="guide-card-tips">
-              <span class="guide-tip">KPIs</span>
-              <span class="guide-tip">Gráficos</span>
-              <span class="guide-tip">Insights IA</span>
+              <span
+                v-for="tag in (tm(`settings.guide.features.${feat.key}.tags`) as string[])"
+                :key="tag"
+                class="guide-tip"
+              >{{ tag }}</span>
             </div>
           </div>
         </div>
 
         <div class="guide-philosophy">
-          <Icon name="lucide:leaf" size="20" />
-          <p>
-            O Mindle foi criado para quem busca <strong>clareza, não mais complexidade</strong>.
-            Cada funcionalidade é pensada para ser leve, acessível e gentil com o seu ritmo.
-            Sem pressa, sem pressão — apenas o que importa.
-          </p>
+          <Icon
+            name="lucide:leaf"
+            size="20"
+          />
+          <p>{{ $t('settings.guide.philosophy') }}</p>
         </div>
       </div>
 
@@ -559,10 +468,10 @@
             />
             <div>
               <h2 class="section-title">
-                Suporte e Feedback
+                {{ $t('settings.support.title') }}
               </h2>
               <p class="section-hint">
-                Envie para suporte@mindle.space
+                {{ $t('settings.support.emailHint') }}
               </p>
             </div>
           </div>
@@ -575,28 +484,28 @@
               <label
                 for="feedback-subject"
                 class="feedback-label"
-              >Assunto</label>
+              >{{ $t('settings.support.subjectLabel') }}</label>
               <input
                 id="feedback-subject"
                 v-model="feedbackSubject"
                 type="text"
                 class="feedback-input"
-                placeholder="Qual o tema?"
+                :placeholder="$t('settings.support.subjectPlaceholder')"
                 required
-              >
+              />
             </div>
 
             <div class="feedback-field">
               <label
                 for="feedback-message"
                 class="feedback-label"
-              >Mensagem</label>
+              >{{ $t('settings.support.messageLabel') }}</label>
               <textarea
                 id="feedback-message"
                 v-model="feedbackMessage"
                 class="feedback-textarea"
                 rows="4"
-                placeholder="Descreva sua dúvida, sugestão ou problema..."
+                :placeholder="$t('settings.support.messagePlaceholder')"
                 required
               />
             </div>
@@ -610,7 +519,7 @@
                 size="16"
                 :class="{ spinning: sendingFeedback }"
               />
-              {{ sendingFeedback ? "Enviando..." : "Enviar Feedback" }}
+              {{ sendingFeedback ? $t('settings.support.sendingBtn') : $t('settings.support.sendBtn') }}
             </UiButton>
           </form>
         </section>
@@ -622,27 +531,27 @@
               size="20"
             />
             <div>
-              <h2 class="section-title">Perguntas frequentes</h2>
-              <p class="section-hint">Dúvidas comuns sobre o Mindle</p>
+              <h2 class="section-title">
+                {{ $t('settings.faq.title') }}
+              </h2>
+              <p class="section-hint">
+                {{ $t('settings.faq.subtitle') }}
+              </p>
             </div>
           </div>
 
           <div class="faq-list">
-            <details class="faq-item">
-              <summary class="faq-question">Meus dados são salvos automaticamente?</summary>
-              <p class="faq-answer">Sim! Todas as suas alterações em preferências, tarefas, hábitos e projetos são salvas automaticamente na nuvem.</p>
-            </details>
-            <details class="faq-item">
-              <summary class="faq-question">Posso exportar meus dados?</summary>
-              <p class="faq-answer">Sim, vá em Preferências → Dados e segurança → Exportar dados. Você receberá um arquivo JSON com tudo.</p>
-            </details>
-            <details class="faq-item">
-              <summary class="faq-question">O Mindle é gratuito?</summary>
-              <p class="faq-answer">Sim, o Mindle é 100% gratuito. Foi criado como um projeto de estudo e paixão por produtividade acessível.</p>
-            </details>
-            <details class="faq-item">
-              <summary class="faq-question">Posso usar no celular?</summary>
-              <p class="faq-answer">Sim! A interface é totalmente responsiva e funciona bem em qualquer dispositivo.</p>
+            <details
+              v-for="(item, i) in faqItems"
+              :key="i"
+              class="faq-item"
+            >
+              <summary class="faq-question">
+                {{ item.q }}
+              </summary>
+              <p class="faq-answer">
+                {{ item.a }}
+              </p>
             </details>
           </div>
         </section>
@@ -655,8 +564,7 @@
             v1.0.0
           </p>
           <p class="app-philosophy">
-            Um espaço calmo para organizar o que importa. Sem pressa, sem pressão.
-            Feito para quem quer clareza, não mais complexidade.
+            {{ $t('settings.about.desc') }}
           </p>
         </section>
       </div>
@@ -665,6 +573,7 @@
 </template>
 
 <script setup lang="ts">
+const { t, tm } = useI18n();
 const { preferences, fetchPreferences, debouncedSave } = usePreferences();
 const { user } = useAuth();
 const toast = useToast();
@@ -676,30 +585,43 @@ const feedbackSubject = ref("");
 const feedbackMessage = ref("");
 const sendingFeedback = ref(false);
 
-const focusDurationOptions = [
-  { label: "15 minutos", value: "15" },
-  { label: "30 minutos", value: "30" },
-  { label: "45 minutos", value: "45" },
-  { label: "60 minutos", value: "60" },
-  { label: "90 minutos", value: "90" },
+const focusDurationOptions = computed(() => [
+  { label: t("settings.focusDurations.15"), value: "15" },
+  { label: t("settings.focusDurations.30"), value: "30" },
+  { label: t("settings.focusDurations.45"), value: "45" },
+  { label: t("settings.focusDurations.60"), value: "60" },
+  { label: t("settings.focusDurations.90"), value: "90" },
+]);
+
+const weekStartOptions = computed(() => [
+  { label: t("settings.weekDays.monday"), value: "monday" },
+  { label: t("settings.weekDays.sunday"), value: "sunday" },
+]);
+
+const themeOptions = computed(() => [
+  { label: t("settings.appearance.themes.light"), value: "light" },
+  { label: t("settings.appearance.themes.dark"), value: "dark" },
+  { label: t("settings.appearance.themes.system"), value: "system" },
+]);
+
+const fontSizeOptions = computed(() => [
+  { label: t("settings.appearance.fontSizes.small"), value: "small" },
+  { label: t("settings.appearance.fontSizes.normal"), value: "normal" },
+  { label: t("settings.appearance.fontSizes.large"), value: "large" },
+]);
+
+const guideFeatures = [
+  { key: "tasks", icon: "lucide:check-square", bg: "#d1fae5", color: "#059669" },
+  { key: "focus", icon: "lucide:target", bg: "#e0e7ff", color: "#4f46e5" },
+  { key: "habits", icon: "lucide:heart", bg: "#fce7f3", color: "#db2777" },
+  { key: "planner", icon: "lucide:calendar-days", bg: "#fef3c7", color: "#d97706" },
+  { key: "projects", icon: "lucide:folder-kanban", bg: "#dbeafe", color: "#2563eb" },
+  { key: "goals", icon: "lucide:trophy", bg: "#f3e8ff", color: "#7c3aed" },
+  { key: "finance", icon: "lucide:wallet", bg: "#ccfbf1", color: "#0d9488" },
+  { key: "metrics", icon: "lucide:bar-chart-3", bg: "#fee2e2", color: "#dc2626" },
 ];
 
-const weekStartOptions = [
-  { label: "Segunda-feira", value: "monday" },
-  { label: "Domingo", value: "sunday" },
-];
-
-const themeOptions = [
-  { label: "Claro", value: "light" },
-  { label: "Escuro", value: "dark" },
-  { label: "Sistema", value: "system" },
-];
-
-const fontSizeOptions = [
-  { label: "Pequeno", value: "small" },
-  { label: "Normal", value: "normal" },
-  { label: "Grande", value: "large" },
-];
+const faqItems = computed(() => tm("settings.faq.items") as { q: string; a: string }[]);
 
 watch(
   preferences,
@@ -737,16 +659,10 @@ const exportData = async () => {
     a.download = `mindle-export-${new Date().toISOString().split("T")[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success({
-      title: "Dados exportados",
-      message: "Continue assim!",
-    });
+    toast.success({ title: t("settings.toasts.exported") });
   } catch (error) {
     console.error("Error exporting data:", error);
-    toast.error({
-      title: "Erro ao exportar dados",
-      message: "Tente novamente mais tarde",
-    });
+    toast.error({ title: t("settings.toasts.exportError") });
   } finally {
     exporting.value = false;
   }
@@ -754,10 +670,7 @@ const exportData = async () => {
 
 const clearCache = () => {
   localStorage.clear();
-  toast.info({
-    title: "Cache limpo",
-    message: "Continue assim!",
-  });
+  toast.info({ title: t("settings.toasts.cacheCleared") });
 };
 
 const sendFeedback = async () => {
@@ -773,12 +686,12 @@ const sendFeedback = async () => {
       },
     });
     if (response.success) {
-      toast.success({ title: "Feedback enviado", message: "Obrigado por ajudar a melhorar o Mindle!" });
+      toast.success({ title: t("settings.toasts.feedbackSent"), message: t("settings.toasts.feedbackThanks") });
       feedbackSubject.value = "";
       feedbackMessage.value = "";
     }
   } catch {
-    toast.error({ title: "Erro ao enviar feedback", message: "Tente novamente mais tarde" });
+    toast.error({ title: t("settings.toasts.feedbackError") });
   } finally {
     sendingFeedback.value = false;
   }
@@ -794,10 +707,10 @@ const toggleEmailNotifications = async () => {
     });
     if (response.success) {
       emailNotifications.value = newValue;
-      toast.success({ title: newValue ? "Notificações ativadas" : "Notificações desativadas" });
+      toast.success({ title: newValue ? t("settings.toasts.notifEnabled") : t("settings.toasts.notifDisabled") });
     }
   } catch {
-    toast.error({ title: "Erro ao atualizar notificações" });
+    toast.error({ title: t("settings.toasts.notifError") });
   } finally {
     emailLoading.value = false;
   }

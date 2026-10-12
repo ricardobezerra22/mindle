@@ -6,13 +6,13 @@ export default defineEventHandler(async (event) => {
     const id = getRouterParam(event, "id");
     const body = await readBody(event);
 
-    if (!id) return sendError(event, "Project ID is required", 400);
+    if (!id) return sendError(event, serverT(event, "server.projectIdIsRequired"), 400);
 
     const existing = await prisma.project.findFirst({
       where: { id, userId },
     });
 
-    if (!existing) return sendError(event, "Project not found", 404);
+    if (!existing) return sendError(event, serverT(event, "server.projectNotFound"), 404);
 
     const { title, description, categoryId, archived, position, dueDate } = body;
 
@@ -51,6 +51,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, project);
   } catch (error) {
     console.error("Error updating project:", error);
-    return sendError(event, "Failed to update project", 500);
+    return sendError(event, serverT(event, "server.failedToUpdateProject"), 500);
   }
 });

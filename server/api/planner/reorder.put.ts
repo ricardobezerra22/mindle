@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     const { items } = body;
 
     if (!Array.isArray(items)) {
-      return sendError(event, "Items array is required", 400);
+      return sendError(event, serverT(event, "server.itemsArrayIsRequired"), 400);
     }
 
     const updates = items.map((item: { id: string; position: number }) =>
@@ -21,6 +21,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, { updated: items.length });
   } catch (error) {
     console.error("Error reordering planner entries:", error);
-    return sendError(event, "Failed to reorder planner entries", 500);
+    return sendError(event, serverT(event, "server.failedToReorderPlannerEntries"), 500);
   }
 });

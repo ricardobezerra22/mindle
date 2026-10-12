@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     const { focusContext, durationMinutes, elapsedMinutes, taskId } = body;
 
     if (!durationMinutes || !elapsedMinutes) {
-      return sendError(event, "Missing required fields", 400);
+      return sendError(event, serverT(event, "server.missingRequiredFields"), 400);
     }
 
     const elapsed = parseInt(elapsedMinutes);
@@ -38,6 +38,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, focusSession);
   } catch (error) {
     console.error("Error creating focus session:", error);
-    return sendError(event, "Failed to create focus session", 500);
+    return sendError(event, serverT(event, "server.failedToCreateFocusSession"), 500);
   }
 });

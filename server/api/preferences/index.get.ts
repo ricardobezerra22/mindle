@@ -17,6 +17,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, prefs);
   } catch (error) {
     console.error("Error fetching preferences:", error);
-    return sendError(event, "Erro ao buscar preferências", 500);
+    return sendError(event, serverT(event, "server.preferencesFetchError"), 500);
   }
 });

@@ -34,17 +34,23 @@
         <div class="subtopic-actions">
           <button
             class="action-btn"
-            title="Adicionar tarefa"
+            :title="$t('projects.subtopic.addTask')"
             @click.stop="showAddTask = true"
           >
-            <Icon name="lucide:plus" size="14" />
+            <Icon
+              name="lucide:plus"
+              size="14"
+            />
           </button>
           <button
             class="action-btn danger"
-            title="Excluir subtópico"
+            :title="$t('projects.subtopic.delete')"
             @click.stop="$emit('delete', subtopic.id)"
           >
-            <Icon name="lucide:trash-2" size="14" />
+            <Icon
+              name="lucide:trash-2"
+              size="14"
+            />
           </button>
         </div>
       </div>
@@ -74,7 +80,7 @@
           ref="newTaskInput"
           v-model="newTaskTitle"
           class="add-task-input"
-          placeholder="Nova tarefa..."
+          :placeholder="$t('projects.card.newTaskPlaceholder')"
           @keydown.enter="addTask"
           @keydown.escape="cancelAddTask"
           @blur="addTask"
@@ -86,8 +92,11 @@
         class="add-task-btn"
         @click="showAddTask = true"
       >
-        <Icon name="lucide:plus" size="14" />
-        Tarefa
+        <Icon
+          name="lucide:plus"
+          size="14"
+        />
+        {{ $t("projects.card.task") }}
       </button>
     </div>
   </ProjectsExpandableSection>
@@ -121,7 +130,7 @@ const newTaskInput = ref<HTMLInputElement | null>(null);
 
 const taskCount = computed(() => props.subtopic.tasks?.length ?? 0);
 const doneCount = computed(
-  () => props.subtopic.tasks?.filter((t) => t.done).length ?? 0,
+  () => props.subtopic.tasks?.filter(t => t.done).length ?? 0,
 );
 
 const startEdit = () => {

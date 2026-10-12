@@ -12,6 +12,7 @@ interface APIResponse<T> {
 }
 
 export const useTasks = () => {
+  const { $i18n } = useNuxtApp();
   const tasks = ref<Task[]>([]);
   const categories = ref<TaskCategory[]>([]);
   const loading = ref(false);
@@ -26,7 +27,7 @@ export const useTasks = () => {
         tasks.value = response.data;
       }
     } catch (e) {
-      error.value = "Failed to fetch tasks";
+      error.value = $i18n.t("errors.c_fetchTasks");
       console.error(e);
     } finally {
       loading.value = false;
@@ -56,14 +57,14 @@ export const useTasks = () => {
         },
       );
       if (response.success) {
-        const exists = categories.value.find((c) => c.id === response.data.id);
+        const exists = categories.value.find(c => c.id === response.data.id);
         if (!exists) {
           categories.value.push(response.data);
         }
         return response.data;
       }
     } catch (e: any) {
-      const message = e?.data?.error || "Erro ao criar categoria";
+      const message = e?.data?.error || $i18n.t("taskForm.toasts.categoryError");
       throw new Error(message);
     }
   };
@@ -90,7 +91,7 @@ export const useTasks = () => {
         return response.data;
       }
     } catch (e) {
-      error.value = "Failed to create task";
+      error.value = $i18n.t("errors.c_createTask");
       console.error(e);
     } finally {
       loading.value = false;
@@ -99,7 +100,7 @@ export const useTasks = () => {
 
   const updateTask = async (id: string, updates: Partial<Task>) => {
     error.value = null;
-    const index = tasks.value.findIndex((t) => t.id === id);
+    const index = tasks.value.findIndex(t => t.id === id);
     if (index === -1) return;
 
     const previousTask = { ...tasks.value[index] };
@@ -119,11 +120,11 @@ export const useTasks = () => {
         return response.data;
       } else {
         tasks.value[index] = previousTask;
-        error.value = "Failed to update task";
+        error.value = $i18n.t("errors.c_updateTask");
       }
     } catch (e) {
       tasks.value[index] = previousTask;
-      error.value = "Failed to update task";
+      error.value = $i18n.t("errors.c_updateTask");
       console.error(e);
       throw e;
     }
@@ -131,17 +132,17 @@ export const useTasks = () => {
 
   const deleteTask = async (id: string) => {
     error.value = null;
-    const taskIndex = tasks.value.findIndex((t) => t.id === id);
+    const taskIndex = tasks.value.findIndex(t => t.id === id);
     if (taskIndex === -1) return;
 
     const deletedTask = tasks.value[taskIndex];
-    tasks.value = tasks.value.filter((t) => t.id !== id);
+    tasks.value = tasks.value.filter(t => t.id !== id);
 
     try {
       await $fetch(`/api/tasks/${id}`, { method: "DELETE" });
     } catch (e) {
       tasks.value.splice(taskIndex, 0, deletedTask);
-      error.value = "Failed to delete task";
+      error.value = $i18n.t("errors.c_deleteTask");
       console.error(e);
       throw e;
     }
@@ -152,7 +153,7 @@ export const useTasks = () => {
   };
 
   const toggleFavorite = async (id: string) => {
-    const task = tasks.value.find((t) => t.id === id);
+    const task = tasks.value.find(t => t.id === id);
     if (!task) return;
     return updateTask(id, { isFavorite: !task.isFavorite });
   };
@@ -164,7 +165,7 @@ export const useTasks = () => {
         body: { title, taskId },
       });
       if (response.success) {
-        const task = tasks.value.find((t) => t.id === taskId);
+        const task = tasks.value.find(t => t.id === taskId);
         if (task) {
           if (!task.subTasks) task.subTasks = [];
           task.subTasks.push(response.data);
@@ -187,7 +188,7 @@ export const useTasks = () => {
       );
       if (response.success) {
         for (const task of tasks.value) {
-          const st = task.subTasks?.find((s) => s.id === subTaskId);
+          const st = task.subTasks?.find(s => s.id === subTaskId);
           if (st) {
             st.done = done;
             break;

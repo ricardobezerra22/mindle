@@ -45,6 +45,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, projects);
   } catch (error) {
     console.error("Error fetching projects:", error);
-    return sendError(event, "Failed to fetch projects", 500);
+    return sendError(event, serverT(event, "server.failedToFetchProjects"), 500);
   }
 });

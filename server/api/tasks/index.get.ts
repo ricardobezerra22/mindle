@@ -56,6 +56,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, tasks);
   } catch (error) {
     console.error("Error fetching tasks:", error);
-    return sendError(event, "Failed to fetch tasks", 500);
+    return sendError(event, serverT(event, "server.failedToFetchTasks"), 500);
   }
 });

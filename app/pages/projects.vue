@@ -7,14 +7,20 @@
             :class="['tab-btn', { active: activeTab === 'active' }]"
             @click="activeTab = 'active'"
           >
-            Ativos
+            {{ $t("projects.tabs.active") }}
           </button>
           <button
             :class="['tab-btn', { active: activeTab === 'archived' }]"
-            @click="activeTab = 'archived'; fetchArchivedProjects()"
+            @click="
+              activeTab = 'archived';
+              fetchArchivedProjects();
+            "
           >
-            <Icon name="lucide:archive" size="14" />
-            Arquivados
+            <Icon
+              name="lucide:archive"
+              size="14"
+            />
+            {{ $t("projects.tabs.archived") }}
             <span
               v-if="archivedProjects.length > 0"
               class="tab-badge"
@@ -32,7 +38,11 @@
               :name="allExpanded ? 'lucide:minimize-2' : 'lucide:maximize-2'"
               size="16"
             />
-            {{ allExpanded ? 'Recolher tudo' : 'Expandir tudo' }}
+            {{
+              allExpanded
+                ? $t("projects.collapseAll")
+                : $t("projects.expandAll")
+            }}
           </button>
 
           <button
@@ -40,8 +50,11 @@
             class="new-project-btn"
             @click="showCreateModal = true"
           >
-            <Icon name="lucide:plus" size="16" />
-            Novo Projeto
+            <Icon
+              name="lucide:plus"
+              size="16"
+            />
+            {{ $t("projects.newProject") }}
           </button>
         </div>
       </div>
@@ -60,14 +73,23 @@
           v-model="archiveSearch"
           type="text"
           class="archive-search"
-          placeholder="Buscar arquivados..."
+          :placeholder="$t('projects.searchArchived')"
         />
         <button
           class="archive-sort-btn"
-          @click="archiveSortOrder = archiveSortOrder === 'desc' ? 'asc' : 'desc'"
+          @click="
+            archiveSortOrder = archiveSortOrder === 'desc' ? 'asc' : 'desc'
+          "
         >
-          <Icon :name="archiveSortOrder === 'desc' ? 'lucide:arrow-down' : 'lucide:arrow-up'" size="14" />
-          Data
+          <Icon
+            :name="
+              archiveSortOrder === 'desc'
+                ? 'lucide:arrow-down'
+                : 'lucide:arrow-up'
+            "
+            size="14"
+          />
+          {{ $t("projects.sortByDate") }}
         </button>
       </div>
     </div>
@@ -103,18 +125,29 @@
         size="48"
       />
       <h3 class="empty-title">
-        {{ hasActiveFilters ? 'Nenhum projeto encontrado' : 'Nenhum projeto ainda' }}
+        {{
+          hasActiveFilters
+            ? $t("projects.empty.noResults")
+            : $t("projects.empty.noProjects")
+        }}
       </h3>
       <p class="empty-text">
-        {{ hasActiveFilters ? 'Tente ajustar os filtros.' : 'Crie seu primeiro projeto para começar a organizar.' }}
+        {{
+          hasActiveFilters
+            ? $t("projects.empty.noResultsSub")
+            : $t("projects.empty.noProjectsSub")
+        }}
       </p>
       <button
         v-if="!hasActiveFilters"
         class="new-project-btn"
         @click="showCreateModal = true"
       >
-        <Icon name="lucide:plus" size="16" />
-        Criar projeto
+        <Icon
+          name="lucide:plus"
+          size="16"
+        />
+        {{ $t("projects.createProject") }}
       </button>
     </div>
 
@@ -138,7 +171,13 @@
           @add-subtopic="handleAddSubtopic"
           @delete-subtopic="handleDeleteSubtopic"
           @update-subtopic="handleUpdateSubtopic"
-          @add-task="(parentId: string, title: string, level: 'project' | 'topic' | 'subtopic') => handleAddTask(parentId, title, level)"
+          @add-task="
+            (
+              parentId: string,
+              title: string,
+              level: 'project' | 'topic' | 'subtopic',
+            ) => handleAddTask(parentId, title, level)
+          "
           @toggle-task="handleToggleTask"
           @delete-task="handleDeleteTask"
           @update-task="handleUpdateTask"
@@ -152,9 +191,16 @@
         v-if="filteredArchivedProjects.length === 0"
         class="empty-state"
       >
-        <Icon name="lucide:archive" size="48" />
-        <h3 class="empty-title">Nenhum projeto arquivado</h3>
-        <p class="empty-text">Projetos arquivados aparecerão aqui.</p>
+        <Icon
+          name="lucide:archive"
+          size="48"
+        />
+        <h3 class="empty-title">
+          {{ $t("projects.empty.noArchived") }}
+        </h3>
+        <p class="empty-text">
+          {{ $t("projects.empty.noArchivedSub") }}
+        </p>
       </div>
 
       <div
@@ -167,22 +213,33 @@
           class="archived-card"
         >
           <div class="archived-card-info">
-            <h3 class="archived-card-title">{{ project.title }}</h3>
+            <h3 class="archived-card-title">
+              {{ project.title }}
+            </h3>
             <p
               v-if="project.description"
               class="archived-card-desc"
-            >{{ project.description }}</p>
+            >
+              {{ project.description }}
+            </p>
             <span class="archived-card-date">
-              Arquivado em {{ formatDate(project.archivedAt) }}
+              {{
+                $t("projects.archivedOn", {
+                  date: formatDate(project.archivedAt),
+                })
+              }}
             </span>
           </div>
           <button
             class="restore-btn"
-            title="Restaurar projeto"
+            :title="$t('shared.restore')"
             @click="handleRestore(project.id)"
           >
-            <Icon name="lucide:archive-restore" size="16" />
-            Restaurar
+            <Icon
+              name="lucide:archive-restore"
+              size="16"
+            />
+            {{ $t("shared.restore") }}
           </button>
         </div>
       </div>
@@ -195,40 +252,55 @@
     >
       <div class="modal-content">
         <div class="modal-header">
-          <h3>{{ editingProject ? 'Editar Projeto' : 'Novo Projeto' }}</h3>
+          <h3>
+            {{
+              editingProject
+                ? $t("projects.modal.editTitle")
+                : $t("projects.modal.newTitle")
+            }}
+          </h3>
           <button
             class="modal-close"
             @click="closeModal"
           >
-            <Icon name="lucide:x" size="18" />
+            <Icon
+              name="lucide:x"
+              size="18"
+            />
           </button>
         </div>
 
         <div class="modal-body">
           <div class="form-group">
-            <label class="form-label">Nome do projeto</label>
+            <label class="form-label">{{
+              $t("projects.modal.nameLabel")
+            }}</label>
             <input
               ref="projectNameInput"
               v-model="formTitle"
               type="text"
               class="form-input"
-              placeholder="ex: Redesign do App"
+              :placeholder="$t('projects.modal.namePlaceholder')"
               @keydown.enter="handleSubmitProject"
             />
           </div>
 
           <div class="form-group">
-            <label class="form-label">Descrição (opcional)</label>
+            <label class="form-label">{{
+              $t("projects.modal.descriptionLabel")
+            }}</label>
             <textarea
               v-model="formDescription"
               class="form-textarea"
-              placeholder="Breve descrição do projeto..."
+              :placeholder="$t('projects.modal.descriptionPlaceholder')"
               rows="3"
             />
           </div>
 
           <div class="form-group">
-            <label class="form-label">Prazo (opcional)</label>
+            <label class="form-label">{{
+              $t("projects.modal.dueDateLabel")
+            }}</label>
             <input
               v-model="formDueDate"
               type="date"
@@ -237,21 +309,31 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Categoria</label>
+            <label class="form-label">{{
+              $t("projects.modal.categoryLabel")
+            }}</label>
             <div class="category-chips">
               <button
                 class="category-chip"
                 :class="{ active: !formCategoryId }"
                 @click="formCategoryId = ''"
               >
-                Nenhuma
+                {{ $t("projects.modal.noCategory") }}
               </button>
               <button
                 v-for="cat in categories"
                 :key="cat.id"
                 class="category-chip"
                 :class="{ active: formCategoryId === cat.id }"
-                :style="formCategoryId === cat.id ? { backgroundColor: `${cat.color}20`, color: cat.color, borderColor: `${cat.color}40` } : {}"
+                :style="
+                  formCategoryId === cat.id
+                    ? {
+                      backgroundColor: `${cat.color}20`,
+                      color: cat.color,
+                      borderColor: `${cat.color}40`,
+                    }
+                    : {}
+                "
                 @click="formCategoryId = cat.id"
               >
                 <span
@@ -269,14 +351,14 @@
             class="btn-cancel"
             @click="closeModal"
           >
-            Cancelar
+            {{ $t("shared.cancel") }}
           </button>
           <button
             class="btn-save"
             :disabled="!formTitle.trim()"
             @click="handleSubmitProject"
           >
-            {{ editingProject ? 'Salvar' : 'Criar' }}
+            {{ editingProject ? $t("shared.save") : $t("shared.create") }}
           </button>
         </div>
       </div>
@@ -289,11 +371,11 @@
     >
       <div class="modal-content modal-small">
         <div class="modal-header">
-          <h3>Excluir projeto?</h3>
+          <h3>{{ $t("projects.modal.deleteTitle") }}</h3>
         </div>
         <div class="modal-body">
           <p class="delete-warning">
-            Isso excluirá todos os tópicos, subtópicos e tarefas vinculados. Essa ação não pode ser desfeita.
+            {{ $t("projects.modal.deleteWarning") }}
           </p>
         </div>
         <div class="modal-footer">
@@ -301,13 +383,13 @@
             class="btn-cancel"
             @click="showDeleteModal = false"
           >
-            Cancelar
+            {{ $t("shared.cancel") }}
           </button>
           <button
             class="btn-delete"
             @click="handleDeleteProject"
           >
-            Excluir
+            {{ $t("projects.modal.deleteButton") }}
           </button>
         </div>
       </div>
@@ -320,11 +402,11 @@
     >
       <div class="modal-content modal-small">
         <div class="modal-header">
-          <h3>Arquivar projeto?</h3>
+          <h3>{{ $t("projects.modal.archiveTitle") }}</h3>
         </div>
         <div class="modal-body">
           <p class="delete-warning">
-            O projeto será movido para a aba de arquivados. Você pode restaurá-lo a qualquer momento.
+            {{ $t("projects.modal.archiveWarning") }}
           </p>
         </div>
         <div class="modal-footer">
@@ -332,13 +414,13 @@
             class="btn-cancel"
             @click="showArchiveModal = false"
           >
-            Cancelar
+            {{ $t("shared.cancel") }}
           </button>
           <button
             class="btn-save"
             @click="handleArchiveProject"
           >
-            Arquivar
+            {{ $t("projects.modal.archiveButton") }}
           </button>
         </div>
       </div>
@@ -373,6 +455,7 @@ const {
 
 const { categories, fetchCategories } = useTasks();
 const toast = useToast();
+const { t, locale } = useI18n();
 
 const activeTab = ref<"active" | "archived">("active");
 const filters = ref({ search: "", categoryId: "" });
@@ -392,15 +475,15 @@ const formCategoryId = ref("");
 const formDueDate = ref("");
 const projectNameInput = ref<HTMLInputElement | null>(null);
 
-const hasActiveFilters = computed(() =>
-  !!(filters.value.search || filters.value.categoryId),
+const hasActiveFilters = computed(
+  () => !!(filters.value.search || filters.value.categoryId),
 );
 
 const filteredProjects = computed(() => {
   let result = projects.value;
 
   if (filters.value.categoryId) {
-    result = result.filter((p) => p.categoryId === filters.value.categoryId);
+    result = result.filter(p => p.categoryId === filters.value.categoryId);
   }
 
   if (filters.value.search) {
@@ -430,13 +513,15 @@ const toggleAllExpanded = () => {
 };
 
 const openEditModal = (id: string) => {
-  const project = projects.value.find((p) => p.id === id);
+  const project = projects.value.find(p => p.id === id);
   if (!project) return;
   editingProject.value = project;
   formTitle.value = project.title;
   formDescription.value = project.description || "";
   formCategoryId.value = project.categoryId || "";
-  formDueDate.value = project.dueDate ? new Date(project.dueDate).toISOString().split("T")[0] : "";
+  formDueDate.value = project.dueDate
+    ? new Date(project.dueDate).toISOString().split("T")[0]
+    : "";
   showCreateModal.value = true;
 };
 
@@ -460,7 +545,7 @@ const handleSubmitProject = async () => {
         categoryId: formCategoryId.value || undefined,
         dueDate: formDueDate.value || undefined,
       } as any);
-      toast.success({ title: "Projeto atualizado" });
+      toast.success({ title: t("projects.toasts.updated") });
     } else {
       await createProject({
         title: formTitle.value.trim(),
@@ -468,11 +553,11 @@ const handleSubmitProject = async () => {
         categoryId: formCategoryId.value || undefined,
         dueDate: formDueDate.value || undefined,
       } as any);
-      toast.success({ title: "Projeto criado" });
+      toast.success({ title: t("projects.toasts.created") });
     }
     closeModal();
   } catch {
-    toast.error({ title: "Erro ao salvar projeto" });
+    toast.error({ title: t("projects.toasts.saveError") });
   }
 };
 
@@ -485,9 +570,9 @@ const handleDeleteProject = async () => {
   if (!deletingProjectId.value) return;
   try {
     await deleteProject(deletingProjectId.value);
-    toast.success({ title: "Projeto excluído" });
+    toast.success({ title: t("projects.toasts.deleted") });
   } catch {
-    toast.error({ title: "Erro ao excluir projeto" });
+    toast.error({ title: t("projects.toasts.deleteError") });
   } finally {
     showDeleteModal.value = false;
     deletingProjectId.value = null;
@@ -503,9 +588,9 @@ const handleArchiveProject = async () => {
   if (!archivingProjectId.value) return;
   try {
     await archiveProject(archivingProjectId.value);
-    toast.success({ title: "Projeto arquivado" });
+    toast.success({ title: t("projects.toasts.archived") });
   } catch {
-    toast.error({ title: "Erro ao arquivar projeto" });
+    toast.error({ title: t("projects.toasts.archiveError") });
   } finally {
     showArchiveModal.value = false;
     archivingProjectId.value = null;
@@ -515,9 +600,9 @@ const handleArchiveProject = async () => {
 const handleRestore = async (id: string) => {
   try {
     await restoreProject(id);
-    toast.success({ title: "Projeto restaurado" });
+    toast.success({ title: t("projects.toasts.restored") });
   } catch {
-    toast.error({ title: "Erro ao restaurar projeto" });
+    toast.error({ title: t("projects.toasts.restoreError") });
   }
 };
 
@@ -525,7 +610,7 @@ const filteredArchivedProjects = computed(() => {
   let result = archivedProjects.value;
   if (archiveSearch.value) {
     const q = archiveSearch.value.toLowerCase();
-    result = result.filter((p) => p.title.toLowerCase().includes(q));
+    result = result.filter(p => p.title.toLowerCase().includes(q));
   }
   return [...result].sort((a, b) => {
     const dateA = new Date(a.archivedAt || a.updatedAt).getTime();
@@ -536,7 +621,7 @@ const filteredArchivedProjects = computed(() => {
 
 const formatDate = (date?: Date | string) => {
   if (!date) return "";
-  return new Date(date).toLocaleDateString("pt-BR", {
+  return new Date(date).toLocaleDateString(locale.value === "pt" ? "pt-BR" : "en-US", {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -547,7 +632,7 @@ const handleUpdateProject = async (id: string, updates: Partial<Project>) => {
   try {
     await updateProject(id, updates);
   } catch {
-    toast.error({ title: "Erro ao atualizar projeto" });
+    toast.error({ title: t("projects.toasts.updateError") });
   }
 };
 
@@ -555,7 +640,7 @@ const handleAddTopic = async (projectId: string, title: string) => {
   try {
     await createTopic(projectId, title);
   } catch {
-    toast.error({ title: "Erro ao criar tópico" });
+    toast.error({ title: t("projects.toasts.topicCreateError") });
   }
 };
 
@@ -563,7 +648,7 @@ const handleDeleteTopic = async (id: string) => {
   try {
     await deleteTopic(id);
   } catch {
-    toast.error({ title: "Erro ao excluir tópico" });
+    toast.error({ title: t("projects.toasts.topicDeleteError") });
   }
 };
 
@@ -571,7 +656,7 @@ const handleUpdateTopic = async (id: string, updates: Partial<Topic>) => {
   try {
     await updateTopic(id, updates);
   } catch {
-    toast.error({ title: "Erro ao atualizar tópico" });
+    toast.error({ title: t("projects.toasts.topicUpdateError") });
   }
 };
 
@@ -579,7 +664,7 @@ const handleAddSubtopic = async (topicId: string, title: string) => {
   try {
     await createSubtopic(topicId, title);
   } catch {
-    toast.error({ title: "Erro ao criar subtópico" });
+    toast.error({ title: t("projects.toasts.subtopicCreateError") });
   }
 };
 
@@ -587,7 +672,7 @@ const handleDeleteSubtopic = async (id: string) => {
   try {
     await deleteSubtopic(id);
   } catch {
-    toast.error({ title: "Erro ao excluir subtópico" });
+    toast.error({ title: t("projects.toasts.subtopicDeleteError") });
   }
 };
 
@@ -595,15 +680,19 @@ const handleUpdateSubtopic = async (id: string, updates: Partial<Subtopic>) => {
   try {
     await updateSubtopic(id, updates);
   } catch {
-    toast.error({ title: "Erro ao atualizar subtópico" });
+    toast.error({ title: t("projects.toasts.subtopicUpdateError") });
   }
 };
 
-const handleAddTask = async (parentId: string, title: string, level: "project" | "topic" | "subtopic" = "subtopic") => {
+const handleAddTask = async (
+  parentId: string,
+  title: string,
+  level: "project" | "topic" | "subtopic" = "subtopic",
+) => {
   try {
     await createProjectTask(parentId, title, level);
   } catch {
-    toast.error({ title: "Erro ao criar tarefa" });
+    toast.error({ title: t("taskForm.toasts.taskError") });
   }
 };
 
@@ -611,7 +700,7 @@ const handleToggleTask = async (id: string, done: boolean) => {
   try {
     await toggleProjectTask(id, done);
   } catch {
-    toast.error({ title: "Erro ao atualizar tarefa" });
+    toast.error({ title: t("tasks.toasts.updateError") });
   }
 };
 
@@ -619,7 +708,7 @@ const handleDeleteTask = async (id: string) => {
   try {
     await deleteProjectTask(id);
   } catch {
-    toast.error({ title: "Erro ao excluir tarefa" });
+    toast.error({ title: t("tasks.toasts.deleteError") });
   }
 };
 
@@ -630,19 +719,28 @@ const handleUpdateTask = async (id: string, title: string) => {
       body: { id, title },
     });
     for (const project of projects.value) {
-      const pt = project.tasks?.find((t) => t.id === id);
-      if (pt) { pt.title = title; return; }
+      const pt = project.tasks?.find(t => t.id === id);
+      if (pt) {
+        pt.title = title;
+        return;
+      }
       for (const topic of project.topics || []) {
-        const tt = topic.tasks?.find((t) => t.id === id);
-        if (tt) { tt.title = title; return; }
+        const tt = topic.tasks?.find(t => t.id === id);
+        if (tt) {
+          tt.title = title;
+          return;
+        }
         for (const sub of topic.subtopics || []) {
-          const st = sub.tasks?.find((t) => t.id === id);
-          if (st) { st.title = title; return; }
+          const st = sub.tasks?.find(t => t.id === id);
+          if (st) {
+            st.title = title;
+            return;
+          }
         }
       }
     }
   } catch {
-    toast.error({ title: "Erro ao atualizar tarefa" });
+    toast.error({ title: t("tasks.toasts.updateError") });
   }
 };
 
@@ -650,10 +748,14 @@ watch(showCreateModal, (val) => {
   if (val) nextTick(() => projectNameInput.value?.focus());
 });
 
-watch(filters, () => {
-  const stored = JSON.stringify(filters.value);
-  localStorage.setItem("mindle-project-filters", stored);
-}, { deep: true });
+watch(
+  filters,
+  () => {
+    const stored = JSON.stringify(filters.value);
+    localStorage.setItem("mindle-project-filters", stored);
+  },
+  { deep: true },
+);
 
 onMounted(() => {
   const saved = localStorage.getItem("mindle-project-filters");
@@ -952,8 +1054,13 @@ onMounted(() => {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .empty-state {
@@ -1137,7 +1244,7 @@ onMounted(() => {
 }
 
 .category-chip.active {
-  background: #E8F3ED;
+  background: #e8f3ed;
   border-color: var(--color-primary);
   color: var(--color-primary-dark);
   font-weight: 500;

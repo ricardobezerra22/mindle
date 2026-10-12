@@ -5,6 +5,7 @@ interface User {
 }
 
 export const useAuth = () => {
+  const { $i18n } = useNuxtApp();
   const user = useState<User | null>("auth-user", () => null);
   const loading = useState<boolean>("auth-loading", () => true);
 
@@ -39,7 +40,11 @@ export const useAuth = () => {
       return response;
     } catch (err: unknown) {
       const e = err as { data?: { error?: string }; statusCode?: number };
-      return { success: false as const, error: e?.data?.error ?? "Erro ao fazer login", statusCode: e?.statusCode };
+      return {
+        success: false as const,
+        error: e?.data?.error ?? $i18n.t("auth.loginError"),
+        statusCode: e?.statusCode,
+      };
     }
   };
 
@@ -70,7 +75,11 @@ export const useAuth = () => {
       return response;
     } catch (err: unknown) {
       const e = err as { data?: { error?: string }; statusCode?: number };
-      return { success: false as const, error: e?.data?.error ?? "Erro ao fazer login com Google", statusCode: e?.statusCode };
+      return {
+        success: false as const,
+        error: e?.data?.error ?? $i18n.t("auth.googleLoginError"),
+        statusCode: e?.statusCode,
+      };
     }
   };
 

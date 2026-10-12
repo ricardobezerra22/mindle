@@ -6,7 +6,7 @@
         class="voice-chat-panel"
       >
         <div class="panel-header">
-          <span class="panel-title">Criar tarefas por voz</span>
+          <span class="panel-title">{{ $t("voice.title") }}</span>
           <button
             class="close-btn"
             @click="closePanel"
@@ -34,13 +34,13 @@
               v-else
               class="hint"
             >
-              Use o microfone ou escreva as tarefas abaixo.
+              {{ $t("voice.hint") }}
             </p>
             <div class="textarea-header">
-              <span class="textarea-label">Tarefas</span>
+              <span class="textarea-label">{{ $t("voice.tasks") }}</span>
               <button
                 class="copy-example-btn"
-                :title="copied ? 'Copiado!' : 'Copiar exemplo'"
+                :title="copied ? $t('voice.copied') : $t('voice.copyExample')"
                 @click="copyExample"
               >
                 <Icon
@@ -51,7 +51,7 @@
                   "
                   size="12"
                 />
-                {{ copied ? "Copiado!" : "Copiar exemplo" }}
+                {{ copied ? $t("voice.copied") : $t("voice.copyExample") }}
               </button>
             </div>
             <textarea
@@ -74,7 +74,9 @@
           >
             <div class="spinner" />
             <span>{{
-              state === "processing" ? "Interpretando..." : "Criando tarefas..."
+              state === "processing"
+                ? $t("voice.processing")
+                : $t("voice.confirming")
             }}</span>
           </div>
 
@@ -145,7 +147,7 @@
                     <span
                       v-if="task.proposedCategoryName"
                       class="new-badge"
-                    >Nova</span>
+                    >{{ $t("voice.newBadge") }}</span>
                   </span>
                   <span
                     v-if="task.dueDate"
@@ -168,7 +170,7 @@
                 name="i-heroicons-information-circle"
                 size="13"
               />
-              Categorias a criar:
+              {{ $t("voice.categoriesToCreate") }}
               <strong>{{ newCategories.map((c) => c.name).join(", ") }}</strong>
             </div>
           </div>
@@ -196,12 +198,7 @@
               size="32"
               class="done-icon"
             />
-            <p>
-              {{ confirmedTasks.length }} tarefa{{
-                confirmedTasks.length !== 1 ? "s" : ""
-              }}
-              criada{{ confirmedTasks.length !== 1 ? "s" : "" }} com sucesso!
-            </p>
+            <p>{{ $t("voice.tasksCreated", confirmedTasks.length) }}</p>
             <ul class="done-list">
               <li
                 v-for="(t, i) in confirmedTasks"
@@ -223,19 +220,17 @@
                 name="i-heroicons-arrow-left"
                 size="14"
               />
-              Voltar
+              {{ $t("voice.back") }}
             </button>
             <button
               class="reset-btn"
               @click="clearAll"
             >
-              Limpar
+              {{ $t("voice.clear") }}
             </button>
           </template>
 
-          <template
-            v-else-if="state === 'idle' || state === 'listening'"
-          >
+          <template v-else-if="state === 'idle' || state === 'listening'">
             <button
               :class="['mic-btn-sm', { recording: state === 'listening' }]"
               @click="toggleMic"
@@ -248,7 +243,9 @@
                 "
                 size="16"
               />
-              {{ state === "listening" ? "Parar" : "Gravar" }}
+              {{
+                state === "listening" ? $t("voice.stop") : $t("voice.record")
+              }}
             </button>
             <button
               v-if="activeInput"
@@ -259,14 +256,14 @@
                 name="i-heroicons-paper-airplane"
                 size="16"
               />
-              Interpretar
+              {{ $t("voice.interpret") }}
             </button>
             <button
               v-if="activeInput"
               class="reset-btn"
               @click="clearAll"
             >
-              Limpar
+              {{ $t("voice.clear") }}
             </button>
           </template>
 
@@ -275,7 +272,7 @@
               class="cancel-btn"
               @click="reset"
             >
-              Cancelar
+              {{ $t("voice.cancel") }}
             </button>
             <button
               class="confirm-btn"
@@ -285,9 +282,7 @@
                 name="i-heroicons-check"
                 size="16"
               />
-              Confirmar {{ previewTasks.length }} tarefa{{
-                previewTasks.length !== 1 ? "s" : ""
-              }}
+              {{ $t("voice.confirm", previewTasks.length) }}
             </button>
           </template>
 
@@ -296,7 +291,7 @@
               class="send-btn"
               @click="reset"
             >
-              Nova tarefa
+              {{ $t("voice.newTask") }}
             </button>
           </template>
         </div>
@@ -311,7 +306,7 @@
             processing: state === 'processing' || state === 'confirming',
           },
         ]"
-        :title="open ? 'Fechar' : 'Criar tarefas por voz'"
+        :title="open ? $t('voice.close') : $t('voice.title')"
         @click="togglePanel"
       >
         <Icon
@@ -324,19 +319,9 @@
 </template>
 
 <script setup lang="ts">
-const INPUT_PLACEHOLDER = `Formato livre ou lista numerada. Exemplos:
-1. Revisar relatório / Alta / 16-10-2026 / Trabalho
-   - Verificar dados
-   - Revisar gráficos
-2. Corrigir bug crítico / Urgente / 12-10-2026 / Desenvolvimento
+const { t } = useI18n();
 
-Ou: criar tarefa urgente de enviar email ao cliente hoje, categoria Comunicação`;
-
-const EXAMPLE_INPUT = `1. Revisar relatório financeiro / Alta / 16-10-2026 / Trabalho
-   - Verificar dados do Excel
-   - Revisar com o gestor
-2. Corrigir bug crítico em produção / Urgente / 12-10-2026 / Desenvolvimento
-3. Preparar apresentação do trimestre / Alta / 15-10-2026 / Trabalho`;
+const INPUT_PLACEHOLDER = computed(() => t("voice.inputPlaceholder"));
 
 const {
   state,
@@ -396,7 +381,7 @@ function backToEdit() {
 }
 
 async function copyExample() {
-  await navigator.clipboard.writeText(EXAMPLE_INPUT);
+  await navigator.clipboard.writeText(t("voice.exampleInput"));
   copied.value = true;
   setTimeout(() => {
     copied.value = false;
@@ -405,9 +390,9 @@ async function copyExample() {
 
 function priorityLabel(p: string): string {
   const map: Record<string, string> = {
-    HIGH: "Alta",
-    MEDIUM: "Média",
-    LOW: "Baixa",
+    HIGH: t("shared.priorities.high"),
+    MEDIUM: t("shared.priorities.medium"),
+    LOW: t("shared.priorities.low"),
   };
   return map[p] ?? p;
 }

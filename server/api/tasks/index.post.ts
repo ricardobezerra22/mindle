@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     const { title, description, status, priority, dueDate, color, categoryId, subTasks, isFavorite } = body;
 
     if (!title) {
-      return sendError(event, "Title is required", 400);
+      return sendError(event, serverT(event, "server.titleIsRequired"), 400);
     }
 
     const task = await prisma.task.create({
@@ -37,6 +37,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, task, 201);
   } catch (error) {
     console.error("Error creating task:", error);
-    return sendError(event, "Failed to create task", 500);
+    return sendError(event, serverT(event, "server.failedToCreateTask"), 500);
   }
 });

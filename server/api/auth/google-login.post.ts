@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     const { credential } = body;
 
     if (!credential) {
-      return sendError(event, "Token do Google é obrigatório", 400);
+      return sendError(event, serverT(event, "server.googleTokenRequired"), 400);
     }
 
     const clientId = process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID;
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
     };
 
     if (!email) {
-      return sendError(event, "Email não encontrado no token do Google", 400);
+      return sendError(event, serverT(event, "server.googleEmailMissing"), 400);
     }
 
     let user = await prisma.user.findUnique({ where: { email } });
@@ -61,7 +61,7 @@ export default defineEventHandler(async (event) => {
     if (!user.isActive) {
       return sendError(
         event,
-        "Sua conta está inativa. Entre em contato com o administrador.",
+        serverT(event, "server.inactiveAccountShort"),
         403,
       );
     }
@@ -87,6 +87,6 @@ export default defineEventHandler(async (event) => {
     });
   } catch (error) {
     console.error("Error with Google login:", error);
-    return sendError(event, "Erro ao fazer login com Google", 500);
+    return sendError(event, serverT(event, "server.googleLoginError"), 500);
   }
 });
