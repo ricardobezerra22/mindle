@@ -3,10 +3,10 @@
     <div class="settings-container">
       <div class="settings-header">
         <h1 class="page-title">
-          {{ $t('pages.settings') }}
+          {{ $t("pages.settings") }}
         </h1>
         <p class="page-subtitle">
-          {{ $t('settings.subtitle') }}
+          {{ $t("settings.subtitle") }}
         </p>
       </div>
 
@@ -19,7 +19,7 @@
             name="lucide:sliders-horizontal"
             size="16"
           />
-          {{ $t('settings.tabs.preferences') }}
+          {{ $t("settings.tabs.preferences") }}
         </button>
         <button
           :class="['settings-tab', { active: settingsTab === 'guidelines' }]"
@@ -29,7 +29,7 @@
             name="lucide:book-open"
             size="16"
           />
-          {{ $t('settings.tabs.guide') }}
+          {{ $t("settings.tabs.guide") }}
         </button>
         <button
           :class="['settings-tab', { active: settingsTab === 'assistance' }]"
@@ -39,7 +39,7 @@
             name="lucide:life-buoy"
             size="16"
           />
-          {{ $t('settings.tabs.support') }}
+          {{ $t("settings.tabs.support") }}
         </button>
       </div>
 
@@ -55,18 +55,22 @@
             />
             <div>
               <h2 class="section-title">
-                {{ $t('settings.focus.title') }}
+                {{ $t("settings.focus.title") }}
               </h2>
               <p class="section-hint">
-                {{ $t('settings.focus.subtitle') }}
+                {{ $t("settings.focus.subtitle") }}
               </p>
             </div>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">{{ $t('settings.focus.defaultDuration') }}</span>
-              <span class="setting-description">{{ $t('settings.focus.durationHint') }}</span>
+              <span class="setting-label">{{
+                $t("settings.focus.defaultDuration")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.focus.durationHint")
+              }}</span>
             </div>
             <select
               v-model="preferences.focusDuration"
@@ -84,8 +88,12 @@
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">{{ $t('settings.focus.autoPause') }}</span>
-              <span class="setting-description">{{ $t('settings.focus.autoPauseHint') }}</span>
+              <span class="setting-label">{{
+                $t("settings.focus.autoPause")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.focus.autoPauseHint")
+              }}</span>
             </div>
             <button
               :class="['toggle', { active: preferences.autoBreak }]"
@@ -97,8 +105,12 @@
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">{{ $t('settings.focus.sound') }}</span>
-              <span class="setting-description">{{ $t('settings.focus.soundHint') }}</span>
+              <span class="setting-label">{{
+                $t("settings.focus.sound")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.focus.soundHint")
+              }}</span>
             </div>
             <button
               :class="['toggle', { active: preferences.focusSound }]"
@@ -117,18 +129,22 @@
             />
             <div>
               <h2 class="section-title">
-                {{ $t('settings.planning.title') }}
+                {{ $t("settings.planning.title") }}
               </h2>
               <p class="section-hint">
-                {{ $t('settings.planning.subtitle') }}
+                {{ $t("settings.planning.subtitle") }}
               </p>
             </div>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">{{ $t('settings.planning.weekStart') }}</span>
-              <span class="setting-description">{{ $t('settings.planning.weekStartHint') }}</span>
+              <span class="setting-label">{{
+                $t("settings.planning.weekStart")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.planning.weekStartHint")
+              }}</span>
             </div>
             <select
               v-model="preferences.weekStart"
@@ -146,8 +162,12 @@
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">{{ $t('settings.planning.showTodayOnly') }}</span>
-              <span class="setting-description">{{ $t('settings.planning.showTodayOnlyHint') }}</span>
+              <span class="setting-label">{{
+                $t("settings.planning.showTodayOnly")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.planning.showTodayOnlyHint")
+              }}</span>
             </div>
             <button
               :class="['toggle', { active: preferences.showOnlyToday }]"
@@ -159,8 +179,12 @@
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">{{ $t('settings.planning.showCompleted') }}</span>
-              <span class="setting-description">{{ $t('settings.planning.showCompletedHint') }}</span>
+              <span class="setting-label">{{
+                $t("settings.planning.showCompleted")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.planning.showCompletedHint")
+              }}</span>
             </div>
             <button
               :class="['toggle', { active: preferences.showCompleted }]"
@@ -179,18 +203,22 @@
             />
             <div>
               <h2 class="section-title">
-                {{ $t('settings.habitsWellbeing.title') }}
+                {{ $t("settings.habitsWellbeing.title") }}
               </h2>
               <p class="section-hint">
-                {{ $t('settings.habitsWellbeing.subtitle') }}
+                {{ $t("settings.habitsWellbeing.subtitle") }}
               </p>
             </div>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">{{ $t('settings.habitsWellbeing.dailyReminder') }}</span>
-              <span class="setting-description">{{ $t('settings.habitsWellbeing.dailyReminderHint') }}</span>
+              <span class="setting-label">{{
+                $t("settings.habitsWellbeing.dailyReminder")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.habitsWellbeing.dailyReminderHint")
+              }}</span>
             </div>
             <button
               :class="['toggle', { active: preferences.dailyReminder }]"
@@ -202,8 +230,12 @@
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">{{ $t('settings.habitsWellbeing.showInsights') }}</span>
-              <span class="setting-description">{{ $t('settings.habitsWellbeing.showInsightsHint') }}</span>
+              <span class="setting-label">{{
+                $t("settings.habitsWellbeing.showInsights")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.habitsWellbeing.showInsightsHint")
+              }}</span>
             </div>
             <button
               :class="['toggle', { active: preferences.showInsights }]"
@@ -222,22 +254,28 @@
             />
             <div>
               <h2 class="section-title">
-                {{ $t('settings.finance.title') }}
+                {{ $t("settings.finance.title") }}
               </h2>
               <p class="section-hint">
-                {{ $t('settings.finance.subtitle') }}
+                {{ $t("settings.finance.subtitle") }}
               </p>
             </div>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">{{ $t('settings.finance.dashboardReminder') }}</span>
-              <span class="setting-description">{{ $t('settings.finance.dashboardReminderHint') }}</span>
+              <span class="setting-label">{{
+                $t("settings.finance.dashboardReminder")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.finance.dashboardReminderHint")
+              }}</span>
             </div>
             <button
               :class="['toggle', { active: preferences.financeReminder }]"
-              @click="preferences.financeReminder = !preferences.financeReminder"
+              @click="
+                preferences.financeReminder = !preferences.financeReminder
+              "
             >
               <span class="toggle-thumb" />
             </button>
@@ -245,12 +283,18 @@
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">{{ $t('settings.finance.archivePaid') }}</span>
-              <span class="setting-description">{{ $t('settings.finance.archivePaidHint') }}</span>
+              <span class="setting-label">{{
+                $t("settings.finance.archivePaid")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.finance.archivePaidHint")
+              }}</span>
             </div>
             <button
               :class="['toggle', { active: preferences.autoArchivePaid }]"
-              @click="preferences.autoArchivePaid = !preferences.autoArchivePaid"
+              @click="
+                preferences.autoArchivePaid = !preferences.autoArchivePaid
+              "
             >
               <span class="toggle-thumb" />
             </button>
@@ -265,18 +309,22 @@
             />
             <div>
               <h2 class="section-title">
-                {{ $t('settings.appearance.title') }}
+                {{ $t("settings.appearance.title") }}
               </h2>
               <p class="section-hint">
-                {{ $t('settings.appearance.subtitle') }}
+                {{ $t("settings.appearance.subtitle") }}
               </p>
             </div>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">{{ $t('settings.appearance.theme') }}</span>
-              <span class="setting-description">{{ $t('settings.appearance.themeHint') }}</span>
+              <span class="setting-label">{{
+                $t("settings.appearance.theme")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.appearance.themeHint")
+              }}</span>
             </div>
             <select
               v-model="preferences.theme"
@@ -294,8 +342,12 @@
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">{{ $t('settings.appearance.fontSize') }}</span>
-              <span class="setting-description">{{ $t('settings.appearance.fontSizeHint') }}</span>
+              <span class="setting-label">{{
+                $t("settings.appearance.fontSize")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.appearance.fontSizeHint")
+              }}</span>
             </div>
             <select
               v-model="preferences.fontSize"
@@ -320,18 +372,22 @@
             />
             <div>
               <h2 class="section-title">
-                {{ $t('settings.notifications.title') }}
+                {{ $t("settings.notifications.title") }}
               </h2>
               <p class="section-hint">
-                {{ $t('settings.notifications.subtitle') }}
+                {{ $t("settings.notifications.subtitle") }}
               </p>
             </div>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">{{ $t('settings.notifications.dailySummary') }}</span>
-              <span class="setting-description">{{ $t('settings.notifications.dailySummaryHint') }}</span>
+              <span class="setting-label">{{
+                $t("settings.notifications.dailySummary")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.notifications.dailySummaryHint")
+              }}</span>
             </div>
             <button
               :class="['toggle', { active: emailNotifications }]"
@@ -351,18 +407,22 @@
             />
             <div>
               <h2 class="section-title">
-                {{ $t('settings.data.title') }}
+                {{ $t("settings.data.title") }}
               </h2>
               <p class="section-hint">
-                {{ $t('settings.data.subtitle') }}
+                {{ $t("settings.data.subtitle") }}
               </p>
             </div>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">{{ $t('settings.data.export') }}</span>
-              <span class="setting-description">{{ $t('settings.data.exportHint') }}</span>
+              <span class="setting-label">{{
+                $t("settings.data.export")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.data.exportHint")
+              }}</span>
             </div>
             <button
               class="action-btn"
@@ -374,14 +434,22 @@
                 size="16"
                 :class="{ spinning: exporting }"
               />
-              {{ exporting ? $t('settings.data.exporting') : $t('settings.data.exportBtn') }}
+              {{
+                exporting
+                  ? $t("settings.data.exporting")
+                  : $t("settings.data.exportBtn")
+              }}
             </button>
           </div>
 
           <div class="setting-row">
             <div class="setting-info">
-              <span class="setting-label">{{ $t('settings.data.clearCache') }}</span>
-              <span class="setting-description">{{ $t('settings.data.clearCacheHint') }}</span>
+              <span class="setting-label">{{
+                $t("settings.data.clearCache")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.data.clearCacheHint")
+              }}</span>
             </div>
             <button
               class="action-btn"
@@ -391,7 +459,7 @@
                 name="lucide:trash-2"
                 size="16"
               />
-              {{ $t('settings.data.clearBtn') }}
+              {{ $t("settings.data.clearBtn") }}
             </button>
           </div>
         </section>
@@ -409,10 +477,10 @@
             />
           </div>
           <h2 class="guide-hero-title">
-            {{ $t('settings.guide.welcome') }}
+            {{ $t("settings.guide.welcome") }}
           </h2>
           <p class="guide-hero-text">
-            {{ $t('settings.guide.welcomeDesc') }}
+            {{ $t("settings.guide.welcomeDesc") }}
           </p>
         </div>
 
@@ -439,10 +507,12 @@
             </p>
             <div class="guide-card-tips">
               <span
-                v-for="tag in (tm(`settings.guide.features.${feat.key}.tags`) as string[])"
+                v-for="tag in getFeatureTags(feat.key)"
                 :key="tag"
                 class="guide-tip"
-              >{{ tag }}</span>
+              >
+                {{ tag }}
+              </span>
             </div>
           </div>
         </div>
@@ -452,7 +522,7 @@
             name="lucide:leaf"
             size="20"
           />
-          <p>{{ $t('settings.guide.philosophy') }}</p>
+          <p>{{ $t("settings.guide.philosophy") }}</p>
         </div>
       </div>
 
@@ -468,10 +538,10 @@
             />
             <div>
               <h2 class="section-title">
-                {{ $t('settings.support.title') }}
+                {{ $t("settings.support.title") }}
               </h2>
               <p class="section-hint">
-                {{ $t('settings.support.emailHint') }}
+                {{ $t("settings.support.emailHint") }}
               </p>
             </div>
           </div>
@@ -484,7 +554,8 @@
               <label
                 for="feedback-subject"
                 class="feedback-label"
-              >{{ $t('settings.support.subjectLabel') }}</label>
+                >{{ $t("settings.support.subjectLabel") }}</label
+              >
               <input
                 id="feedback-subject"
                 v-model="feedbackSubject"
@@ -499,7 +570,8 @@
               <label
                 for="feedback-message"
                 class="feedback-label"
-              >{{ $t('settings.support.messageLabel') }}</label>
+                >{{ $t("settings.support.messageLabel") }}</label
+              >
               <textarea
                 id="feedback-message"
                 v-model="feedbackMessage"
@@ -519,7 +591,11 @@
                 size="16"
                 :class="{ spinning: sendingFeedback }"
               />
-              {{ sendingFeedback ? $t('settings.support.sendingBtn') : $t('settings.support.sendBtn') }}
+              {{
+                sendingFeedback
+                  ? $t("settings.support.sendingBtn")
+                  : $t("settings.support.sendBtn")
+              }}
             </UiButton>
           </form>
         </section>
@@ -532,10 +608,10 @@
             />
             <div>
               <h2 class="section-title">
-                {{ $t('settings.faq.title') }}
+                {{ $t("settings.faq.title") }}
               </h2>
               <p class="section-hint">
-                {{ $t('settings.faq.subtitle') }}
+                {{ $t("settings.faq.subtitle") }}
               </p>
             </div>
           </div>
@@ -557,14 +633,10 @@
         </section>
 
         <section class="about-section">
-          <p class="app-name">
-            Mindle
-          </p>
-          <p class="app-version">
-            v1.0.0
-          </p>
+          <p class="app-name">Mindle</p>
+          <p class="app-version">v1.0.0</p>
           <p class="app-philosophy">
-            {{ $t('settings.about.desc') }}
+            {{ $t("settings.about.desc") }}
           </p>
         </section>
       </div>
@@ -577,7 +649,9 @@ const { t, tm } = useI18n();
 const { preferences, fetchPreferences, debouncedSave } = usePreferences();
 const { user } = useAuth();
 const toast = useToast();
-const settingsTab = ref<"preferences" | "guidelines" | "assistance">("preferences");
+const settingsTab = ref<"preferences" | "guidelines" | "assistance">(
+  "preferences",
+);
 const exporting = ref(false);
 const emailNotifications = ref(true);
 const emailLoading = ref(false);
@@ -611,17 +685,51 @@ const fontSizeOptions = computed(() => [
 ]);
 
 const guideFeatures = [
-  { key: "tasks", icon: "lucide:check-square", bg: "#d1fae5", color: "#059669" },
+  {
+    key: "tasks",
+    icon: "lucide:check-square",
+    bg: "#d1fae5",
+    color: "#059669",
+  },
   { key: "focus", icon: "lucide:target", bg: "#e0e7ff", color: "#4f46e5" },
   { key: "habits", icon: "lucide:heart", bg: "#fce7f3", color: "#db2777" },
-  { key: "planner", icon: "lucide:calendar-days", bg: "#fef3c7", color: "#d97706" },
-  { key: "projects", icon: "lucide:folder-kanban", bg: "#dbeafe", color: "#2563eb" },
+  {
+    key: "planner",
+    icon: "lucide:calendar-days",
+    bg: "#fef3c7",
+    color: "#d97706",
+  },
+  {
+    key: "projects",
+    icon: "lucide:folder-kanban",
+    bg: "#dbeafe",
+    color: "#2563eb",
+  },
   { key: "goals", icon: "lucide:trophy", bg: "#f3e8ff", color: "#7c3aed" },
   { key: "finance", icon: "lucide:wallet", bg: "#ccfbf1", color: "#0d9488" },
-  { key: "metrics", icon: "lucide:bar-chart-3", bg: "#fee2e2", color: "#dc2626" },
+  {
+    key: "metrics",
+    icon: "lucide:bar-chart-3",
+    bg: "#fee2e2",
+    color: "#dc2626",
+  },
 ];
 
-const faqItems = computed(() => tm("settings.faq.items") as { q: string; a: string }[]);
+const faqItems = computed(
+  () => tm("settings.faq.items") as { q: string; a: string }[],
+);
+
+const getFeatureTags = (featureKey: string): string[] => {
+  const { locale, messages } = useI18n();
+  const currentLocale = locale.value as string;
+  const localeMessages = messages[currentLocale] as Record<string, unknown>;
+  const settings = localeMessages.settings as Record<string, unknown>;
+  const guide = settings.guide as Record<string, unknown>;
+  const features = guide.features as Record<string, Record<string, unknown>>;
+  const feature = features[featureKey];
+  const tags = feature?.tags;
+  return Array.isArray(tags) ? tags : [];
+};
 
 watch(
   preferences,
@@ -640,7 +748,7 @@ const exportData = async () => {
       $fetch("/api/habits/logs"),
       $fetch("/api/finance"),
     ]);
-
+    console.log("tasks", tasks);
     const data = {
       exportedAt: new Date().toISOString(),
       tasks: tasks.success ? tasks.data : [],
@@ -686,7 +794,10 @@ const sendFeedback = async () => {
       },
     });
     if (response.success) {
-      toast.success({ title: t("settings.toasts.feedbackSent"), message: t("settings.toasts.feedbackThanks") });
+      toast.success({
+        title: t("settings.toasts.feedbackSent"),
+        message: t("settings.toasts.feedbackThanks"),
+      });
       feedbackSubject.value = "";
       feedbackMessage.value = "";
     }
@@ -707,7 +818,11 @@ const toggleEmailNotifications = async () => {
     });
     if (response.success) {
       emailNotifications.value = newValue;
-      toast.success({ title: newValue ? t("settings.toasts.notifEnabled") : t("settings.toasts.notifDisabled") });
+      toast.success({
+        title: newValue
+          ? t("settings.toasts.notifEnabled")
+          : t("settings.toasts.notifDisabled"),
+      });
     }
   } catch {
     toast.error({ title: t("settings.toasts.notifError") });
@@ -1099,7 +1214,9 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .guide-card:hover {
