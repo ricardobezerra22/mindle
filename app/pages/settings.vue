@@ -507,7 +507,7 @@
             </p>
             <div class="guide-card-tips">
               <span
-                v-for="tag in getFeatureTags(feat.key)"
+                v-for="tag in getGuideFeatureTags(feat.key)"
                 :key="tag"
                 class="guide-tip"
               >
@@ -715,11 +715,25 @@ const guideFeatures = [
   },
 ];
 
-const faqItems = computed(
-  () => tm("settings.faq.items") as { q: string; a: string }[],
-);
+const getFaqItems = (): { q: string; a: string }[] => {
+  const { locale, messages } = useI18n();
+  const currentLocale = locale.value as string;
+  const localeMessages = messages[currentLocale] as Record<string, unknown>;
+  if (!localeMessages) return [];
 
-const getFeatureTags = (featureKey: string): string[] => {
+  const settings = localeMessages.settings as Record<string, unknown>;
+  if (!settings) return [];
+
+  const faq = settings.faq as Record<string, unknown>;
+  if (!faq) return [];
+
+  const items = faq.items;
+  return Array.isArray(items) ? items : [];
+};
+
+const faqItems = computed(() => getFaqItems());
+
+const getGuideFeatureTags = (featureKey: string): string[] => {
   const { locale, messages } = useI18n();
   const currentLocale = locale.value as string;
   const localeMessages = messages[currentLocale] as Record<string, unknown>;
