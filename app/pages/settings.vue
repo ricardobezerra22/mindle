@@ -645,7 +645,7 @@
 </template>
 
 <script setup lang="ts">
-const { t, tm } = useI18n();
+const { t, tm, rt } = useI18n();
 const { preferences, fetchPreferences, debouncedSave } = usePreferences();
 const { user } = useAuth();
 const toast = useToast();
@@ -715,44 +715,14 @@ const guideFeatures = [
   },
 ];
 
-const getFaqItems = (): { q: string; a: string }[] => {
-  const { locale, messages } = useI18n();
-  const currentLocale = locale.value as string;
-  const localeMessages = messages[currentLocale] as Record<string, unknown>;
-  if (!localeMessages) return [];
-
-  const settings = localeMessages.settings as Record<string, unknown>;
-  if (!settings) return [];
-
-  const faq = settings.faq as Record<string, unknown>;
-  if (!faq) return [];
-
-  const items = faq.items;
-  return Array.isArray(items) ? items : [];
-};
-
-const faqItems = computed(() => getFaqItems());
+const faqItems = computed(() => {
+  const items = tm("settings.faq.items") as unknown as { q: never; a: never }[];
+  return items.map(item => ({ q: rt(item.q), a: rt(item.a) }));
+});
 
 const getGuideFeatureTags = (featureKey: string): string[] => {
-  const { locale, messages } = useI18n();
-  const currentLocale = locale.value as string;
-  const localeMessages = messages[currentLocale] as Record<string, unknown>;
-  if (!localeMessages) return [];
-
-  const settings = localeMessages.settings as Record<string, unknown>;
-  if (!settings) return [];
-
-  const guide = settings.guide as Record<string, unknown>;
-  if (!guide) return [];
-
-  const features = guide.features as Record<string, Record<string, unknown>>;
-  if (!features) return [];
-
-  const feature = features[featureKey];
-  if (!feature) return [];
-
-  const tags = feature.tags;
-  return Array.isArray(tags) ? tags : [];
+  const tags = tm(`settings.guide.features.${featureKey}.tags`) as unknown as never[];
+  return tags.map(tag => rt(tag));
 };
 
 watch(
