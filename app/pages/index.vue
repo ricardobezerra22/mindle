@@ -2,9 +2,7 @@
   <div class="dashboard">
     <section class="greeting-section">
       <div class="greeting-content">
-        <h1 class="greeting-text">
-          {{ greetingMessage }}, {{ userName }}
-        </h1>
+        <h1 class="greeting-text">{{ greetingMessage }}, {{ userName }}</h1>
         <p class="context-line">
           {{ contextLine }}
         </p>
@@ -19,27 +17,50 @@
       <div class="col-main">
         <section class="focus-section">
           <div class="section-label">
-            <Icon name="lucide:target" size="16" />
-            <span>Foco de hoje</span>
+            <Icon
+              name="lucide:target"
+              size="16"
+            />
+            <span>{{ $t("index.focusToday") }}</span>
           </div>
 
-          <div v-if="loadingTasks" class="loading-placeholder">
+          <div
+            v-if="loadingTasks"
+            class="loading-placeholder"
+          >
             <div
               v-for="i in 3"
               :key="i"
               class="skeleton-focus-task"
             >
-              <UiSkeleton variant="circle" width="20px" height="20px" />
-              <UiSkeleton height="14px" :width="['85%', '65%', '75%'][i - 1]" />
+              <UiSkeleton
+                variant="circle"
+                width="20px"
+                height="20px"
+              />
+              <UiSkeleton
+                height="14px"
+                :width="['85%', '65%', '75%'][i - 1]"
+              />
             </div>
           </div>
 
-          <div v-else-if="todayTasks.length === 0" class="empty-focus">
-            <p class="empty-message">Hoje está livre.</p>
-            <p class="empty-hint">Escolha uma coisa ou descanse.</p>
+          <div
+            v-else-if="todayTasks.length === 0"
+            class="empty-focus"
+          >
+            <p class="empty-message">
+              {{ $t("index.freeDay") }}
+            </p>
+            <p class="empty-hint">
+              {{ $t("index.freeSubtitle") }}
+            </p>
           </div>
 
-          <div v-else class="focus-tasks">
+          <div
+            v-else
+            class="focus-tasks"
+          >
             <div
               v-for="task in todayTasks.slice(0, 5)"
               :key="task.id"
@@ -47,35 +68,57 @@
               @click="toggleTaskStatus(task.id, task.status)"
             >
               <Icon
-                :name="task.status === 'DONE' ? 'lucide:check-circle-2' : 'lucide:circle'"
+                :name="
+                  task.status === 'DONE'
+                    ? 'lucide:check-circle-2'
+                    : 'lucide:circle'
+                "
                 size="20"
                 class="task-icon"
               />
               <span class="task-name">{{ task.title }}</span>
-              <span v-if="task.priority === 'HIGH'" class="priority-dot" />
+              <span
+                v-if="task.priority === 'HIGH'"
+                class="priority-dot"
+              />
             </div>
-            <p v-if="todayTasks.length > 5" class="more-tasks">
+            <p
+              v-if="todayTasks.length > 5"
+              class="more-tasks"
+            >
               +{{ todayTasks.length - 5 }} mais
             </p>
           </div>
 
-          <NuxtLink to="/focus" class="focus-action">
-            <Icon name="lucide:play" size="16" />
-            Iniciar foco
+          <NuxtLink
+            to="/focus"
+            class="focus-action"
+          >
+            <Icon
+              name="lucide:play"
+              size="16"
+            />
+            {{ $t("index.startFocus") }}
           </NuxtLink>
         </section>
 
         <section class="week-view-section">
           <div class="section-label">
-            <Icon name="lucide:calendar-days" size="16" />
-            <span>Visão semanal</span>
+            <Icon
+              name="lucide:calendar-days"
+              size="16"
+            />
+            <span>{{ $t("index.weeklyView") }}</span>
           </div>
           <div class="week-days-row">
             <NuxtLink
               v-for="day in weekDaysPreview"
               :key="day.date"
               to="/planner/week"
-              :class="['week-day-cell', { 'today': day.isToday, 'has-tasks': day.taskCount > 0 }]"
+              :class="[
+                'week-day-cell',
+                { today: day.isToday, 'has-tasks': day.taskCount > 0 },
+              ]"
             >
               <span class="week-day-name">{{ day.label }}</span>
               <span class="week-day-number">{{ day.dayNumber }}</span>
@@ -94,91 +137,173 @@
       <div class="col-side">
         <section class="progress-section">
           <div class="section-label">
-            <Icon name="lucide:bar-chart-3" size="16" />
-            <span>Progresso semanal</span>
+            <Icon
+              name="lucide:bar-chart-3"
+              size="16"
+            />
+            <span>{{ $t("index.weeklyProgress") }}</span>
           </div>
           <div class="progress-cards">
             <div class="progress-card">
               <div class="progress-icon">
-                <Icon name="lucide:list-checks" size="18" />
+                <Icon
+                  name="lucide:list-checks"
+                  size="18"
+                />
               </div>
               <div class="progress-info">
                 <span class="progress-value">{{ weekPlanned }}</span>
-                <span class="progress-label">planejadas</span>
+                <span class="progress-label">{{ $t("index.planned") }}</span>
               </div>
             </div>
             <div class="progress-card">
               <div class="progress-icon done">
-                <Icon name="lucide:check-check" size="18" />
+                <Icon
+                  name="lucide:check-check"
+                  size="18"
+                />
               </div>
               <div class="progress-info">
                 <span class="progress-value">{{ weekCompleted }}</span>
-                <span class="progress-label">concluídas</span>
+                <span class="progress-label">{{ $t("index.completed") }}</span>
               </div>
             </div>
             <div class="progress-card">
               <div class="progress-icon pending">
-                <Icon name="lucide:clock" size="18" />
+                <Icon
+                  name="lucide:clock"
+                  size="18"
+                />
               </div>
               <div class="progress-info">
-                <span class="progress-value">{{ weekPlanned - weekCompleted }}</span>
-                <span class="progress-label">pendentes</span>
+                <span class="progress-value">{{
+                  weekPlanned - weekCompleted
+                }}</span>
+                <span class="progress-label">{{ $t("index.pending") }}</span>
               </div>
             </div>
           </div>
-          <div v-if="weekPlanned > 0" class="completion-bar-wrap">
+          <div
+            v-if="weekPlanned > 0"
+            class="completion-bar-wrap"
+          >
             <div class="completion-bar">
-              <div class="completion-fill" :style="{ width: completionPercent + '%' }" />
+              <div
+                class="completion-fill"
+                :style="{ width: completionPercent + '%' }"
+              />
             </div>
-            <span class="completion-text">{{ completionPercent }}% concluído</span>
+            <span class="completion-text">{{
+              $t("index.percentDone", { pct: completionPercent })
+            }}</span>
           </div>
         </section>
 
-        <section v-if="habits.length > 0" class="habits-section">
+        <section
+          v-if="habits.length > 0"
+          class="habits-section"
+        >
           <div class="section-label">
-            <Icon name="lucide:heart" size="16" />
-            <span>Hábitos de hoje</span>
+            <Icon
+              name="lucide:heart"
+              size="16"
+            />
+            <span>{{ $t("index.habitsToday") }}</span>
           </div>
           <div class="habits-row">
             <button
               v-for="habit in habits"
               :key="habit.id"
-              :class="['habit-bubble', { checked: isHabitCheckedToday(habit.id) }]"
+              :class="[
+                'habit-bubble',
+                { checked: isHabitCheckedToday(habit.id) },
+              ]"
               @click="toggleHabit(habit.id)"
             >
-              <Icon :name="habit.icon || 'lucide:circle'" size="22" />
+              <Icon
+                :name="habit.icon || 'lucide:circle'"
+                size="22"
+              />
             </button>
           </div>
         </section>
 
-        <section v-if="preferences.financeReminder && pendingFinanceCount > 0" class="finance-section">
-          <NuxtLink to="/finance" class="finance-card">
-            <Icon name="lucide:wallet" size="18" />
-            <span>{{ pendingFinanceCount }} {{ pendingFinanceCount === 1 ? "item precisa" : "itens precisam" }} de atenção</span>
-            <Icon name="lucide:arrow-right" size="14" />
+        <section
+          v-if="preferences.financeReminder && pendingFinanceCount > 0"
+          class="finance-section"
+        >
+          <NuxtLink
+            to="/finance"
+            class="finance-card"
+          >
+            <Icon
+              name="lucide:wallet"
+              size="18"
+            />
+            <span>{{ $t("index.needsAttention", pendingFinanceCount) }}</span>
+            <Icon
+              name="lucide:arrow-right"
+              size="14"
+            />
           </NuxtLink>
         </section>
 
         <section class="quick-links">
-          <NuxtLink to="/tasks" class="quick-link">
-            <Icon name="lucide:list-checks" size="18" />
-            <span>Todas as tarefas</span>
-            <Icon name="lucide:chevron-right" size="14" />
+          <NuxtLink
+            to="/tasks"
+            class="quick-link"
+          >
+            <Icon
+              name="lucide:list-checks"
+              size="18"
+            />
+            <span>{{ $t("index.allTasks") }}</span>
+            <Icon
+              name="lucide:chevron-right"
+              size="14"
+            />
           </NuxtLink>
-          <NuxtLink to="/planner/week" class="quick-link">
-            <Icon name="lucide:calendar-days" size="18" />
-            <span>Planner semanal</span>
-            <Icon name="lucide:chevron-right" size="14" />
+          <NuxtLink
+            to="/planner/week"
+            class="quick-link"
+          >
+            <Icon
+              name="lucide:calendar-days"
+              size="18"
+            />
+            <span>{{ $t("index.weeklyPlanner") }}</span>
+            <Icon
+              name="lucide:chevron-right"
+              size="14"
+            />
           </NuxtLink>
-          <NuxtLink to="/projects" class="quick-link">
-            <Icon name="lucide:folder-kanban" size="18" />
-            <span>Projetos</span>
-            <Icon name="lucide:chevron-right" size="14" />
+          <NuxtLink
+            to="/projects"
+            class="quick-link"
+          >
+            <Icon
+              name="lucide:folder-kanban"
+              size="18"
+            />
+            <span>{{ $t("index.projects") }}</span>
+            <Icon
+              name="lucide:chevron-right"
+              size="14"
+            />
           </NuxtLink>
-          <NuxtLink to="/metrics" class="quick-link">
-            <Icon name="lucide:bar-chart-2" size="18" />
-            <span>Métricas</span>
-            <Icon name="lucide:chevron-right" size="14" />
+          <NuxtLink
+            to="/metrics"
+            class="quick-link"
+          >
+            <Icon
+              name="lucide:bar-chart-2"
+              size="18"
+            />
+            <span>{{ $t("index.metrics") }}</span>
+            <Icon
+              name="lucide:chevron-right"
+              size="14"
+            />
           </NuxtLink>
         </section>
       </div>
@@ -189,6 +314,7 @@
 <script setup lang="ts">
 const { user } = useAuth();
 const toast = useToast();
+const { t } = useI18n();
 const { playDone } = useSound();
 const { preferences } = usePreferences();
 
@@ -208,25 +334,29 @@ const userName = computed(() => {
 
 const greetingMessage = computed(() => {
   const hour = new Date().getHours();
-  if (hour < 12) return "Bom dia";
-  if (hour < 18) return "Boa tarde";
-  return "Boa noite";
+  if (hour < 12) return t("shared.greetings.morning");
+  if (hour < 18) return t("shared.greetings.afternoon");
+  return t("shared.greetings.evening");
 });
 
 const todayFormatted = computed(() => {
+  const { locale } = useI18n();
   const now = new Date();
   const dayNames = [
-    "Domingo",
-    "Segunda",
-    "Terça",
-    "Quarta",
-    "Quinta",
-    "Sexta",
-    "Sábado",
+    t("shared.days.sun"),
+    t("shared.days.mon"),
+    t("shared.days.tue"),
+    t("shared.days.wed"),
+    t("shared.days.thu"),
+    t("shared.days.fri"),
+    t("shared.days.sat"),
   ];
   return {
     day: dayNames[now.getDay()],
-    full: now.toLocaleDateString("pt-BR", { day: "numeric", month: "long" }),
+    full: now.toLocaleDateString(locale.value, {
+      day: "numeric",
+      month: "long",
+    }),
   };
 });
 
@@ -240,14 +370,22 @@ const weekDaysPreview = computed(() => {
   today.setHours(0, 0, 0, 0);
   const currentDay = today.getDay();
   const daysUntilSunday = 7 - currentDay;
-  const dayLabels = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+  const dayLabels = [
+    t("shared.days.sun").slice(0, 3),
+    t("shared.days.mon").slice(0, 3),
+    t("shared.days.tue").slice(0, 3),
+    t("shared.days.wed").slice(0, 3),
+    t("shared.days.thu").slice(0, 3),
+    t("shared.days.fri").slice(0, 3),
+    t("shared.days.sat").slice(0, 3),
+  ];
 
   for (let i = 0; i <= daysUntilSunday; i++) {
     const date = new Date(today);
     date.setDate(today.getDate() + i);
     const dateStr = date.toISOString().split("T")[0];
     const dayTasks = tasks.value.filter(
-      t => t.dueDate && t.dueDate.split("T")[0] === dateStr,
+      (t) => t.dueDate && t.dueDate.split("T")[0] === dateStr,
     );
 
     days.push({
@@ -256,7 +394,7 @@ const weekDaysPreview = computed(() => {
       dayNumber: date.getDate(),
       isToday: i === 0,
       taskCount: dayTasks.length,
-      doneCount: dayTasks.filter(t => t.status === "DONE").length,
+      doneCount: dayTasks.filter((t) => t.status === "DONE").length,
     });
   }
 
@@ -265,7 +403,7 @@ const weekDaysPreview = computed(() => {
 
 const todayTasks = computed(() => {
   return tasks.value
-    .filter(t => t.dueDate && t.dueDate.split("T")[0] === todayStr.value)
+    .filter((t) => t.dueDate && t.dueDate.split("T")[0] === todayStr.value)
     .sort((a, b) => {
       if (a.status === "DONE" && b.status !== "DONE") return 1;
       if (a.status !== "DONE" && b.status === "DONE") return -1;
@@ -276,12 +414,14 @@ const todayTasks = computed(() => {
 });
 
 const contextLine = computed(() => {
-  const pending = todayTasks.value.filter(t => t.status !== "DONE").length;
+  const pending = todayTasks.value.filter(
+    (task) => task.status !== "DONE",
+  ).length;
   if (pending === 0 && todayTasks.value.length === 0)
-    return "Nenhuma tarefa para hoje. Aproveite o momento.";
-  if (pending === 0) return "Tudo concluído. Você merece descansar.";
-  if (pending === 1) return "Só 1 coisa para hoje. Você consegue.";
-  return `${pending} coisas planejadas. Um passo de cada vez.`;
+    return t("index.noTasksToday");
+  if (pending === 0) return t("index.allDone");
+  if (pending === 1) return t("index.oneTask");
+  return t("index.manyTasks", { count: pending });
 });
 
 const weekPlanned = computed(() => {
@@ -298,7 +438,7 @@ const weekPlanned = computed(() => {
   }
 
   return tasks.value.filter(
-    t => t.dueDate && weekDates.has(t.dueDate.split("T")[0]),
+    (t) => t.dueDate && weekDates.has(t.dueDate.split("T")[0]),
   ).length;
 });
 
@@ -316,10 +456,10 @@ const weekCompleted = computed(() => {
   }
 
   return tasks.value.filter(
-    t =>
-      t.dueDate
-      && weekDates.has(t.dueDate.split("T")[0])
-      && t.status === "DONE",
+    (t) =>
+      t.dueDate &&
+      weekDates.has(t.dueDate.split("T")[0]) &&
+      t.status === "DONE",
   ).length;
 });
 
@@ -329,17 +469,17 @@ const completionPercent = computed(() => {
 });
 
 const pendingFinanceCount = computed(() => {
-  return finances.value.filter(f => f.status !== "PAID" && !f.archived)
+  return finances.value.filter((f) => f.status !== "PAID" && !f.archived)
     .length;
 });
 
 const isHabitCheckedToday = (habitId: string) => {
   const today = new Date().toDateString();
   return habitLogs.value.some(
-    log =>
-      log.habitId === habitId
-      && new Date(log.date).toDateString() === today
-      && log.done,
+    (log) =>
+      log.habitId === habitId &&
+      new Date(log.date).toDateString() === today &&
+      log.done,
   );
 };
 
@@ -393,7 +533,7 @@ const fetchFinances = async () => {
 const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
   if (toggleInFlight.has(taskId)) return;
 
-  const index = tasks.value.findIndex(t => t.id === taskId);
+  const index = tasks.value.findIndex((t) => t.id === taskId);
   if (index === -1) return;
 
   const current = tasks.value[index].status;
@@ -404,8 +544,8 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
   if (newStatus === "DONE") {
     playDone();
     toast.success({
-      title: "Tarefa concluída",
-      message: "Continue assim!",
+      title: t("index.toasts.taskDone"),
+      message: t("index.toasts.keepGoing"),
     });
   }
 
@@ -421,7 +561,7 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
 
     if (toggleVersions.get(taskId) !== version) return;
 
-    const idx = tasks.value.findIndex(t => t.id === taskId);
+    const idx = tasks.value.findIndex((t) => t.id === taskId);
     if (idx === -1) return;
     const finalStatus = tasks.value[idx].status;
 
@@ -433,14 +573,14 @@ const toggleTaskStatus = (taskId: string, _currentStatus: string) => {
       });
 
       if (response.success && toggleVersions.get(taskId) === version) {
-        const i = tasks.value.findIndex(t => t.id === taskId);
+        const i = tasks.value.findIndex((t) => t.id === taskId);
         if (i !== -1) tasks.value[i] = response.data;
       }
     } catch (error) {
       console.error("Error updating task status:", error);
       toast.error({
-        title: "Erro ao atualizar tarefa",
-        message: "Tente novamente mais tarde",
+        title: t("index.toasts.taskError"),
+        message: t("shared.error"),
       });
     } finally {
       toggleInFlight.delete(taskId);
@@ -458,13 +598,13 @@ const toggleHabit = async (habitId: string) => {
   try {
     if (isChecked) {
       const log = habitLogs.value.find(
-        l =>
-          l.habitId === habitId
-          && new Date(l.date).toDateString() === new Date().toDateString(),
+        (l) =>
+          l.habitId === habitId &&
+          new Date(l.date).toDateString() === new Date().toDateString(),
       );
       if (log) {
         await $fetch(`/api/habits/log-${log.id}`, { method: "DELETE" });
-        habitLogs.value = habitLogs.value.filter(l => l.id !== log.id);
+        habitLogs.value = habitLogs.value.filter((l) => l.id !== log.id);
       }
     } else {
       const response = await $fetch("/api/habits/logs", {
@@ -475,16 +615,16 @@ const toggleHabit = async (habitId: string) => {
         habitLogs.value.push(response.data);
         playDone();
         toast.success({
-          title: "Hábito registrado",
-          message: "Continue assim!",
+          title: t("index.toasts.habitLogged"),
+          message: t("index.toasts.keepGoing"),
         });
       }
     }
   } catch (error) {
     console.error("Error toggling habit:", error);
     toast.error({
-      title: "Erro ao registrar hábito",
-      message: "Tente novamente mais tarde",
+      title: t("index.toasts.habitError"),
+      message: t("shared.error"),
     });
   }
 };

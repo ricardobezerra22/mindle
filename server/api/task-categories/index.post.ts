@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
     const { name, color } = body;
 
     if (!name || !color) {
-      return sendError(event, "Name and color are required", 400);
+      return sendError(event, serverT(event, "server.nameAndColorAreRequired"), 400);
     }
 
     const normalizedColor = color.toUpperCase().trim();
@@ -21,14 +21,14 @@ export default defineEventHandler(async (event) => {
       c => c.name.toLowerCase() === name.trim().toLowerCase(),
     );
     if (nameExists) {
-      return sendError(event, "Já existe uma categoria com esse nome", 400);
+      return sendError(event, serverT(event, "server.categoryNameExists"), 400);
     }
 
     const colorExists = userCategories.some(
       c => c.color.toUpperCase() === normalizedColor,
     );
     if (colorExists) {
-      return sendError(event, "Já existe uma categoria com essa cor", 400);
+      return sendError(event, serverT(event, "server.categoryColorExists"), 400);
     }
 
     const category = await prisma.taskCategory.create({
@@ -38,6 +38,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, category, 201);
   } catch (error) {
     console.error("Error creating task category:", error);
-    return sendError(event, "Failed to create task category", 500);
+    return sendError(event, serverT(event, "server.failedToCreateTaskCategory"), 500);
   }
 });

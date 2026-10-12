@@ -1,5 +1,6 @@
 export const formatDate = (date: Date): string => {
-  return new Date(date).toLocaleDateString("pt-BR", {
+  const { locale } = useI18n();
+  return new Date(date).toLocaleDateString(locale.value, {
     day: "2-digit",
     month: "short",
   });

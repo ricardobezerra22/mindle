@@ -17,6 +17,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, entries);
   } catch (error) {
     console.error("Error fetching planner entries:", error);
-    return sendError(event, "Failed to fetch planner entries", 500);
+    return sendError(event, serverT(event, "server.failedToFetchPlannerEntries"), 500);
   }
 });

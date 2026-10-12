@@ -7,7 +7,7 @@
       @change="emit('update:modelValue', ($event.target as HTMLInputElement).checked)"
     />
     <Icon name="lucide:star" />
-    <span>Prioridade</span>
+    <span>{{ $t("taskForm.priorityLabel") }}</span>
   </label>
 </template>
 

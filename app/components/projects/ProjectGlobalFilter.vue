@@ -10,14 +10,17 @@
           v-model="searchInput"
           type="text"
           class="search-input"
-          placeholder="Buscar projeto..."
+          :placeholder="$t('projects.filter.searchPlaceholder')"
         />
         <button
           v-if="searchInput"
           class="clear-search"
           @click="searchInput = ''"
         >
-          <Icon name="lucide:x" size="14" />
+          <Icon
+            name="lucide:x"
+            size="14"
+          />
         </button>
       </div>
 
@@ -41,7 +44,7 @@
             size="14"
           />
           <span class="category-label">
-            {{ selectedCategory?.name || 'Categoria' }}
+            {{ selectedCategory?.name || $t("shared.category") }}
           </span>
           <Icon
             :name="showCategories ? 'lucide:chevron-up' : 'lucide:chevron-down'"
@@ -59,7 +62,7 @@
               :class="{ active: !modelValue.categoryId }"
               @click="selectCategory('')"
             >
-              Todas
+              {{ $t("projects.filter.all") }}
             </button>
             <button
               v-for="cat in categories"
@@ -84,8 +87,11 @@
           class="clear-btn"
           @click="clearAll"
         >
-          <Icon name="lucide:filter-x" size="14" />
-          Limpar
+          <Icon
+            name="lucide:filter-x"
+            size="14"
+          />
+          {{ $t("projects.filter.clear") }}
         </button>
       </Transition>
     </div>
@@ -101,17 +107,26 @@
         >
           "{{ modelValue.search }}"
           <button @click="updateFilter({ search: '' })">
-            <Icon name="lucide:x" size="10" />
+            <Icon
+              name="lucide:x"
+              size="10"
+            />
           </button>
         </span>
         <span
           v-if="selectedCategory"
           class="filter-tag"
-          :style="{ backgroundColor: `${selectedCategory.color}15`, color: selectedCategory.color }"
+          :style="{
+            backgroundColor: `${selectedCategory.color}15`,
+            color: selectedCategory.color,
+          }"
         >
           {{ selectedCategory.name }}
           <button @click="updateFilter({ categoryId: '' })">
-            <Icon name="lucide:x" size="10" />
+            <Icon
+              name="lucide:x"
+              size="10"
+            />
           </button>
         </span>
       </div>
@@ -150,7 +165,9 @@ useClickOutside(categoryRef, () => {
 
 const selectedCategory = computed(() => {
   if (!props.modelValue.categoryId) return null;
-  return props.categories.find((c) => c.id === props.modelValue.categoryId) || null;
+  return (
+    props.categories.find(c => c.id === props.modelValue.categoryId) || null
+  );
 });
 
 const hasActiveFilters = computed(() => {
@@ -327,7 +344,7 @@ watch(
 }
 
 .dropdown-option.active {
-  background: #E8F3ED;
+  background: #e8f3ed;
   font-weight: 500;
 }
 

@@ -8,16 +8,16 @@ export default defineEventHandler(async (event) => {
     const { name, email, password } = body;
 
     if (!email || !password || !name) {
-      return sendError(event, "Nome, email e senha são obrigatórios", 400);
+      return sendError(event, serverT(event, "server.registerRequired"), 400);
     }
 
     if (password.length < 6) {
-      return sendError(event, "A senha deve ter pelo menos 6 caracteres", 400);
+      return sendError(event, serverT(event, "server.passwordTooShort"), 400);
     }
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
-      return sendError(event, "Este email já está em uso", 409);
+      return sendError(event, serverT(event, "server.emailInUse"), 409);
     }
 
     const hashedPassword = await hashPassword(password);
@@ -50,6 +50,6 @@ export default defineEventHandler(async (event) => {
     }, 201);
   } catch (error) {
     console.error("Error registering user:", error);
-    return sendError(event, "Erro ao criar conta", 500);
+    return sendError(event, serverT(event, "server.registerError"), 500);
   }
 });

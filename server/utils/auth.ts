@@ -48,7 +48,7 @@ export const requireAuth = async (event: H3Event): Promise<string> => {
   if (!userId) {
     throw createError({
       statusCode: 401,
-      statusMessage: "Não autorizado",
+      statusMessage: serverT(event, "server.unauthorized"),
     });
   }
   return userId;

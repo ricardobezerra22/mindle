@@ -3,27 +3,29 @@ definePageMeta({
   layout: "none",
 });
 
+const { t } = useI18n();
+
 useHead({
-  title: "Mindle - Clareza Mental para ADHD | Gestão de Tarefas e Produtividade",
+  title: computed(() => t("landing.meta.title")),
   meta: [
     {
       name: "description",
       content:
-        "Mindle: O ecossistema que organiza sua vida, reduz a ansiedade e conecta tarefas, hábitos e metas em um único lugar. Projetado para neurodiversidade.",
+        computed(() => t("landing.meta.description")),
     },
     {
       name: "keywords",
       content:
-        "ADHD, gestão de tarefas, produtividade, hábitos, foco, bem-estar, neurodiversidade, planner",
+        computed(() => t("landing.meta.keywords")),
     },
     {
       property: "og:title",
-      content: "Mindle - Clareza Mental para ADHD",
+      content: computed(() => t("landing.meta.ogTitle")),
     },
     {
       property: "og:description",
       content:
-        "Sistema interconectado de gestão de tarefas, hábitos, foco e bem-estar para mentes neurodiversas.",
+        computed(() => t("landing.meta.ogDescription")),
     },
     {
       property: "og:type",
@@ -35,12 +37,12 @@ useHead({
     },
     {
       name: "twitter:title",
-      content: "Mindle - Clareza Mental para ADHD",
+      content: computed(() => t("landing.meta.ogTitle")),
     },
     {
       name: "twitter:description",
       content:
-        "Organize sua vida, reduza ansiedade e conecte tarefas, hábitos e metas em um único lugar.",
+        computed(() => t("landing.meta.twitterDescription")),
     },
     {
       name: "viewport",
@@ -74,98 +76,90 @@ useHead({
         style="width: 100%"
       >
         <div class="flex items-center gap-2">
-          <img src="/mindle-logo.png" alt="Mindle" class="logo-img" />
+          <img
+            src="/mindle-logo.png"
+            alt="Mindle"
+            class="logo-img"
+          />
           <span class="logo-text">Mindle</span>
         </div>
         <div class="nav-links">
-          <a href="#metodologia">Método</a>
-          <a href="#recursos">Recursos</a>
+          <a href="#metodologia">{{ $t("landing.metodo") }}</a>
+          <a href="#recursos">{{ $t("landing.recursos") }}</a>
         </div>
         <div class="nav-actions">
           <NuxtLink
             to="/auth/login"
             class="login-link"
-            >Login</NuxtLink
-          >
+          >{{ $t("landing.login") }}</NuxtLink>
           <NuxtLink
             to="/auth/login"
             class="btn btn-dark"
-            >Começar</NuxtLink
-          >
+          >{{ $t("landing.comecar") }}</NuxtLink>
         </div>
       </div>
     </nav>
 
     <header class="hero">
-      <div class="bg-grid"></div>
-      <div class="blob-1"></div>
-      <div class="blob-2"></div>
+      <div class="bg-grid" />
+      <div class="blob-1" />
+      <div class="blob-2" />
 
       <div class="container">
         <div class="tag">
           <div class="ping">
-            <span class="ping-circle"></span>
-            <span class="ping-dot"></span>
-          </div>
-          Design focado em neurodiversidade
+            <span class="ping-circle" />
+            <span class="ping-dot" />
+          </div> {{ $t("landing.designFocadoEmNeurodiversidade") }}
         </div>
 
         <h1>
-          Clareza mental para transformar
-          <br
+          {{ $t("landing.clarezaMentalParaTransformar") }} <br
             style="display: none"
             class="md-break"
           />
-          <span>
-            intenção em ação.
-            <svg
-              preserveAspectRatio="none"
-              viewBox="0 0 100 10"
-            >
-              <path
-                d="M0 5 Q 50 10 100 5"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="3"
-              ></path>
-            </svg>
+          <span> {{ $t("landing.intencaoEmAcao") }} <svg
+            preserveAspectRatio="none"
+            viewBox="0 0 100 10"
+          >
+            <path
+              d="M0 5 Q 50 10 100 5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+            />
+          </svg>
           </span>
         </h1>
 
-        <p>
-          O ecossistema que organiza sua vida, reduz a ansiedade e conecta
-          tarefas, hábitos e metas em um fluxo único e natural.
-        </p>
+        <p>{{ $t("landing.oEcossistemaQueOrganiza") }}</p>
 
         <div class="hero-buttons">
           <NuxtLink
             to="/"
             class="btn btn-primary"
-          >
-            Começar gratuitamente
-            <Icon
-              name="lucide:arrow-right"
-              size="20"
-            />
+          > {{ $t("landing.comecarGratuitamente") }} <Icon
+            name="lucide:arrow-right"
+            size="20"
+          />
           </NuxtLink>
           <button class="btn btn-outline">
             <Icon
               name="lucide:play"
               size="20"
               style="color: var(--text-light)"
-            />
-            Ver como funciona
+            /> {{ $t("landing.verComoFunciona") }}
           </button>
         </div>
 
         <div class="mockup-container">
-          <div class="mockup-gradient"></div>
+          <div class="mockup-gradient" />
           <div class="mockup-window">
             <div class="mockup-header">
               <div class="mockup-dots">
-                <div></div>
-                <div></div>
-                <div></div>
+                <div />
+                <div />
+                <div />
               </div>
             </div>
             <div class="mockup-body">
@@ -181,32 +175,27 @@ useHead({
                       border-radius: 4px;
                       background: var(--primary);
                     "
-                  ></div>
-                  <span style="font-weight: 700; color: var(--text-main)"
-                    >Mindle</span
-                  >
+                  />
+                  <span style="font-weight: 700; color: var(--text-main)">Mindle</span>
                 </div>
                 <div>
                   <div class="sidebar-item active">
                     <Icon
                       name="lucide:layout-dashboard"
                       size="18"
-                    />
-                    Dashboard
+                    /> {{ $t("landing.dashboard") }}
                   </div>
                   <div class="sidebar-item">
                     <Icon
                       name="lucide:check-circle"
                       size="18"
-                    />
-                    Tarefas
+                    /> {{ $t("landing.tarefas") }}
                   </div>
                   <div class="sidebar-item">
                     <Icon
                       name="lucide:timer"
                       size="18"
-                    />
-                    Foco
+                    /> {{ $t("landing.foco") }}
                   </div>
                 </div>
               </div>
@@ -218,8 +207,8 @@ useHead({
                     style="align-items: flex-end; margin-bottom: 2rem"
                   >
                     <div class="mockup-greeting">
-                      <h2>Bom dia, Alex 👋</h2>
-                      <p>Sua mente está focada em 3 prioridades hoje.</p>
+                      <h2>{{ $t("landing.bomDiaAlex") }}</h2>
+                      <p>{{ $t("landing.suaMenteEstaFocada") }}</p>
                     </div>
                     <div style="text-align: right">
                       <div
@@ -229,12 +218,12 @@ useHead({
                           color: var(--text-muted);
                         "
                       >
-                        Nível de Energia
+                        {{ $t("landing.nivelDeEnergia") }}
                       </div>
                       <div class="energy-bar">
-                        <div></div>
-                        <div></div>
-                        <div></div>
+                        <div />
+                        <div />
+                        <div />
                       </div>
                     </div>
                   </div>
@@ -242,14 +231,16 @@ useHead({
                   <div class="stats-grid">
                     <div class="stat-card">
                       <div class="stat-card-header">
-                        <span>Sessão Foco</span>
+                        <span>{{ $t("landing.sessaoFoco") }}</span>
                         <Icon
                           name="lucide:timer"
                           size="20"
                           style="color: var(--primary)"
                         />
                       </div>
-                      <div class="stat-value">25:00</div>
+                      <div class="stat-value">
+                        25:00
+                      </div>
                       <div
                         style="
                           font-size: 0.75rem;
@@ -257,33 +248,37 @@ useHead({
                           margin-top: 4px;
                         "
                       >
-                        Pronto para começar?
+                        {{ $t("landing.prontoParaComecar") }}
                       </div>
                     </div>
                     <div class="stat-card">
                       <div class="stat-card-header">
-                        <span>Tarefas Feitas</span>
+                        <span>{{ $t("landing.tarefasFeitas") }}</span>
                         <Icon
                           name="lucide:check-circle"
                           size="20"
                           style="color: var(--green)"
                         />
                       </div>
-                      <div class="stat-value">4/12</div>
+                      <div class="stat-value">
+                        4/12
+                      </div>
                       <div class="progress-bar">
-                        <div class="progress-fill"></div>
+                        <div class="progress-fill" />
                       </div>
                     </div>
                     <div class="stat-card">
                       <div class="stat-card-header">
-                        <span>Hábito Principal</span>
+                        <span>{{ $t("landing.habitoPrincipal") }}</span>
                         <Icon
                           name="lucide:flame"
                           size="20"
                           style="color: var(--orange)"
                         />
                       </div>
-                      <div class="stat-value">5 dias</div>
+                      <div class="stat-value">
+                        {{ $t("landing.5Dias") }}
+                      </div>
                       <div
                         style="
                           font-size: 0.75rem;
@@ -291,40 +286,44 @@ useHead({
                           margin-top: 4px;
                         "
                       >
-                        Sequência atual
+                        {{ $t("landing.sequenciaAtual") }}
                       </div>
                     </div>
                   </div>
 
                   <div class="task-list">
                     <h3 style="font-size: 1rem; margin-bottom: 1rem">
-                      Em Progresso
+                      {{ $t("landing.emProgresso") }}
                     </h3>
 
                     <div
                       class="task-item"
                       style="box-shadow: var(--shadow-sm); cursor: pointer"
                     >
-                      <div class="task-checkbox"></div>
+                      <div class="task-checkbox" />
                       <div style="flex: 1">
                         <div class="task-title">
-                          Revisar wireframes do projeto Mindle
+                          {{ $t("landing.revisarWireframesDoProjeto") }}
                         </div>
-                        <div class="task-meta">Design • Hoje</div>
+                        <div class="task-meta">
+                          {{ $t("landing.designHoje") }}
+                        </div>
                       </div>
-                      <span class="badge">Alta Prioridade</span>
+                      <span class="badge">{{ $t("landing.altaPrioridade") }}</span>
                     </div>
 
                     <div
                       class="task-item"
                       style="opacity: 0.6"
                     >
-                      <div class="task-checkbox"></div>
+                      <div class="task-checkbox" />
                       <div style="flex: 1">
                         <div class="task-title">
-                          Responder emails de suporte
+                          {{ $t("landing.responderEmailsDeSuporte") }}
                         </div>
-                        <div class="task-meta">Admin • Amanhã</div>
+                        <div class="task-meta">
+                          {{ $t("landing.adminAmanha") }}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -338,15 +337,12 @@ useHead({
 
     <section class="flow-section">
       <div class="container">
-        <span class="section-tag">O Fluxo Mindle</span>
-        <h2>Um sistema interconectado.</h2>
-        <p>
-          Não são apenas ferramentas soltas. É um fluxo contínuo onde cada ação
-          alimenta a próxima, criando um ciclo virtuoso de realização.
-        </p>
+        <span class="section-tag">{{ $t("landing.oFluxoMindle") }}</span>
+        <h2>{{ $t("landing.umSistemaInterconectado") }}</h2>
+        <p>{{ $t("landing.naoSaoApenasFerramentas") }}</p>
 
         <div class="flow-grid">
-          <div class="flow-line"></div>
+          <div class="flow-line" />
 
           <div class="flow-card">
             <div
@@ -358,10 +354,9 @@ useHead({
                 size="32"
               />
             </div>
-            <h3>1. Organizar</h3>
+            <h3>{{ $t("landing.1Organizar") }}</h3>
             <p>
-              Despeje suas ideias. O sistema categoriza e prioriza
-              automaticamente suas <strong>Tarefas</strong>.
+              {{ $t("landing.despejeSuasIdeiasO") }} <strong>{{ $t("landing.tarefas") }}</strong>.
             </p>
           </div>
 
@@ -375,11 +370,8 @@ useHead({
                 size="32"
               />
             </div>
-            <h3>2. Executar</h3>
-            <p>
-              Entre em modo <strong>Foco</strong> profundo. Bloqueie distrações
-              e execute uma coisa de cada vez.
-            </p>
+            <h3>{{ $t("landing.2Executar") }}</h3>
+            <p> {{ $t("landing.entreEmModo") }} <strong>{{ $t("landing.foco") }}</strong> {{ $t("landing.profundoBloqueieDistracoesE") }} </p>
           </div>
 
           <div class="flow-card">
@@ -392,11 +384,8 @@ useHead({
                 size="32"
               />
             </div>
-            <h3>3. Consolidar</h3>
-            <p>
-              A repetição vira rotina. Seus <strong>Hábitos</strong> são
-              rastreados e recompensados visualmente.
-            </p>
+            <h3>{{ $t("landing.3Consolidar") }}</h3>
+            <p> {{ $t("landing.aRepeticaoViraRotina") }} <strong>{{ $t("landing.habitos") }}</strong> {{ $t("landing.saoRastreadosERecompensados") }} </p>
           </div>
 
           <div class="flow-card">
@@ -409,11 +398,8 @@ useHead({
                 size="32"
               />
             </div>
-            <h3>4. Conquistar</h3>
-            <p>
-              Veja o panorama geral. Cada pequena ação alimenta suas grandes
-              <strong>Metas</strong> de vida.
-            </p>
+            <h3>{{ $t("landing.4Conquistar") }}</h3>
+            <p> {{ $t("landing.vejaOPanoramaGeral") }} <strong>{{ $t("landing.metas") }}</strong> {{ $t("landing.deVida") }} </p>
           </div>
         </div>
       </div>
@@ -422,24 +408,19 @@ useHead({
     <section class="features-section">
       <div class="container">
         <div class="features-header">
-          <h2>Projetado para o cérebro moderno.</h2>
-          <p>
-            Recursos visuais e táteis que tornam a organização satisfatória.
-          </p>
+          <h2>{{ $t("landing.projetadoParaOCerebro") }}</h2>
+          <p>{{ $t("landing.recursosVisuaisETateis") }}</p>
         </div>
 
         <div class="features-grid">
           <div class="feature-card">
-            <h3>Foco Sem Atrito</h3>
-            <p>
-              Timer integrado diretamente às suas tarefas para reduzir a
-              resistência inicial.
-            </p>
+            <h3>{{ $t("landing.focoSemAtrito") }}</h3>
+            <p>{{ $t("landing.timerIntegradoDiretamenteAs") }}</p>
             <div
               class="feature-ui-box"
               style="align-items: center"
             >
-              <div class="timer-top-line"></div>
+              <div class="timer-top-line" />
               <div
                 style="
                   font-size: 0.75rem;
@@ -449,9 +430,11 @@ useHead({
                   margin-bottom: 1rem;
                 "
               >
-                Sessão Atual
+                {{ $t("landing.sessaoAtual") }}
               </div>
-              <div class="timer-text">24:59</div>
+              <div class="timer-text">
+                24:59
+              </div>
 
               <div
                 class="flex items-center gap-2"
@@ -470,10 +453,8 @@ useHead({
                     border-radius: 50%;
                     background: var(--primary);
                   "
-                ></span>
-                <span style="font-size: 0.75rem; font-weight: 500"
-                  >Vinculado: Relatório Q3</span
-                >
+                />
+                <span style="font-size: 0.75rem; font-weight: 500">{{ $t("landing.vinculadoRelatorioQ3") }}</span>
               </div>
 
               <div
@@ -490,7 +471,7 @@ useHead({
                     font-weight: 700;
                   "
                 >
-                  Pausar
+                  {{ $t("landing.pausar") }}
                 </button>
                 <button
                   style="
@@ -503,26 +484,21 @@ useHead({
                     font-weight: 700;
                   "
                 >
-                  Parar
+                  {{ $t("landing.parar") }}
                 </button>
               </div>
             </div>
           </div>
 
           <div class="feature-card">
-            <h3>Ritmo de Dopamina</h3>
-            <p>
-              Visualize seu progresso com bolhas de hábito que dão satisfação
-              real ao completar.
-            </p>
+            <h3>{{ $t("landing.ritmoDeDopamina") }}</h3>
+            <p>{{ $t("landing.visualizeSeuProgressoCom") }}</p>
             <div class="feature-ui-box">
               <div
                 class="flex justify-between items-center"
                 style="margin-bottom: 1rem"
               >
-                <span style="font-weight: 700; font-size: 0.875rem"
-                  >Beber Água</span
-                >
+                <span style="font-weight: 700; font-size: 0.875rem">{{ $t("landing.beberAgua") }}</span>
                 <span
                   style="
                     font-size: 0.75rem;
@@ -532,8 +508,7 @@ useHead({
                     padding: 2px 8px;
                     border-radius: 4px;
                   "
-                  >12 dias 🔥</span
-                >
+                >{{ $t("landing.12Dias") }}</span>
               </div>
 
               <div class="habit-bubbles">
@@ -548,7 +523,7 @@ useHead({
                       border-radius: 50%;
                       background: var(--primary);
                     "
-                  ></div>
+                  />
                 </div>
                 <div
                   class="bubble"
@@ -561,7 +536,7 @@ useHead({
                       border-radius: 50%;
                       background: var(--primary);
                     "
-                  ></div>
+                  />
                 </div>
                 <div
                   class="bubble"
@@ -574,7 +549,7 @@ useHead({
                       border-radius: 50%;
                       background: var(--primary);
                     "
-                  ></div>
+                  />
                 </div>
                 <div
                   class="bubble"
@@ -604,7 +579,7 @@ useHead({
                 <div
                   class="bubble"
                   style="border: 2px dashed var(--border-color); opacity: 0.5"
-                ></div>
+                />
               </div>
               <p
                 style="
@@ -614,17 +589,14 @@ useHead({
                   margin: 0;
                 "
               >
-                Continue assim! Só mais 2 dias para o marco.
+                {{ $t("landing.continueAssimSoMais") }}
               </p>
             </div>
           </div>
 
           <div class="feature-card">
-            <h3>Métricas que Importam</h3>
-            <p>
-              Entenda seus padrões. Acompanhe humor e energia junto com sua
-              produtividade.
-            </p>
+            <h3>{{ $t("landing.metricasQueImportam") }}</h3>
+            <p>{{ $t("landing.entendaSeusPadroesAcompanhe") }}</p>
             <div
               class="feature-ui-box"
               style="justify-content: flex-start; padding: 1rem"
@@ -653,10 +625,10 @@ useHead({
                         color: var(--text-light);
                       "
                     >
-                      Nível de Energia
+                      {{ $t("landing.nivelDeEnergia") }}
                     </div>
                     <div style="font-size: 0.875rem; font-weight: 700">
-                      Alto
+                      {{ $t("landing.alto") }}
                     </div>
                   </div>
                 </div>
@@ -668,7 +640,7 @@ useHead({
                       background: var(--yellow);
                       border-radius: 2px;
                     "
-                  ></div>
+                  />
                   <div
                     style="
                       width: 6px;
@@ -676,7 +648,7 @@ useHead({
                       background: var(--yellow);
                       border-radius: 2px;
                     "
-                  ></div>
+                  />
                   <div
                     style="
                       width: 6px;
@@ -684,7 +656,7 @@ useHead({
                       background: var(--yellow);
                       border-radius: 2px;
                     "
-                  ></div>
+                  />
                   <div
                     style="
                       width: 6px;
@@ -692,7 +664,7 @@ useHead({
                       background: var(--border-color);
                       border-radius: 2px;
                     "
-                  ></div>
+                  />
                 </div>
               </div>
 
@@ -720,10 +692,10 @@ useHead({
                         color: var(--text-light);
                       "
                     >
-                      Humor
+                      {{ $t("landing.humor") }}
                     </div>
                     <div style="font-size: 0.875rem; font-weight: 700">
-                      Focado
+                      {{ $t("landing.focado") }}
                     </div>
                   </div>
                 </div>
@@ -734,12 +706,8 @@ useHead({
                 class="flex justify-between items-center"
                 style="padding: 0 0.5rem; margin-top: 0.25rem"
               >
-                <span style="font-size: 0.75rem; color: var(--text-light)"
-                  >Tarefas completadas hoje</span
-                >
-                <span style="font-size: 0.875rem; font-weight: 700"
-                  >8 / 10</span
-                >
+                <span style="font-size: 0.75rem; color: var(--text-light)">{{ $t("landing.tarefasCompletadasHoje") }}</span>
+                <span style="font-size: 0.875rem; font-weight: 700">8 / 10</span>
               </div>
             </div>
           </div>
@@ -747,131 +715,115 @@ useHead({
       </div>
     </section>
 
-    <section id="metodologia" class="metodologia-section">
+    <section
+      id="metodologia"
+      class="metodologia-section"
+    >
       <div class="container">
         <div class="section-header">
-          <h2>A Metodologia Mindle</h2>
-          <p>Um sistema interconectado de 4 pilares que transformam intenção em ação</p>
+          <h2>{{ $t("landing.aMetodologiaMindle") }}</h2>
+          <p>{{ $t("landing.umSistemaInterconectadoDe") }}</p>
         </div>
 
         <div class="metodologia-grid">
           <div class="metodologia-card">
-            <div class="card-number">1</div>
-            <h3>Organizar</h3>
-            <p>
-              Despeje todas as suas ideias, tarefas e metas no Mindle. O sistema categoriza e prioriza automaticamente,
-              ajudando você a ver claramente o que precisa ser feito.
-            </p>
+            <div class="card-number">
+              1
+            </div>
+            <h3>{{ $t("landing.organizar") }}</h3>
+            <p>{{ $t("landing.despejeTodasAsSuas") }}</p>
             <ul>
-              <li>Crie tarefas com títulos claros</li>
-              <li>Adicione descrições e contexto</li>
-              <li>Organize por categorias e projetos</li>
-              <li>Defina prioridades e datas</li>
+              <li>{{ $t("landing.crieTarefasComTitulos") }}</li>
+              <li>{{ $t("landing.adicioneDescricoesEContexto") }}</li>
+              <li>{{ $t("landing.organizePorCategoriasE") }}</li>
+              <li>{{ $t("landing.definaPrioridadesEDatas") }}</li>
             </ul>
           </div>
 
           <div class="metodologia-card">
-            <div class="card-number">2</div>
-            <h3>Executar</h3>
-            <p>
-              Com suas tarefas organizadas, entre em modo Foco profundo. Bloqueie distrações e execute uma coisa de
-              cada vez com o timer integrado.
-            </p>
+            <div class="card-number">
+              2
+            </div>
+            <h3>{{ $t("landing.executar") }}</h3>
+            <p>{{ $t("landing.comSuasTarefasOrganizadas") }}</p>
             <ul>
-              <li>Ative o modo Foco</li>
-              <li>Use o timer de Pomodoro</li>
-              <li>Minimize distrações</li>
-              <li>Marque tarefas como concluídas</li>
+              <li>{{ $t("landing.ativeOModoFoco") }}</li>
+              <li>{{ $t("landing.useOTimerDe") }}</li>
+              <li>{{ $t("landing.minimizeDistracoes") }}</li>
+              <li>{{ $t("landing.marqueTarefasComoConcluidas") }}</li>
             </ul>
           </div>
 
           <div class="metodologia-card">
-            <div class="card-number">3</div>
-            <h3>Consolidar</h3>
-            <p>
-              A repetição cria hábitos. Rastreie seus hábitos diários e veja sua sequência crescer com feedback visual
-              satisfatório.
-            </p>
+            <div class="card-number">
+              3
+            </div>
+            <h3>{{ $t("landing.consolidar") }}</h3>
+            <p>{{ $t("landing.aRepeticaoCriaHabitos") }}</p>
             <ul>
-              <li>Crie hábitos para desenvolver</li>
-              <li>Marque como concluído diariamente</li>
-              <li>Veja sua sequência crescer</li>
-              <li>Receba recompensas visuais</li>
+              <li>{{ $t("landing.crieHabitosParaDesenvolver") }}</li>
+              <li>{{ $t("landing.marqueComoConcluidoDiariamente") }}</li>
+              <li>{{ $t("landing.vejaSuaSequenciaCrescer") }}</li>
+              <li>{{ $t("landing.recebaRecompensasVisuais") }}</li>
             </ul>
           </div>
 
           <div class="metodologia-card">
-            <div class="card-number">4</div>
-            <h3>Conquistar</h3>
-            <p>
-              Cada pequena ação alimenta suas grandes metas. Rastreie o progresso em direção aos seus objetivos de
-              longo prazo.
-            </p>
+            <div class="card-number">
+              4
+            </div>
+            <h3>{{ $t("landing.conquistar") }}</h3>
+            <p>{{ $t("landing.cadaPequenaAcaoAlimenta") }}</p>
             <ul>
-              <li>Defina metas de longo prazo</li>
-              <li>Conecte tarefas às metas</li>
-              <li>Rastreie progresso visualmente</li>
-              <li>Celebre conquistas</li>
+              <li>{{ $t("landing.definaMetasDeLongo") }}</li>
+              <li>{{ $t("landing.conecteTarefasAsMetas") }}</li>
+              <li>{{ $t("landing.rastreieProgressoVisualmente") }}</li>
+              <li>{{ $t("landing.celebreConquistas") }}</li>
             </ul>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="recursos" class="recursos-section">
+    <section
+      id="recursos"
+      class="recursos-section"
+    >
       <div class="container">
         <div class="section-header">
-          <h2>Recursos Principais</h2>
-          <p>Tudo que você precisa para organizar sua vida e aumentar sua produtividade</p>
+          <h2>{{ $t("landing.recursosPrincipais") }}</h2>
+          <p>{{ $t("landing.tudoQueVocePrecisa") }}</p>
         </div>
 
         <div class="recursos-grid">
           <div class="recurso-card">
-            <h3>Gestão de Tarefas</h3>
-            <p>
-              Organize suas tarefas em categorias, defina prioridades e datas de vencimento. Crie subtarefas para
-              quebrar projetos grandes em passos menores.
-            </p>
+            <h3>{{ $t("landing.gestaoDeTarefas") }}</h3>
+            <p>{{ $t("landing.organizeSuasTarefasEm") }}</p>
           </div>
 
           <div class="recurso-card">
-            <h3>Modo Foco</h3>
-            <p>
-              Elimine distrações e entre em foco profundo. Timer integrado ajuda você a manter sessões produtivas e
-              rastreia seu tempo ao longo do tempo.
-            </p>
+            <h3>{{ $t("landing.modoFoco") }}</h3>
+            <p>{{ $t("landing.elimineDistracoesEEntre") }}</p>
           </div>
 
           <div class="recurso-card">
-            <h3>Rastreamento de Hábitos</h3>
-            <p>
-              Construa hábitos duradouros com feedback visual imediato. Veja sua sequência crescer e celebre suas
-              vitórias com recompensas visuais.
-            </p>
+            <h3>{{ $t("landing.rastreamentoDeHabitos") }}</h3>
+            <p>{{ $t("landing.construaHabitosDuradourosCom") }}</p>
           </div>
 
           <div class="recurso-card">
-            <h3>Planner Semanal</h3>
-            <p>
-              Visualize sua semana em um calendário interativo. Arraste e solte tarefas para reorganizar sua agenda e
-              planeje com antecedência.
-            </p>
+            <h3>{{ $t("landing.plannerSemanal") }}</h3>
+            <p>{{ $t("landing.visualizeSuaSemanaEm") }}</p>
           </div>
 
           <div class="recurso-card">
-            <h3>Métricas e Insights</h3>
-            <p>
-              Entenda seus padrões de produtividade. Rastreie seu humor, energia e correlacione com sua produtividade
-              para otimizar seu desempenho.
-            </p>
+            <h3>{{ $t("landing.metricasEInsights") }}</h3>
+            <p>{{ $t("landing.entendaSeusPadroesDe") }}</p>
           </div>
 
           <div class="recurso-card">
-            <h3>Sincronização em Tempo Real</h3>
-            <p>
-              Seus dados são sincronizados entre todos os seus dispositivos. Comece no desktop e continue no celular
-              sem problemas.
-            </p>
+            <h3>{{ $t("landing.sincronizacaoEmTempoReal") }}</h3>
+            <p>{{ $t("landing.seusDadosSaoSincronizados") }}</p>
           </div>
         </div>
       </div>
@@ -883,16 +835,12 @@ useHead({
         style="max-width: 900px"
       >
         <div class="cta-box">
-          <h2>Respire. Organize. Avance.</h2>
-          <p>
-            Sua mente não precisa ser um lugar caótico. Experimente a calma de
-            ter um sistema em que você pode confiar.
-          </p>
+          <h2>{{ $t("landing.respireOrganizeAvance") }}</h2>
+          <p>{{ $t("landing.suaMenteNaoPrecisa") }}</p>
           <NuxtLink
             to="/auth/login"
             class="btn btn-primary"
-            >Criar conta gratuita</NuxtLink
-          >
+          >{{ $t("landing.criarContaGratuita") }}</NuxtLink>
           <div
             style="
               margin-top: 1.5rem;
@@ -901,7 +849,7 @@ useHead({
               font-weight: 500;
             "
           >
-            Plano gratuito generoso • Sem cartão de crédito
+            {{ $t("landing.planoGratuitoGenerosoSem") }}
           </div>
         </div>
       </div>
@@ -915,60 +863,65 @@ useHead({
               class="flex items-center gap-2"
               style="margin-bottom: 1.5rem"
             >
-              <img src="/mindle-logo.png" alt="Mindle" class="logo-img" style="width: 32px; height: 32px" />
+              <img
+                src="/mindle-logo.png"
+                alt="Mindle"
+                class="logo-img"
+                style="width: 32px; height: 32px"
+              />
               <span class="logo-text">Mindle</span>
             </div>
             <p style="font-size: 0.875rem; color: var(--text-muted)">
-              Construindo ferramentas de pensamento para mentes que não param.
+              {{ $t("landing.construindoFerramentasDePensamento") }}
             </p>
           </div>
 
           <div>
-            <h4>Recursos</h4>
+            <h4>{{ $t("landing.recursos") }}</h4>
             <ul>
-              <li><NuxtLink to="/blog">Blog</NuxtLink></li>
-              <li><NuxtLink to="/comunidade">Comunidade</NuxtLink></li>
-              <li><a href="#metodologia">Metodologia</a></li>
-              <li><NuxtLink to="/ajuda">Ajuda</NuxtLink></li>
+              <li><NuxtLink to="/blog">{{ $t("landing.blog") }}</NuxtLink></li>
+              <li><NuxtLink to="/comunidade">{{ $t("landing.comunidade") }}</NuxtLink></li>
+              <li><a href="#metodologia">{{ $t("landing.metodologia") }}</a></li>
+              <li><NuxtLink to="/ajuda">{{ $t("landing.ajuda") }}</NuxtLink></li>
             </ul>
           </div>
 
           <div>
-            <h4>Produto</h4>
+            <h4>{{ $t("landing.produto") }}</h4>
             <ul>
-              <li><a href="#recursos">Funcionalidades</a></li>
-              <li><a href="#">Integrações</a></li>
-              <li><a href="#">Preços</a></li>
-              <li><a href="#">Changelog</a></li>
+              <li><a href="#recursos">{{ $t("landing.funcionalidades") }}</a></li>
+              <li><a href="#">{{ $t("landing.integracoes") }}</a></li>
+              <li><a href="#">{{ $t("landing.precos") }}</a></li>
+              <li><a href="#">{{ $t("landing.changelog") }}</a></li>
             </ul>
           </div>
 
           <div>
-            <h4>Legal</h4>
+            <h4>{{ $t("landing.legal") }}</h4>
             <ul>
-              <li><NuxtLink to="/privacidade">Privacidade</NuxtLink></li>
-              <li><NuxtLink to="/termos">Termos</NuxtLink></li>
-              <li><NuxtLink to="/cookies">Cookies</NuxtLink></li>
+              <li><NuxtLink to="/privacidade">{{ $t("landing.privacidade") }}</NuxtLink></li>
+              <li><NuxtLink to="/termos">{{ $t("landing.termos") }}</NuxtLink></li>
+              <li><NuxtLink to="/cookies">{{ $t("landing.cookies") }}</NuxtLink></li>
             </ul>
           </div>
         </div>
 
         <div class="footer-bottom">
-          <div>© 2023 Mindle Inc. Todos os direitos reservados.</div>
+          <div>{{ $t("landing.2023MindleIncTodos") }}</div>
           <div class="social-links">
             <a
               href="#"
               aria-label="Twitter"
-              ><Icon
-                name="lucide:twitter"
-                size="20"
+            ><Icon
+              name="lucide:twitter"
+              size="20"
             /></a>
             <a
               href="#"
               aria-label="GitHub"
-              ><Icon
-                name="lucide:github"
-                size="20"
+            ><Icon
+              name="lucide:github"
+              size="20"
             /></a>
           </div>
         </div>

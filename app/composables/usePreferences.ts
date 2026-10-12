@@ -11,6 +11,7 @@ interface Preferences {
   autoArchivePaid: boolean;
   theme: string;
   fontSize: string;
+  palette: string;
 }
 
 const defaults: Preferences = {
@@ -26,10 +27,15 @@ const defaults: Preferences = {
   autoArchivePaid: false,
   theme: "light",
   fontSize: "normal",
+  palette: "contrastful",
 };
 
 export const usePreferences = () => {
-  const preferences = useState<Preferences>("user-preferences", () => ({ ...defaults }));
+  const paletteCookie = useCookie<string | null>("mindle_palette");
+  const preferences = useState<Preferences>("user-preferences", () => ({
+    ...defaults,
+    palette: paletteCookie.value === "classic" ? "classic" : "contrastful",
+  }));
   const loading = useState<boolean>("prefs-loading", () => false);
   const loaded = useState<boolean>("prefs-loaded", () => false);
 

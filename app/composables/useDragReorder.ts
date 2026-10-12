@@ -45,8 +45,8 @@ export const useDragReorder = <T extends DragItem>(
     }
 
     const items = options.items.value;
-    const sourceIndex = items.findIndex((item) => item.id === sourceId);
-    const targetIndex = items.findIndex((item) => item.id === targetId);
+    const sourceIndex = items.findIndex(item => item.id === sourceId);
+    const targetIndex = items.findIndex(item => item.id === targetId);
 
     if (sourceIndex === -1 || targetIndex === -1) {
       draggedId.value = null;

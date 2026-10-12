@@ -1,7 +1,7 @@
 <template>
   <div
-    class="status-toggle-wrapper"
     ref="wrapperRef"
+    class="status-toggle-wrapper"
     @click.stop
   >
     <button
@@ -43,6 +43,7 @@ const emit = defineEmits<{
 
 const { playDone } = useSound();
 const toast = useToast();
+const { t } = useI18n();
 
 const isOpen = ref(false);
 const wrapperRef = ref<HTMLElement | null>(null);
@@ -51,11 +52,11 @@ useClickOutside(wrapperRef, () => {
   isOpen.value = false;
 });
 
-const statusOptions = [
-  { value: "NOT_STARTED" as TaskStatus, label: "Não iniciada", icon: "lucide:circle" },
-  { value: "IN_PROGRESS" as TaskStatus, label: "Em progresso", icon: "lucide:loader" },
-  { value: "DONE" as TaskStatus, label: "Concluída", icon: "lucide:check-circle-2" },
-];
+const statusOptions = computed(() => [
+  { value: "NOT_STARTED" as TaskStatus, label: t("tasks.columns.notStarted"), icon: "lucide:circle" },
+  { value: "IN_PROGRESS" as TaskStatus, label: t("tasks.columns.inProgress"), icon: "lucide:loader" },
+  { value: "DONE" as TaskStatus, label: t("tasks.columns.done"), icon: "lucide:check-circle-2" },
+]);
 
 const statusIcon = computed(() => {
   const icons: Record<string, string> = {
@@ -67,12 +68,8 @@ const statusIcon = computed(() => {
 });
 
 const statusLabel = computed(() => {
-  const labels: Record<string, string> = {
-    NOT_STARTED: "Não iniciada",
-    IN_PROGRESS: "Em progresso",
-    DONE: "Concluída",
-  };
-  return labels[props.status] || props.status;
+  const opt = statusOptions.value.find(o => o.value === props.status);
+  return opt?.label || props.status;
 });
 
 const statusClass = computed(() => props.status.toLowerCase().replace("_", "-"));
@@ -88,7 +85,7 @@ const handleSelect = (value: TaskStatus) => {
   }
   if (value === "DONE") {
     playDone();
-    toast.success({ title: "Tarefa concluída", message: "Parabéns!" });
+    toast.success({ title: t("taskForm.toasts.taskDone"), message: t("taskForm.toasts.congrats") });
   }
   emit("updateStatus", value);
   isOpen.value = false;

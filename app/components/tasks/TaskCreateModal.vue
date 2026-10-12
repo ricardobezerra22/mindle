@@ -6,7 +6,7 @@
   >
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Nova Tarefa</h2>
+        <h2>{{ $t('taskForm.title') }}</h2>
         <button
           class="close-btn"
           @click="close"
@@ -20,41 +20,47 @@
         @submit.prevent="handleCreate"
       >
         <div class="form-group">
-          <label for="create-title">Título *</label>
+          <label for="create-title">{{ $t('taskForm.titleLabel') }}</label>
           <input
             id="create-title"
             v-model="newTask.title"
             type="text"
-            placeholder="Nome da tarefa"
+            :placeholder="$t('taskForm.titlePlaceholder')"
             required
           />
         </div>
 
         <div class="form-group">
-          <label for="create-description">Descrição</label>
+          <label for="create-description">{{ $t('taskForm.descLabel') }}</label>
           <textarea
             id="create-description"
             v-model="newTask.description"
-            placeholder="Detalhes da tarefa"
+            :placeholder="$t('taskForm.descPlaceholder')"
             rows="3"
           />
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="create-priority">Prioridade</label>
+            <label for="create-priority">{{ $t('taskForm.priorityLabel') }}</label>
             <select
               id="create-priority"
               v-model="newTask.priority"
             >
-              <option value="LOW">Baixa</option>
-              <option value="MEDIUM">Média</option>
-              <option value="HIGH">Alta</option>
+              <option value="LOW">
+                {{ $t('shared.priorities.low') }}
+              </option>
+              <option value="MEDIUM">
+                {{ $t('shared.priorities.medium') }}
+              </option>
+              <option value="HIGH">
+                {{ $t('shared.priorities.high') }}
+              </option>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="create-dueDate">Data de Entrega</label>
+            <label for="create-dueDate">{{ $t('taskForm.dueDateLabel') }}</label>
             <input
               id="create-dueDate"
               v-model="newTask.dueDate"
@@ -64,7 +70,7 @@
         </div>
 
         <div class="form-group">
-          <label>Categoria</label>
+          <label>{{ $t('taskForm.categoryLabel') }}</label>
           <div class="category-selector">
             <div class="category-input-wrapper">
               <input
@@ -72,7 +78,7 @@
                 ref="categoryInputRef"
                 v-model="categorySearch"
                 type="text"
-                placeholder="Selecione ou crie uma categoria..."
+                :placeholder="$t('taskForm.categoryPlaceholder')"
                 class="category-search-input"
                 @focus="showCategoryDropdown = true"
                 @input="onCategoryInput"
@@ -113,7 +119,7 @@
                 :class="[
                   'category-option',
                   {
-                    active: idx === highlightedIndex,
+                    'active': idx === highlightedIndex,
                     'create-new': cat.id === '__create__',
                   },
                 ]"
@@ -121,7 +127,14 @@
               >
                 <template v-if="cat.id === '__create__'">
                   <Icon name="lucide:plus-circle" />
-                  <span>Criar "<strong>{{ categorySearch.trim() }}</strong>"</span>
+                  <i18n-t
+                    keypath="taskForm.createCategory"
+                    tag="span"
+                  >
+                    <template #name>
+                      <strong>{{ categorySearch.trim() }}</strong>
+                    </template>
+                  </i18n-t>
                 </template>
                 <template v-else>
                   <span
@@ -137,7 +150,7 @@
                 class="category-empty"
               >
                 <Icon name="lucide:info" />
-                <span>Digite para criar uma nova categoria</span>
+                <span>{{ $t('taskForm.newCategoryPlaceholder') }}</span>
               </div>
             </div>
           </div>
@@ -147,7 +160,7 @@
           v-if="showNewCategoryForm && !selectedCategory"
           class="form-group new-category-form"
         >
-          <label>Cor da nova categoria</label>
+          <label>{{ $t('taskForm.newCategoryColor') }}</label>
           <div class="color-picker-row">
             <input
               v-model="newCategoryColor"
@@ -177,7 +190,7 @@
         </div>
 
         <div class="form-group">
-          <label>Subtarefas</label>
+          <label>{{ $t('taskForm.subtasksLabel') }}</label>
           <div class="subtasks-form-list">
             <div
               v-for="(st, idx) in newTask.subTasks"
@@ -199,7 +212,7 @@
             <input
               v-model="newSubTaskInput"
               type="text"
-              placeholder="Adicionar subtarefa..."
+              :placeholder="$t('taskForm.subtaskPlaceholder')"
               class="subtask-add-input"
               @keyup.enter="addSubTaskToForm"
             />
@@ -220,14 +233,14 @@
             variant="secondary"
             @click="close"
           >
-            Cancelar
+            {{ $t('shared.cancel') }}
           </UiButton>
           <UiButton
             :loading="isCreating"
             type="submit"
             :disabled="!newTask.title || !selectedCategory"
           >
-            Criar Tarefa
+            {{ $t('shared.create') }}
           </UiButton>
         </div>
       </form>
@@ -250,11 +263,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
-  created: [];
+  "created": [];
 }>();
 
 const { categories, fetchCategories, createTask, createCategory } = useTasks();
 const toast = useToast();
+const { t } = useI18n();
 
 const isCreating = ref(false);
 const categorySearch = ref("");
@@ -278,17 +292,17 @@ const newTask = ref({
 const filteredCategories = computed(() => {
   if (!categorySearch.value.trim()) return categories.value;
   const q = categorySearch.value.toLowerCase();
-  return categories.value.filter((c) => c.name.toLowerCase().includes(q));
+  return categories.value.filter(c => c.name.toLowerCase().includes(q));
 });
 
 const exactCategoryMatch = computed(() => {
   const q = categorySearch.value.trim().toLowerCase();
-  return categories.value.some((c) => c.name.toLowerCase() === q);
+  return categories.value.some(c => c.name.toLowerCase() === q);
 });
 
 const dropdownItems = computed(() => {
-  const items: { id: string; name: string; color: string }[] =
-    filteredCategories.value.map((c) => ({
+  const items: { id: string; name: string; color: string }[]
+    = filteredCategories.value.map(c => ({
       id: c.id,
       name: c.name,
       color: c.color,
@@ -339,8 +353,8 @@ const onCategoryKeydown = (e: KeyboardEvent) => {
     highlightedIndex.value = (highlightedIndex.value + 1) % items.length;
   } else if (e.key === "ArrowUp") {
     e.preventDefault();
-    highlightedIndex.value =
-      highlightedIndex.value <= 0
+    highlightedIndex.value
+      = highlightedIndex.value <= 0
         ? items.length - 1
         : highlightedIndex.value - 1;
   } else if (e.key === "Enter") {
@@ -362,7 +376,7 @@ const onDropdownSelect = (idx: number) => {
     showCategoryDropdown.value = false;
     highlightedIndex.value = -1;
   } else {
-    const cat = categories.value.find((c) => c.id === item.id);
+    const cat = categories.value.find(c => c.id === item.id);
     if (cat) selectCategory(cat);
   }
 };
@@ -372,10 +386,10 @@ const handleCreateCategory = async () => {
   if (!name || creatingCategory.value) return;
 
   const colorExists = categories.value.some(
-    (c) => c.color.toUpperCase() === newCategoryColor.value.toUpperCase(),
+    c => c.color.toUpperCase() === newCategoryColor.value.toUpperCase(),
   );
   if (colorExists) {
-    toast.error({ title: "Já existe uma categoria com essa cor" });
+    toast.error({ title: t("taskForm.toasts.categoryColorExists") });
     return;
   }
 
@@ -383,13 +397,13 @@ const handleCreateCategory = async () => {
   try {
     const cat = await createCategory(name, newCategoryColor.value);
     if (cat) {
-      toast.success({ title: "Categoria criada com sucesso" });
+      toast.success({ title: t("taskForm.toasts.categoryCreated") });
       selectCategory(cat);
       showNewCategoryForm.value = false;
       newCategoryColor.value = "#6FAF8E";
     }
   } catch (e: any) {
-    toast.error({ title: e.message || "Erro ao criar categoria" });
+    toast.error({ title: e.message || t("taskForm.toasts.categoryError") });
   } finally {
     creatingCategory.value = false;
   }
@@ -442,13 +456,13 @@ const handleCreate = async () => {
     });
 
     if (result) {
-      toast.success({ title: "Tarefa Criada" });
+      toast.success({ title: t("taskForm.toasts.taskCreated") });
       emit("created");
     } else {
-      toast.error({ title: "Erro ao criar tarefa" });
+      toast.error({ title: t("taskForm.toasts.taskError") });
     }
   } catch {
-    toast.error({ title: "Erro ao criar tarefa" });
+    toast.error({ title: t("taskForm.toasts.taskError") });
   } finally {
     isCreating.value = false;
     close();

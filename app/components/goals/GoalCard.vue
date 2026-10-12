@@ -32,7 +32,7 @@
             name="lucide:moon"
             size="12"
           />
-          Inativa
+          {{ $t('goals.card.inactive') }}
         </span>
       </div>
       <div
@@ -64,10 +64,8 @@
           name="lucide:folder"
           size="14"
         />
-        <span
-          >{{ goal.projectCount }}
-          {{ goal.projectCount === 1 ? "projeto" : "projetos" }}</span
-        >
+        <span>{{ goal.projectCount }}
+          {{ goal.projectCount === 1 ? $t('goals.card.project') : $t('goals.card.projects') }}</span>
       </div>
       <div class="goal-stat">
         <Icon
@@ -108,11 +106,12 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { t } = useI18n();
 
 const statusLabel = computed(() => {
   const map: Record<string, string> = {
-    IN_PROGRESS: "Em andamento",
-    DONE: "Concluída",
+    IN_PROGRESS: t("goals.card.inProgress"),
+    DONE: t("goals.card.done"),
   };
   return map[props.goal.status] || props.goal.status;
 });
@@ -129,16 +128,16 @@ const isDeadlineClose = computed(() => {
 
 const daysLeftLabel = computed(() => {
   if (daysLeft.value === null) return "";
-  if (daysLeft.value === 0) return "Hoje";
-  if (daysLeft.value === 1) return "Amanhã";
+  if (daysLeft.value === 0) return t("goals.card.today");
+  if (daysLeft.value === 1) return t("goals.card.tomorrow");
   return `${daysLeft.value}d`;
 });
 
 const isInactive = computed(() => {
   if (!props.goal.lastActivity) return true;
   const daysSince = Math.floor(
-    (Date.now() - new Date(props.goal.lastActivity).getTime()) /
-      (1000 * 60 * 60 * 24),
+    (Date.now() - new Date(props.goal.lastActivity).getTime())
+    / (1000 * 60 * 60 * 24),
   );
   return daysSince > 10;
 });

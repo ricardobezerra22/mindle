@@ -4,7 +4,7 @@
     <input
       :value="modelValue"
       type="text"
-      placeholder="Buscar tarefa por nome..."
+      :placeholder="$t('tasks.actions.searchByName')"
       class="search-input"
       @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
     />

@@ -5,8 +5,8 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const { title, topicId } = body;
 
-    if (!title?.trim()) return sendError(event, "Title is required", 400);
-    if (!topicId) return sendError(event, "Topic ID is required", 400);
+    if (!title?.trim()) return sendError(event, serverT(event, "server.titleIsRequired"), 400);
+    if (!topicId) return sendError(event, serverT(event, "server.topicIdIsRequired"), 400);
 
     const count = await prisma.subtopic.count({ where: { topicId } });
 
@@ -22,6 +22,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, subtopic, 201);
   } catch (error) {
     console.error("Error creating subtopic:", error);
-    return sendError(event, "Failed to create subtopic", 500);
+    return sendError(event, serverT(event, "server.failedToCreateSubtopic"), 500);
   }
 });

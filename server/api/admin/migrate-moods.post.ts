@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   try {
     const userId = event.context.userId;
     if (!userId) {
-      return sendError(event, "Unauthorized", 401);
+      return sendError(event, serverT(event, "server.unauthorized"), 401);
     }
 
     let updatedCount = 0;
@@ -40,6 +40,6 @@ export default defineEventHandler(async (event) => {
     });
   } catch (error) {
     console.error("Mood migration error:", error);
-    return sendError(event, "Migration failed", 500);
+    return sendError(event, serverT(event, "server.migrationFailed"), 500);
   }
 });

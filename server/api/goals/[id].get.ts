@@ -6,17 +6,17 @@ export default defineEventHandler(async (event) => {
     const id = getRouterParam(event, "id");
 
     if (!id) {
-      return sendError(event, "ID is required", 400);
+      return sendError(event, serverT(event, "server.idIsRequired"), 400);
     }
 
     const goal = await getGoalById(id, userId);
     if (!goal) {
-      return sendError(event, "Goal not found", 404);
+      return sendError(event, serverT(event, "server.goalNotFound"), 404);
     }
 
     return sendSuccess(event, goal);
   } catch (error) {
     console.error("Error fetching goal:", error);
-    return sendError(event, "Failed to fetch goal", 500);
+    return sendError(event, serverT(event, "server.failedToFetchGoal"), 500);
   }
 });

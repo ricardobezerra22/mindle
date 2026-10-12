@@ -2,10 +2,15 @@
   <div class="chart-card">
     <div class="chart-header">
       <div class="chart-title-row">
-        <Icon name="lucide:target" size="16" />
-        <h3 class="chart-title">Evolução do Foco</h3>
+        <Icon
+          name="lucide:target"
+          size="16"
+        />
+        <h3 class="chart-title">
+          {{ $t("dashboard.focusEvolution") }}
+        </h3>
       </div>
-      <span class="chart-subtitle">Minutos por dia</span>
+      <span class="chart-subtitle">{{ $t("dashboard.minutesPerDay") }}</span>
     </div>
     <div class="chart-body">
       <Line
@@ -13,8 +18,11 @@
         :data="chartData"
         :options="chartOptions"
       />
-      <div v-else class="chart-empty">
-        <span>Sem dados de foco no período</span>
+      <div
+        v-else
+        class="chart-empty"
+      >
+        <span>{{ $t("dashboard.noFocusData") }}</span>
       </div>
     </div>
   </div>
@@ -32,26 +40,40 @@ import {
   Tooltip,
 } from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+);
 
 interface Props {
   dailyData: Record<string, number>;
 }
 
 const props = defineProps<Props>();
+const { t } = useI18n();
 
 const chartData = computed(() => {
-  const entries = Object.entries(props.dailyData).sort(([a], [b]) => a.localeCompare(b));
+  const { locale } = useI18n();
+  const entries = Object.entries(props.dailyData).sort(([a], [b]) =>
+    a.localeCompare(b),
+  );
   if (entries.length === 0) return null;
 
   return {
     labels: entries.map(([date]) => {
       const d = new Date(date + "T12:00:00");
-      return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+      return d.toLocaleDateString(locale.value, {
+        day: "2-digit",
+        month: "2-digit",
+      });
     }),
     datasets: [
       {
-        label: "Minutos",
+        label: t("dashboard.minutes"),
         data: entries.map(([, val]) => val),
         borderColor: "#6faf8e",
         backgroundColor: "rgba(111, 175, 142, 0.1)",

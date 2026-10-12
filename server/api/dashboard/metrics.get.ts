@@ -35,7 +35,12 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const metrics = await getDashboardMetrics(userId, startDate, endDate);
+  const metrics = await getDashboardMetrics(
+    userId,
+    startDate,
+    endDate,
+    serverT(event, "server.weekdaysShort").split(","),
+  );
 
   return sendSuccess(event, metrics);
 });

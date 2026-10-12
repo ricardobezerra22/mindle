@@ -28,9 +28,22 @@ interface ProjectMetrics {
   activeCount: number;
   archivedCount: number;
   avgProgress: number;
-  topProject: { id: string; title: string; progress: number; totalTasks: number; doneTasks: number } | null;
+  topProject: {
+    id: string;
+    title: string;
+    progress: number;
+    totalTasks: number;
+    doneTasks: number;
+  } | null;
   staleProjects: { id: string; title: string; progress: number }[];
-  projectProgress: { id: string; title: string; progress: number; totalTasks: number; doneTasks: number; category: { name: string; color: string } | null }[];
+  projectProgress: {
+    id: string;
+    title: string;
+    progress: number;
+    totalTasks: number;
+    doneTasks: number;
+    category: { name: string; color: string } | null;
+  }[];
 }
 
 interface PlannerMetrics {
@@ -86,17 +99,30 @@ export interface DashboardMetrics {
   mood: MoodMetrics;
 }
 
-export type PeriodOption = "today" | "7d" | "30d" | "this-month" | "last-month" | "custom";
+export type PeriodOption
+  = | "today"
+    | "7d"
+    | "30d"
+    | "this-month"
+    | "last-month"
+    | "custom";
 
 export const useDashboardMetrics = () => {
-  const metrics = useState<DashboardMetrics | null>("dashboard-metrics", () => null);
+  const { $i18n } = useNuxtApp();
+  const metrics = useState<DashboardMetrics | null>(
+    "dashboard-metrics",
+    () => null,
+  );
   const loading = useState("dashboard-loading", () => false);
   const error = useState<string | null>("dashboard-error", () => null);
   const period = useState<PeriodOption>("dashboard-period", () => "30d");
-  const customRange = useState<{ start: string; end: string }>("dashboard-custom-range", () => ({
-    start: "",
-    end: "",
-  }));
+  const customRange = useState<{ start: string; end: string }>(
+    "dashboard-custom-range",
+    () => ({
+      start: "",
+      end: "",
+    }),
+  );
 
   const fetchMetrics = async () => {
     loading.value = true;
@@ -105,14 +131,23 @@ export const useDashboardMetrics = () => {
     try {
       const params: Record<string, string> = {};
 
-      if (period.value === "custom" && customRange.value.start && customRange.value.end) {
+      if (
+        period.value === "custom"
+        && customRange.value.start
+        && customRange.value.end
+      ) {
         params.startDate = new Date(customRange.value.start).toISOString();
-        params.endDate = new Date(customRange.value.end + "T23:59:59").toISOString();
+        params.endDate = new Date(
+          customRange.value.end + "T23:59:59",
+        ).toISOString();
       } else {
         params.period = period.value;
       }
 
-      const response = await $fetch<{ success: boolean; data: DashboardMetrics }>("/api/dashboard/metrics", {
+      const response = await $fetch<{
+        success: boolean;
+        data: DashboardMetrics;
+      }>("/api/dashboard/metrics", {
         params,
       });
 
@@ -120,7 +155,7 @@ export const useDashboardMetrics = () => {
         metrics.value = response.data;
       }
     } catch (e: any) {
-      error.value = e?.message || "Erro ao carregar métricas";
+      error.value = e?.message || $i18n.t("auth.metricsError");
     } finally {
       loading.value = false;
     }
@@ -141,12 +176,12 @@ export const useDashboardMetrics = () => {
 
   const periodLabel = computed(() => {
     const labels: Record<PeriodOption, string> = {
-      "today": "Hoje",
-      "7d": "7 dias",
-      "30d": "30 dias",
-      "this-month": "Este mês",
-      "last-month": "Mês passado",
-      "custom": "Personalizado",
+      "today": $i18n.t("metrics.periods.today"),
+      "7d": $i18n.t("metrics.periods.7d"),
+      "30d": $i18n.t("metrics.periods.30d"),
+      "this-month": $i18n.t("metrics.periods.thisMonth"),
+      "last-month": $i18n.t("metrics.periods.lastMonth"),
+      "custom": $i18n.t("metrics.periods.custom"),
     };
     return labels[period.value];
   });

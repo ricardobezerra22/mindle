@@ -7,5 +7,5 @@ export default defineEventHandler(async (event) => {
     path: "/",
   });
   deleteCookie(event, "auth-token", { path: "/" });
-  return sendSuccess(event, { message: "Logout realizado" });
+  return sendSuccess(event, { message: serverT(event, "server.logoutDone") });
 });

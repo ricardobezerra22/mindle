@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const { id, title, content, position } = body;
 
-    if (!id) return sendError(event, "Subtopic ID is required", 400);
+    if (!id) return sendError(event, serverT(event, "server.subtopicIdIsRequired"), 400);
 
     const subtopic = await prisma.subtopic.update({
       where: { id },
@@ -22,6 +22,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, subtopic);
   } catch (error) {
     console.error("Error updating subtopic:", error);
-    return sendError(event, "Failed to update subtopic", 500);
+    return sendError(event, serverT(event, "server.failedToUpdateSubtopic"), 500);
   }
 });

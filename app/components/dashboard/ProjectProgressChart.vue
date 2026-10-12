@@ -2,10 +2,15 @@
   <div class="chart-card">
     <div class="chart-header">
       <div class="chart-title-row">
-        <Icon name="lucide:folder-kanban" size="16" />
-        <h3 class="chart-title">Progresso dos Projetos</h3>
+        <Icon
+          name="lucide:folder-kanban"
+          size="16"
+        />
+        <h3 class="chart-title">
+          {{ $t("dashboard.projectProgress") }}
+        </h3>
       </div>
-      <span class="chart-subtitle">% de conclusão por projeto</span>
+      <span class="chart-subtitle">{{ $t("dashboard.projectProgressSubtitle") }}</span>
     </div>
     <div class="chart-body">
       <div
@@ -29,14 +34,20 @@
           <div class="project-bar-track">
             <div
               class="project-bar-fill"
-              :style="{ width: `${project.progress}%`, backgroundColor: barColor(project.progress) }"
+              :style="{
+                width: `${project.progress}%`,
+                backgroundColor: barColor(project.progress),
+              }"
             />
           </div>
           <span class="project-bar-tasks">{{ project.doneTasks }}/{{ project.totalTasks }}</span>
         </div>
       </div>
-      <div v-else class="chart-empty">
-        <span>Sem projetos ativos</span>
+      <div
+        v-else
+        class="chart-empty"
+      >
+        <span>{{ $t("dashboard.noProjects") }}</span>
       </div>
     </div>
   </div>

@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
     const { title, description, categoryId, dueDate } = body;
 
     if (!title?.trim()) {
-      return sendError(event, "Title is required", 400);
+      return sendError(event, serverT(event, "server.titleIsRequired"), 400);
     }
 
     const count = await prisma.project.count({ where: { userId } });
@@ -30,6 +30,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, project, 201);
   } catch (error) {
     console.error("Error creating project:", error);
-    return sendError(event, "Failed to create project", 500);
+    return sendError(event, serverT(event, "server.failedToCreateProject"), 500);
   }
 });

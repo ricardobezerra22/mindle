@@ -2,10 +2,15 @@
   <div class="chart-card">
     <div class="chart-header">
       <div class="chart-title-row">
-        <Icon name="lucide:smile" size="16" />
-        <h3 class="chart-title">Humor e Energia</h3>
+        <Icon
+          name="lucide:smile"
+          size="16"
+        />
+        <h3 class="chart-title">
+          {{ $t("dashboard.moodAndEnergy") }}
+        </h3>
       </div>
-      <span class="chart-subtitle">Distribuição no período</span>
+      <span class="chart-subtitle">{{ $t("dashboard.moodDistribution") }}</span>
     </div>
 
     <div class="chart-body">
@@ -34,7 +39,7 @@
           v-if="hasEnergyData"
           class="energy-section"
         >
-          <span class="energy-title">Energia</span>
+          <span class="energy-title">{{ $t("dashboard.energy") }}</span>
           <div class="energy-pills">
             <div
               v-for="e in energyItems"
@@ -53,7 +58,7 @@
           v-if="hasCorrelation"
           class="correlation-section"
         >
-          <span class="correlation-title">Hábitos por humor</span>
+          <span class="correlation-title">{{ $t("dashboard.moodHabits") }}</span>
           <div class="correlation-list">
             <div
               v-for="c in correlationItems"
@@ -72,8 +77,11 @@
           </div>
         </div>
       </template>
-      <div v-else class="chart-empty">
-        <span>Sem registros de humor no período</span>
+      <div
+        v-else
+        class="chart-empty"
+      >
+        <span>{{ $t("dashboard.noMoodData") }}</span>
       </div>
     </div>
   </div>
@@ -87,21 +95,22 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { t } = useI18n();
 
-const moodConfig: Record<string, { emoji: string; label: string; color: string }> = {
-  HAPPY: { emoji: "😊", label: "Feliz", color: "#10b981" },
-  CALMLY: { emoji: "😌", label: "Calmo", color: "#6faf8e" },
-  OK: { emoji: "😐", label: "Ok", color: "#f59e0b" },
-  SAD: { emoji: "😢", label: "Triste", color: "#6366f1" },
-  TIRED: { emoji: "😴", label: "Cansado", color: "#8b5cf6" },
-  OVERWHELMED: { emoji: "😰", label: "Sobrecarregado", color: "#ef4444" },
-};
+const moodConfig = computed(() => ({
+  HAPPY: { emoji: "😊", label: t("mood.options.happy"), color: "#10b981" },
+  CALMLY: { emoji: "😌", label: t("mood.options.calmly"), color: "#6faf8e" },
+  OK: { emoji: "😐", label: t("mood.options.ok"), color: "#f59e0b" },
+  SAD: { emoji: "😢", label: t("mood.options.sad"), color: "#6366f1" },
+  TIRED: { emoji: "😴", label: t("mood.options.tired"), color: "#8b5cf6" },
+  OVERWHELMED: { emoji: "😰", label: t("mood.options.overwhelmed"), color: "#ef4444" },
+} as Record<string, { emoji: string; label: string; color: string }>));
 
-const energyConfig: Record<string, { icon: string; label: string; color: string; bg: string }> = {
-  HIGH: { icon: "⚡", label: "Alta", color: "#059669", bg: "#d1fae5" },
-  MEDIUM: { icon: "🔋", label: "Média", color: "#92400e", bg: "#fef3c7" },
-  LOW: { icon: "🪫", label: "Baixa", color: "#991b1b", bg: "#fee2e2" },
-};
+const energyConfig = computed(() => ({
+  HIGH: { icon: "⚡", label: t("energy.levels.high"), color: "#059669", bg: "#d1fae5" },
+  MEDIUM: { icon: "🔋", label: t("energy.levels.medium"), color: "#92400e", bg: "#fef3c7" },
+  LOW: { icon: "🪫", label: t("energy.levels.low"), color: "#991b1b", bg: "#fee2e2" },
+} as Record<string, { icon: string; label: string; color: string; bg: string }>));
 
 const hasMoodData = computed(() => Object.values(props.distribution).some(v => v > 0));
 const hasEnergyData = computed(() => Object.values(props.energyDistribution).some(v => v > 0));
@@ -110,7 +119,7 @@ const hasCorrelation = computed(() => Object.keys(props.moodHabitCorrelation).le
 const totalMoods = computed(() => Object.values(props.distribution).reduce((a, b) => a + b, 0));
 
 const moodItems = computed(() => {
-  return Object.entries(moodConfig)
+  return Object.entries(moodConfig.value)
     .map(([mood, cfg]) => ({
       mood,
       ...cfg,
@@ -124,7 +133,7 @@ const moodItems = computed(() => {
 });
 
 const energyItems = computed(() => {
-  return Object.entries(energyConfig)
+  return Object.entries(energyConfig.value)
     .map(([level, cfg]) => ({
       level,
       ...cfg,
@@ -137,7 +146,7 @@ const correlationItems = computed(() => {
   return Object.entries(props.moodHabitCorrelation)
     .map(([mood, rate]) => ({
       mood,
-      emoji: moodConfig[mood]?.emoji || "❓",
+      emoji: moodConfig.value[mood]?.emoji || "❓",
       rate,
     }))
     .sort((a, b) => b.rate - a.rate);

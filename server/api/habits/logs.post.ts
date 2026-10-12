@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     const { habitId, date, done } = body;
 
     if (!habitId) {
-      return sendError(event, "Habit ID is required", 400);
+      return sendError(event, serverT(event, "server.habitIdIsRequired"), 400);
     }
 
     const log = await prisma.habitLog.create({
@@ -23,6 +23,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, log);
   } catch (error) {
     console.error("Error creating habit log:", error);
-    return sendError(event, "Failed to create habit log", 500);
+    return sendError(event, serverT(event, "server.failedToCreateHabitLog"), 500);
   }
 });

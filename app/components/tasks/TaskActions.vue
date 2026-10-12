@@ -3,7 +3,7 @@
     <button
       v-if="isFavorite && !editMode"
       class="favorite-indicator"
-      title="Remover prioridade"
+      :title="$t('tasks.actions.removePriority')"
       @click.stop="emit('toggleFavorite')"
     >
       <Icon name="lucide:star" />
@@ -13,7 +13,7 @@
       <button
         v-if="!isFavorite && !editMode"
         class="action-btn favorite-btn"
-        title="Marcar prioridade"
+        :title="$t('tasks.actions.markPriority')"
         @click.stop="emit('toggleFavorite')"
       >
         <Icon name="lucide:star" />
@@ -21,7 +21,7 @@
       <button
         v-if="!editMode"
         class="action-btn"
-        title="Editar"
+        :title="$t('tasks.actions.edit')"
         @click.stop="emit('edit')"
       >
         <Icon name="lucide:pencil" />
@@ -29,7 +29,7 @@
       <button
         v-if="editMode"
         class="action-btn save"
-        title="Salvar"
+        :title="$t('tasks.actions.save')"
         @click.stop="emit('save')"
       >
         <Icon name="lucide:check" />
@@ -37,7 +37,7 @@
       <button
         v-if="editMode"
         class="action-btn cancel"
-        title="Cancelar"
+        :title="$t('tasks.actions.cancel')"
         @click.stop="emit('cancel')"
       >
         <Icon name="lucide:x" />
@@ -45,7 +45,7 @@
       <button
         v-if="!editMode"
         class="action-btn delete"
-        title="Excluir"
+        :title="$t('tasks.actions.delete')"
         @click.stop="emit('delete')"
       >
         <Icon name="lucide:trash-2" />

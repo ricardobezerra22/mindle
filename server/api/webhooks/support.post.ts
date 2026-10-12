@@ -95,7 +95,7 @@ export default defineEventHandler(async (event: H3Event) => {
       text: text || null,
       html: html || null,
       attachments:
-        attachments?.map((a) => ({
+        attachments?.map(a => ({
           filename: a.filename,
           contentType: a.content_type,
           url: a.url || null,

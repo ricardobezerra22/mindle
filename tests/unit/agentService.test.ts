@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+import { sanitizeInput, runPreviewAgent } from "../../server/services/agentService";
+
 const mockRunEphemeral = vi.hoisted(() => vi.fn());
 const mockIsFinalResponse = vi.hoisted(() => vi.fn());
 const mockFindMany = vi.hoisted(() => vi.fn());
@@ -38,8 +40,6 @@ vi.mock("openai", () => ({
     };
   },
 }));
-
-import { sanitizeInput, runPreviewAgent } from "../../server/services/agentService";
 
 function makeEvent(text: string): AsyncGenerator<unknown> {
   return (async function* () {

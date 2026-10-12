@@ -8,17 +8,17 @@ export default defineEventHandler(async (event) => {
     const { mood, energy } = body;
 
     if (!mood) {
-      return sendError(event, "Mood is required", 400);
+      return sendError(event, serverT(event, "server.moodIsRequired"), 400);
     }
 
     const validMoods = ["HAPPY", "CALMLY", "OK", "SAD", "TIRED", "OVERWHELMED"];
     if (!validMoods.includes(mood)) {
-      return sendError(event, "Invalid mood value", 400);
+      return sendError(event, serverT(event, "server.invalidMoodValue"), 400);
     }
 
     const validEnergy = ["LOW", "MEDIUM", "HIGH"];
     if (energy && !validEnergy.includes(energy)) {
-      return sendError(event, "Invalid energy value", 400);
+      return sendError(event, serverT(event, "server.invalidEnergyValue"), 400);
     }
 
     const today = new Date();
@@ -56,6 +56,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, newMood);
   } catch (error) {
     console.error("Error saving mood:", error);
-    return sendError(event, "Failed to save mood", 500);
+    return sendError(event, serverT(event, "server.failedToSaveMood"), 500);
   }
 });

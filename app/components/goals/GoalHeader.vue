@@ -1,23 +1,38 @@
 <template>
-  <div class="goal-header" :style="headerAccent">
+  <div
+    class="goal-header"
+    :style="headerAccent"
+  >
     <div class="header-top">
-      <button class="back-btn" @click="$router.back()">
-        <Icon name="lucide:arrow-left" size="18" />
+      <button
+        class="back-btn"
+        @click="$router.back()"
+      >
+        <Icon
+          name="lucide:arrow-left"
+          size="18"
+        />
       </button>
       <div class="header-actions">
         <button
           class="action-btn"
-          title="Editar meta"
+          :title="$t('goals.header.editTitle')"
           @click="emit('edit')"
         >
-          <Icon name="lucide:pencil" size="16" />
+          <Icon
+            name="lucide:pencil"
+            size="16"
+          />
         </button>
         <button
           class="action-btn danger"
-          title="Excluir meta"
+          :title="$t('goals.header.deleteTitle')"
           @click="emit('delete')"
         >
-          <Icon name="lucide:trash-2" size="16" />
+          <Icon
+            name="lucide:trash-2"
+            size="16"
+          />
         </button>
       </div>
     </div>
@@ -28,27 +43,47 @@
           <span :class="['status-badge', `status-${goal.status.toLowerCase().replace('_', '-')}`]">
             {{ statusLabel }}
           </span>
-          <span v-if="deadlineFormatted" class="deadline-text">
-            <Icon name="lucide:calendar" size="13" />
+          <span
+            v-if="deadlineFormatted"
+            class="deadline-text"
+          >
+            <Icon
+              name="lucide:calendar"
+              size="13"
+            />
             {{ deadlineFormatted }}
           </span>
         </div>
-        <h1 class="goal-name">{{ goal.title }}</h1>
-        <p v-if="goal.description" class="goal-description">{{ goal.description }}</p>
+        <h1 class="goal-name">
+          {{ goal.title }}
+        </h1>
+        <p
+          v-if="goal.description"
+          class="goal-description"
+        >
+          {{ goal.description }}
+        </p>
       </div>
 
       <div class="header-progress">
         <div class="progress-ring-container">
-          <svg class="progress-ring" viewBox="0 0 100 100">
+          <svg
+            class="progress-ring"
+            viewBox="0 0 100 100"
+          >
             <circle
               class="ring-bg"
-              cx="50" cy="50" r="42"
+              cx="50"
+              cy="50"
+              r="42"
               fill="none"
               stroke-width="6"
             />
             <circle
               class="ring-fill"
-              cx="50" cy="50" r="42"
+              cx="50"
+              cy="50"
+              r="42"
               fill="none"
               stroke-width="6"
               :stroke="goal.color || 'var(--color-primary)'"
@@ -63,16 +98,19 @@
           </div>
         </div>
         <div class="progress-meta">
-          <span>{{ goal.completedTasks }}/{{ goal.totalTasks }} tarefas</span>
-          <span>{{ goal.projectCount }} {{ goal.projectCount === 1 ? 'projeto' : 'projetos' }}</span>
+          <span>{{ tasksLabel }}</span>
+          <span>{{ projectsLabel }}</span>
         </div>
       </div>
     </div>
 
     <div class="clarity-bar">
       <div class="clarity-label">
-        <Icon name="lucide:sparkles" size="14" />
-        <span>Clareza</span>
+        <Icon
+          name="lucide:sparkles"
+          size="14"
+        />
+        <span>{{ $t('goals.header.clarity') }}</span>
       </div>
       <div class="clarity-track">
         <div
@@ -98,26 +136,35 @@ const emit = defineEmits<{
   delete: [];
 }>();
 
+const { t, locale } = useI18n();
+
 const circumference = 2 * Math.PI * 42;
 const strokeOffset = computed(() =>
   circumference - (props.goal.progress / 100) * circumference,
 );
 
 const statusLabel = computed(() => {
-  const map: Record<string, string> = {
-    IN_PROGRESS: "Em andamento",
-    DONE: "Concluída",
-  };
-  return map[props.goal.status] || props.goal.status;
+  if (props.goal.status === "IN_PROGRESS") return t("goals.header.statusInProgress");
+  if (props.goal.status === "DONE") return t("goals.header.statusDone");
+  return props.goal.status;
 });
 
 const deadlineFormatted = computed(() => {
   if (!props.goal.deadline) return null;
-  return new Date(props.goal.deadline).toLocaleDateString("pt-PT", {
+  return new Date(props.goal.deadline).toLocaleDateString(locale.value === "en" ? "en-US" : "pt-BR", {
     day: "2-digit",
     month: "short",
     year: "numeric",
   });
+});
+
+const tasksLabel = computed(() =>
+  t("goals.header.tasks", { done: props.goal.completedTasks, total: props.goal.totalTasks }),
+);
+
+const projectsLabel = computed(() => {
+  const n = props.goal.projectCount;
+  return `${n} ${n === 1 ? t("goals.header.project") : t("goals.header.projects")}`;
 });
 
 const clarityColor = computed(() => {

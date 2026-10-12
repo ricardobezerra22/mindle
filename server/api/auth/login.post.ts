@@ -8,25 +8,25 @@ export default defineEventHandler(async (event) => {
     const { email, password } = body;
 
     if (!email || !password) {
-      return sendError(event, "Email e senha são obrigatórios", 400);
+      return sendError(event, serverT(event, "server.emailPasswordRequired"), 400);
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return sendError(event, "Email ou senha incorretos", 401);
+      return sendError(event, serverT(event, "server.invalidCredentials"), 401);
     }
 
     if (!user.password) {
-      return sendError(event, "Esta conta usa login com Google. Use o botão do Google para entrar.", 401);
+      return sendError(event, serverT(event, "server.googleAccount"), 401);
     }
 
     const valid = await comparePassword(password, user.password);
     if (!valid) {
-      return sendError(event, "Email ou senha incorretos", 401);
+      return sendError(event, serverT(event, "server.invalidCredentials"), 401);
     }
 
     if (!user.isActive) {
-      return sendError(event, "Sua conta está inativa. Entre em contato com o administrador para ser ativado.", 403);
+      return sendError(event, serverT(event, "server.inactiveAccount"), 403);
     }
 
     const token = await generateToken(user.id);
@@ -50,6 +50,6 @@ export default defineEventHandler(async (event) => {
     });
   } catch (error) {
     console.error("Error logging in:", error);
-    return sendError(event, "Erro ao fazer login", 500);
+    return sendError(event, serverT(event, "server.loginError"), 500);
   }
 });

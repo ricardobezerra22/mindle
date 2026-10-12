@@ -22,6 +22,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, habits);
   } catch (error) {
     console.error("Error fetching habits:", error);
-    return sendError(event, "Failed to fetch habits", 500);
+    return sendError(event, serverT(event, "server.failedToFetchHabits"), 500);
   }
 });

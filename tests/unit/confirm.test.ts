@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+import { sessionCache } from "../../server/services/agentService";
+
 const mockTx = vi.hoisted(() => ({
   taskCategory: { create: vi.fn() },
   task: { create: vi.fn() },
@@ -22,8 +24,6 @@ vi.mock("../../server/services/agentService", () => {
     sessionCache,
   };
 });
-
-import { sessionCache } from "../../server/services/agentService";
 
 async function loadHandler() {
   const mod = await import("../../server/api/agent/voice-tasks/confirm.post.ts");

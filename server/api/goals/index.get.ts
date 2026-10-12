@@ -7,6 +7,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, goals);
   } catch (error) {
     console.error("Error fetching goals:", error);
-    return sendError(event, "Failed to fetch goals", 500);
+    return sendError(event, serverT(event, "server.failedToFetchGoals"), 500);
   }
 });

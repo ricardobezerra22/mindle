@@ -3,12 +3,14 @@ definePageMeta({
   layout: "default",
 });
 
+const { t } = useI18n();
+
 useHead({
-  title: "Recursos - Mindle",
+  title: computed(() => t("resources.metaTitle")),
   meta: [
     {
       name: "description",
-      content: "Explore os recursos principais do Mindle e como eles podem ajudar você.",
+      content: computed(() => t("resources.metaDescription")),
     },
   ],
 });
@@ -17,90 +19,72 @@ useHead({
 <template>
   <div class="resources-page">
     <div class="container py-12">
-      <h1 class="text-4xl font-bold mb-8">Recursos Mindle</h1>
+      <h1 class="text-4xl font-bold mb-8">{{ $t("resources.recursosMindle") }}</h1>
 
       <div class="resources-content max-w-4xl">
         <div class="resource-item mb-12">
-          <h2>Gestão de Tarefas</h2>
-          <p>
-            Organize suas tarefas em categorias, defina prioridades e datas de vencimento. Crie subtarefas para quebrar
-            projetos grandes em passos menores e gerenciáveis.
-          </p>
+          <h2>{{ $t("resources.gestaoDeTarefas") }}</h2>
+          <p>{{ $t("resources.organizeSuasTarefasEm") }}</p>
           <ul>
-            <li>Tarefas com múltiplos níveis</li>
-            <li>Categorização automática</li>
-            <li>Priorização inteligente</li>
-            <li>Rastreamento de progresso</li>
+            <li>{{ $t("resources.tarefasComMultiplosNiveis") }}</li>
+            <li>{{ $t("resources.categorizacaoAutomatica") }}</li>
+            <li>{{ $t("resources.priorizacaoInteligente") }}</li>
+            <li>{{ $t("resources.rastreamentoDeProgresso") }}</li>
           </ul>
         </div>
 
         <div class="resource-item mb-12">
-          <h2>Modo Foco</h2>
-          <p>
-            Elimine distrações e entre em um estado de foco profundo. O timer integrado ajuda você a manter sessões
-            produtivas e rastreia seu tempo de foco ao longo do tempo.
-          </p>
+          <h2>{{ $t("resources.modoFoco") }}</h2>
+          <p>{{ $t("resources.elimineDistracoesEEntre") }}</p>
           <ul>
-            <li>Timer de Pomodoro customizável</li>
-            <li>Bloqueio de distrações</li>
-            <li>Histórico de sessões</li>
-            <li>Análise de produtividade</li>
+            <li>{{ $t("resources.timerDePomodoroCustomizavel") }}</li>
+            <li>{{ $t("resources.bloqueioDeDistracoes") }}</li>
+            <li>{{ $t("resources.historicoDeSessoes") }}</li>
+            <li>{{ $t("resources.analiseDeProdutividade") }}</li>
           </ul>
         </div>
 
         <div class="resource-item mb-12">
-          <h2>Rastreamento de Hábitos</h2>
-          <p>
-            Construa hábitos duradouros com feedback visual imediato. Veja sua sequência crescer e celebre suas
-            vitórias com recompensas visuais satisfatórias.
-          </p>
+          <h2>{{ $t("resources.rastreamentoDeHabitos") }}</h2>
+          <p>{{ $t("resources.construaHabitosDuradourosCom") }}</p>
           <ul>
-            <li>Hábitos diários com sequência</li>
-            <li>Feedback visual (bolhas de hábito)</li>
-            <li>Análise de consistência</li>
-            <li>Lembretes personalizados</li>
+            <li>{{ $t("resources.habitosDiariosComSequencia") }}</li>
+            <li>{{ $t("resources.feedbackVisualBolhasDe") }}</li>
+            <li>{{ $t("resources.analiseDeConsistencia") }}</li>
+            <li>{{ $t("resources.lembretesPersonalizados") }}</li>
           </ul>
         </div>
 
         <div class="resource-item mb-12">
-          <h2>Planner Semanal</h2>
-          <p>
-            Visualize sua semana em um calendário interativo. Arraste e solte tarefas para reorganizar sua agenda e
-            planeje com antecedência.
-          </p>
+          <h2>{{ $t("resources.plannerSemanal") }}</h2>
+          <p>{{ $t("resources.visualizeSuaSemanaEm") }}</p>
           <ul>
-            <li>Visualização de calendário</li>
-            <li>Drag and drop de tarefas</li>
-            <li>Visão geral semanal</li>
-            <li>Planejamento de longo prazo</li>
+            <li>{{ $t("resources.visualizacaoDeCalendario") }}</li>
+            <li>{{ $t("resources.dragAndDropDe") }}</li>
+            <li>{{ $t("resources.visaoGeralSemanal") }}</li>
+            <li>{{ $t("resources.planejamentoDeLongoPrazo") }}</li>
           </ul>
         </div>
 
         <div class="resource-item mb-12">
-          <h2>Métricas e Insights</h2>
-          <p>
-            Entenda seus padrões de produtividade. Rastreie seu humor, energia e correlacione com sua produtividade
-            para otimizar seu desempenho.
-          </p>
+          <h2>{{ $t("resources.metricasEInsights") }}</h2>
+          <p>{{ $t("resources.entendaSeusPadroesDe") }}</p>
           <ul>
-            <li>Dashboard de métricas</li>
-            <li>Rastreamento de humor</li>
-            <li>Análise de energia</li>
-            <li>Insights personalizados</li>
+            <li>{{ $t("resources.dashboardDeMetricas") }}</li>
+            <li>{{ $t("resources.rastreamentoDeHumor") }}</li>
+            <li>{{ $t("resources.analiseDeEnergia") }}</li>
+            <li>{{ $t("resources.insightsPersonalizados") }}</li>
           </ul>
         </div>
 
         <div class="resource-item">
-          <h2>Sincronização em Tempo Real</h2>
-          <p>
-            Seus dados são sincronizados em tempo real entre todos os seus dispositivos. Comece uma tarefa no desktop
-            e continue no celular sem problemas.
-          </p>
+          <h2>{{ $t("resources.sincronizacaoEmTempoReal") }}</h2>
+          <p>{{ $t("resources.seusDadosSaoSincronizados") }}</p>
           <ul>
-            <li>Sincronização multi-dispositivo</li>
-            <li>Acesso offline</li>
-            <li>Backup automático</li>
-            <li>Segurança de dados</li>
+            <li>{{ $t("resources.sincronizacaoMultiDispositivo") }}</li>
+            <li>{{ $t("resources.acessoOffline") }}</li>
+            <li>{{ $t("resources.backupAutomatico") }}</li>
+            <li>{{ $t("resources.segurancaDeDados") }}</li>
           </ul>
         </div>
       </div>

@@ -9,10 +9,10 @@
           <Icon name="lucide:check-circle-2" />
         </div>
         <h2 class="completion-title">
-          Bom trabalho. Você apareceu.
+          {{ $t('focus.completion.title') }}
         </h2>
         <p class="completion-message">
-          Você focou por {{ formatDuration(elapsedMinutes) }}
+          {{ $t('focus.completion.focusedFor', { duration: formatDuration(elapsedMinutes) }) }}
         </p>
         <div class="completion-actions">
           <button
@@ -29,14 +29,14 @@
               name="lucide:loader-2"
               class="spinning"
             />
-            {{ isLoggingSession ? 'Registrando...' : 'Registrar sessão' }}
+            {{ isLoggingSession ? $t('focus.completion.logging') : $t('focus.completion.logSession') }}
           </button>
           <button
             :disabled="isLoggingSession"
             class="reset-btn"
             @click="resetSession"
           >
-            Iniciar outra
+            {{ $t('focus.completion.startAnother') }}
           </button>
         </div>
       </div>
@@ -48,7 +48,7 @@
         class="setup-view"
       >
         <div class="focus-context">
-          <label class="context-label">Vincular a uma tarefa?</label>
+          <label class="context-label">{{ $t('focus.linkTask') }}</label>
           <div class="task-selector">
             <button
               class="task-selector-toggle"
@@ -60,7 +60,7 @@
                 size="16"
               />
               <span class="task-selector-label">
-                {{ selectedTask ? selectedTask.title : 'Nenhuma tarefa (opcional)' }}
+                {{ selectedTask ? selectedTask.title : $t('focus.noTask') }}
               </span>
               <Icon
                 :name="showTaskDropdown ? 'lucide:chevron-up' : 'lucide:chevron-down'"
@@ -76,7 +76,7 @@
                 v-model="taskSearch"
                 type="text"
                 class="task-search-input"
-                placeholder="Buscar tarefa..."
+                :placeholder="$t('focus.searchTask')"
               />
               <div class="task-dropdown-list">
                 <button
@@ -87,7 +87,7 @@
                     name="lucide:x"
                     size="14"
                   />
-                  Sem tarefa vinculada
+                  {{ $t('focus.noTaskLinked') }}
                 </button>
                 <button
                   v-for="task in filteredAvailableTasks"
@@ -111,7 +111,7 @@
                   v-if="filteredAvailableTasks.length === 0"
                   class="task-dropdown-empty"
                 >
-                  Nenhuma tarefa encontrada
+                  {{ $t('focus.noTaskFound') }}
                 </div>
               </div>
             </div>
@@ -121,21 +121,21 @@
             for="focus-input"
             class="context-label context-label-secondary"
           >
-            {{ selectedTask ? 'Contexto adicional' : 'No que você vai focar?' }}
+            {{ selectedTask ? $t('focus.contextLabelWithTask') : $t('focus.contextLabel') }}
           </label>
           <input
             id="focus-input"
             v-model="focusContext"
             type="text"
             class="context-input"
-            :placeholder="selectedTask ? 'ex: Revisar capítulo 3' : 'ex: Estudar Hematologia'"
+            :placeholder="selectedTask ? $t('focus.contextPlaceholderWithTask') : $t('focus.contextPlaceholder')"
             maxlength="50"
           />
         </div>
 
         <div class="presets-section">
           <h3 class="presets-title">
-            Escolha seu tempo de foco
+            {{ $t('focus.chooseTime') }}
           </h3>
           <div class="presets-grid">
             <button
@@ -157,7 +157,7 @@
             class="custom-toggle"
             @click="showCustom = true"
           >
-            Duração personalizada
+            {{ $t('focus.customDuration') }}
           </button>
 
           <div
@@ -170,13 +170,13 @@
               min="1"
               max="240"
               class="custom-input"
-              placeholder="Minutos"
+              :placeholder="$t('focus.minutesLabel')"
             />
             <button
               class="apply-custom-btn"
               @click="applyCustom"
             >
-              Aplicar
+              {{ $t('focus.apply') }}
             </button>
           </div>
         </div>
@@ -194,10 +194,16 @@
             v-if="selectedTask"
             class="active-task-badge"
           >
-            <Icon name="lucide:link" size="14" />
+            <Icon
+              name="lucide:link"
+              size="14"
+            />
             {{ selectedTask.title }}
           </span>
-          <span v-if="focusContext" class="active-context-text">
+          <span
+            v-if="focusContext"
+            class="active-context-text"
+          >
             {{ focusContext }}
           </span>
         </div>
@@ -230,14 +236,14 @@
               {{ formattedTime }}
             </div>
             <div class="time-label">
-              restante
+              {{ $t('focus.remaining') }}
             </div>
           </div>
         </div>
 
         <div class="distraction-indicator">
           <Icon name="lucide:bell-off" />
-          <span>Mantenha o foco</span>
+          <span>{{ $t('focus.keepFocus') }}</span>
         </div>
       </div>
 
@@ -249,7 +255,7 @@
           @click="startSession"
         >
           <Icon name="lucide:play" />
-          Começar foco
+          {{ $t('focus.start') }}
         </button>
 
         <button
@@ -258,7 +264,7 @@
           @click="pauseSession"
         >
           <Icon name="lucide:pause" />
-          Pausar
+          {{ $t('focus.pause') }}
         </button>
 
         <button
@@ -267,7 +273,7 @@
           @click="resumeSession"
         >
           <Icon name="lucide:play" />
-          Retomar
+          {{ $t('focus.resume') }}
         </button>
 
         <button
@@ -276,7 +282,7 @@
           @click="endSession"
         >
           <Icon name="lucide:octagon" />
-          Encerrar sessão
+          {{ $t('focus.end') }}
         </button>
       </div>
     </div>
@@ -288,6 +294,7 @@ import type { Task } from "~/types";
 
 const { tasks, fetchTasks } = useTasks();
 const { preferences } = usePreferences();
+const { t } = useI18n();
 
 const focusContext = ref("");
 const selectedDuration = ref(0);
@@ -333,12 +340,12 @@ const activeContextLabel = computed(() =>
   selectedTask.value || focusContext.value,
 );
 
-const presets = [
-  { value: 15, label: "15 min", sublabel: "Foco rápido" },
-  { value: 30, label: "30 min", sublabel: "Padrão" },
-  { value: 60, label: "60 min", sublabel: "Trabalho profundo" },
-  { value: 120, label: "120 min", sublabel: "Estendido" },
-];
+const presets = computed(() => [
+  { value: 15, label: "15 min", sublabel: t("focus.presets.15") },
+  { value: 30, label: "30 min", sublabel: t("focus.presets.30") },
+  { value: 60, label: "60 min", sublabel: t("focus.presets.60") },
+  { value: 120, label: "120 min", sublabel: t("focus.presets.120") },
+]);
 
 const selectPreset = (minutes: number) => {
   selectedDuration.value = minutes;

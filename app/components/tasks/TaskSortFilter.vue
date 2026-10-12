@@ -44,16 +44,17 @@ const emit = defineEmits<{
 }>();
 
 const isOpen = ref(false);
+const { t } = useI18n();
 
-const options = [
-  { value: "" as SortValue, label: "Padrão", icon: "lucide:list" },
-  { value: "HIGHEST_PRIORITY" as SortValue, label: "Maior Prioridade", icon: "lucide:arrow-up" },
-  { value: "LOWEST_PRIORITY" as SortValue, label: "Menor Prioridade", icon: "lucide:arrow-down" },
-];
+const options = computed(() => [
+  { value: "" as SortValue, label: t("taskForm.sortOptions.default"), icon: "lucide:list" },
+  { value: "HIGHEST_PRIORITY" as SortValue, label: t("taskForm.sortOptions.highestPriority"), icon: "lucide:arrow-up" },
+  { value: "LOWEST_PRIORITY" as SortValue, label: t("taskForm.sortOptions.lowestPriority"), icon: "lucide:arrow-down" },
+]);
 
 const selectedLabel = computed(() => {
-  const found = options.find((o) => o.value === props.modelValue);
-  return found?.label || "Ordenar";
+  const found = options.value.find(o => o.value === props.modelValue);
+  return found?.label || t("taskForm.sortDefault");
 });
 
 const select = (value: SortValue) => {

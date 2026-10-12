@@ -17,7 +17,7 @@
         class="custom-range"
       >
         <div class="range-field">
-          <label>De</label>
+          <label>{{ $t('shared.from') }}</label>
           <input
             :value="customRange.start"
             type="date"
@@ -27,7 +27,7 @@
         </div>
         <span class="range-sep">→</span>
         <div class="range-field">
-          <label>Até</label>
+          <label>{{ $t('dashboard.dateFilter.to') }}</label>
           <input
             :value="customRange.end"
             type="date"
@@ -44,15 +44,16 @@
 import type { PeriodOption } from "~/composables/useDashboardMetrics";
 
 const { period, customRange, setPeriod, setCustomRange } = useDashboardMetrics();
+const { t } = useI18n();
 
-const periodOptions: { value: PeriodOption; label: string }[] = [
-  { value: "today", label: "Hoje" },
-  { value: "7d", label: "7 dias" },
-  { value: "30d", label: "30 dias" },
-  { value: "this-month", label: "Este mês" },
-  { value: "last-month", label: "Mês passado" },
-  { value: "custom", label: "Personalizado" },
-];
+const periodOptions = computed(() => [
+  { value: "today" as PeriodOption, label: t("dashboard.dateFilter.today") },
+  { value: "7d" as PeriodOption, label: t("dashboard.dateFilter.sevenDays") },
+  { value: "30d" as PeriodOption, label: t("dashboard.dateFilter.thirtyDays") },
+  { value: "this-month" as PeriodOption, label: t("dashboard.dateFilter.thisMonth") },
+  { value: "last-month" as PeriodOption, label: t("dashboard.dateFilter.lastMonth") },
+  { value: "custom" as PeriodOption, label: t("dashboard.dateFilter.custom") },
+]);
 
 const handleStartChange = (e: Event) => {
   const val = (e.target as HTMLInputElement).value;

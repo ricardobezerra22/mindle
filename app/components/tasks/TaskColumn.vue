@@ -28,7 +28,7 @@
         class="empty-state"
       >
         <Icon name="lucide:inbox" />
-        <p>Nenhuma tarefa</p>
+        <p>{{ $t("tasks.empty.noTasks") }}</p>
       </div>
     </div>
   </div>

@@ -4,19 +4,32 @@
       v-if="loading"
       class="loading-state"
     >
-      <Icon name="lucide:loader-2" class="spinning" size="24" />
-      <p>Carregando meta...</p>
+      <Icon
+        name="lucide:loader-2"
+        class="spinning"
+        size="24"
+      />
+      <p>{{ $t("goals.loading") }}</p>
     </div>
 
     <div
       v-else-if="!goal"
       class="empty-state"
     >
-      <Icon name="lucide:alert-circle" size="32" />
-      <p>Meta não encontrada.</p>
-      <NuxtLink to="/goals" class="back-link">
-        <Icon name="lucide:arrow-left" size="14" />
-        Voltar para metas
+      <Icon
+        name="lucide:alert-circle"
+        size="32"
+      />
+      <p>{{ $t("goals.notFound") }}</p>
+      <NuxtLink
+        to="/goals"
+        class="back-link"
+      >
+        <Icon
+          name="lucide:arrow-left"
+          size="14"
+        />
+        {{ $t("goals.backToGoals") }}
       </NuxtLink>
     </div>
 
@@ -67,6 +80,7 @@ import type { GoalWithProgress } from "~/types";
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
+const { t } = useI18n();
 const { fetchGoalById, deleteGoal, unlinkProject } = useGoals();
 
 const goalId = computed(() => route.params.id as string);
@@ -93,15 +107,15 @@ const handleUpdated = async () => {
 const handleDelete = async () => {
   if (!goal.value) return;
 
-  const confirmed = window.confirm("Excluir esta meta? Os projetos vinculados não serão excluídos.");
+  const confirmed = window.confirm(t("goals.confirmDelete"));
   if (!confirmed) return;
 
   const success = await deleteGoal(goal.value.id);
   if (success) {
-    toast.success({ title: "Meta excluída" });
+    toast.success({ title: t("goals.toasts.deleted") });
     router.push("/goals");
   } else {
-    toast.error({ title: "Erro ao excluir meta" });
+    toast.error({ title: t("goals.toasts.deleteError") });
   }
 };
 
@@ -110,10 +124,10 @@ const handleUnlink = async (projectId: string) => {
 
   const success = await unlinkProject(goal.value.id, projectId);
   if (success) {
-    toast.success({ title: "Projeto desvinculado" });
+    toast.success({ title: t("goals.toasts.unlinked") });
     await loadGoal();
   } else {
-    toast.error({ title: "Erro ao desvincular projeto" });
+    toast.error({ title: t("goals.toasts.unlinkError") });
   }
 };
 

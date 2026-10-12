@@ -3,12 +3,14 @@ definePageMeta({
   layout: "legal",
 });
 
+const { t } = useI18n();
+
 useHead({
-  title: "Política de Privacidade - Mindle",
+  title: computed(() => t("privacy.metaTitle")),
   meta: [
     {
       name: "description",
-      content: "Conheça nossa política de privacidade e como protegemos seus dados.",
+      content: computed(() => t("privacy.metaDescription")),
     },
   ],
 });
@@ -16,44 +18,34 @@ useHead({
 
 <template>
   <div>
-    <h1>Política de Privacidade</h1>
+    <h1>{{ $t("privacy.politicaDePrivacidade") }}</h1>
 
-    <h2>1. Introdução</h2>
-    <p>
-      A Mindle ("nós", "nosso" ou "nos") opera o aplicativo Mindle. Esta página informa você sobre nossas políticas
-      relativas à coleta, uso e divulgação de dados pessoais quando você usa nosso serviço.
-    </p>
+    <h2>{{ $t("privacy.1Introducao") }}</h2>
+    <p>{{ $t("privacy.aMindleNosNosso") }}</p>
 
-    <h2>2. Coleta de Dados</h2>
-    <p>
-      Coletamos vários tipos de informações para fins diversos para fornecer e melhorar nosso serviço:
-    </p>
+    <h2>{{ $t("privacy.2ColetaDeDados") }}</h2>
+    <p>{{ $t("privacy.coletamosVariosTiposDe") }}</p>
     <ul>
-      <li>Dados de conta (nome, email, senha)</li>
-      <li>Dados de uso (tarefas, hábitos, métricas)</li>
-      <li>Dados técnicos (IP, navegador, dispositivo)</li>
+      <li>{{ $t("privacy.dadosDeContaNome") }}</li>
+      <li>{{ $t("privacy.dadosDeUsoTarefas") }}</li>
+      <li>{{ $t("privacy.dadosTecnicosIpNavegador") }}</li>
     </ul>
 
-    <h2>3. Uso de Dados</h2>
-    <p>A Mindle usa os dados coletados para vários fins:</p>
+    <h2>{{ $t("privacy.3UsoDeDados") }}</h2>
+    <p>{{ $t("privacy.aMindleUsaOs") }}</p>
     <ul>
-      <li>Fornecer e manter nosso serviço</li>
-      <li>Notificar você sobre mudanças em nosso serviço</li>
-      <li>Permitir que você participe de recursos interativos</li>
-      <li>Fornecer suporte ao cliente</li>
-      <li>Coletar análises para melhorar nosso serviço</li>
+      <li>{{ $t("privacy.fornecerEManterNosso") }}</li>
+      <li>{{ $t("privacy.notificarVoceSobreMudancas") }}</li>
+      <li>{{ $t("privacy.permitirQueVoceParticipe") }}</li>
+      <li>{{ $t("privacy.fornecerSuporteAoCliente") }}</li>
+      <li>{{ $t("privacy.coletarAnalisesParaMelhorar") }}</li>
     </ul>
 
-    <h2>4. Segurança de Dados</h2>
-    <p>
-      A segurança de seus dados é importante para nós, mas lembre-se de que nenhum método de transmissão pela
-      Internet ou método de armazenamento eletrônico é 100% seguro.
-    </p>
+    <h2>{{ $t("privacy.4SegurancaDeDados") }}</h2>
+    <p>{{ $t("privacy.aSegurancaDeSeus") }}</p>
 
-    <h2>5. Contato</h2>
-    <p>
-      Se você tiver dúvidas sobre esta Política de Privacidade, entre em contato conosco em
-      <a href="mailto:privacy@mindle.space">privacy@mindle.space</a>.
+    <h2>{{ $t("privacy.5Contato") }}</h2>
+    <p> {{ $t("privacy.seVoceTiverDuvidas") }} <a href="mailto:privacy@mindle.space">privacy@mindle.space</a>.
     </p>
   </div>
 </template>

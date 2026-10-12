@@ -20,20 +20,45 @@
     <div class="sidebar-header">
       <button
         class="toggle-btn"
-        title="Menu"
+        :title="$t('nav.menu')"
         @click="isExpanded = !isExpanded"
       >
-        <Icon
-          name="lucide:brain"
+        <svg
+          viewBox="0 0 96 96"
+          width="40"
+          height="40"
           class="brand-icon"
-        />
+          aria-hidden="true"
+        >
+          <rect
+            width="96"
+            height="96"
+            rx="28"
+            fill="var(--color-primary)"
+          />
+          <g
+            fill="none"
+            stroke="#F4F7F4"
+            stroke-width="9"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M28 68 V46 C28 34 48 34 48 46 V68" />
+            <path d="M48 46 C48 34 68 34 68 46 V68" />
+          </g>
+          <circle
+            cx="68"
+            cy="21"
+            r="6.5"
+            fill="#F4A261"
+          />
+        </svg>
       </button>
       <Transition name="fade">
         <span
           v-if="isExpanded"
           class="brand-text"
-          >Mindle</span
-        >
+        >Mindle</span>
       </Transition>
       <Transition name="fade">
         <button
@@ -51,44 +76,38 @@
         to="/"
         class="nav-item"
         exact-active-class="active"
-        :title="!isExpanded ? 'Ínicio' : undefined"
+        :title="!isExpanded ? $t('nav.home') : undefined"
         @click="closeMobile"
       >
         <Icon name="lucide:layout-dashboard" />
-        <Transition name="fade"
-          ><span v-if="isExpanded">Ínicio</span></Transition
-        >
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.home") }}</span></Transition>
       </NuxtLink>
       <NuxtLink
         to="/metrics"
         class="nav-item"
         active-class="active"
-        :title="!isExpanded ? 'Métricas' : undefined"
+        :title="!isExpanded ? $t('nav.metrics') : undefined"
         @click="closeMobile"
       >
         <Icon name="lucide:bar-chart-2" />
-        <Transition name="fade"
-          ><span v-if="isExpanded">Métricas</span></Transition
-        >
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.metrics") }}</span></Transition>
       </NuxtLink>
       <NuxtLink
         to="/tasks"
         class="nav-item"
         active-class="active"
-        :title="!isExpanded ? 'Tarefas' : undefined"
+        :title="!isExpanded ? $t('nav.tasks') : undefined"
         @click="closeMobile"
       >
         <Icon name="lucide:home" />
-        <Transition name="fade"
-          ><span v-if="isExpanded">Tarefas</span></Transition
-        >
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.tasks") }}</span></Transition>
       </NuxtLink>
 
       <div
         v-if="isExpanded"
         class="nav-group"
       >
-        <span class="nav-group-title">Planner</span>
+        <span class="nav-group-title">{{ $t("nav.planner") }}</span>
         <NuxtLink
           to="/planner/week"
           class="nav-item"
@@ -96,7 +115,7 @@
           @click="closeMobile"
         >
           <Icon name="lucide:calendar-days" />
-          <span>Semanal</span>
+          <span>{{ $t("nav.plannerWeek") }}</span>
         </NuxtLink>
         <NuxtLink
           to="/planner/month"
@@ -105,7 +124,7 @@
           @click="closeMobile"
         >
           <Icon name="lucide:calendar" />
-          <span>Mensal</span>
+          <span>{{ $t("nav.plannerMonth") }}</span>
         </NuxtLink>
       </div>
       <template v-else>
@@ -113,7 +132,7 @@
           to="/planner/week"
           class="nav-item"
           active-class="active"
-          title="Planner Semanal"
+          :title="$t('pages.plannerWeek')"
           @click="closeMobile"
         >
           <Icon name="lucide:calendar-days" />
@@ -122,7 +141,7 @@
           to="/planner/month"
           class="nav-item"
           active-class="active"
-          title="Planner Mensal"
+          :title="$t('pages.plannerMonth')"
           @click="closeMobile"
         >
           <Icon name="lucide:calendar" />
@@ -133,76 +152,92 @@
         to="/focus"
         class="nav-item"
         active-class="active"
-        :title="!isExpanded ? 'Foco' : undefined"
+        :title="!isExpanded ? $t('nav.focus') : undefined"
         @click="closeMobile"
       >
         <Icon name="lucide:target" />
-        <Transition name="fade"><span v-if="isExpanded">Foco</span></Transition>
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.focus") }}</span></Transition>
       </NuxtLink>
 
       <NuxtLink
         to="/habits"
         class="nav-item"
         active-class="active"
-        :title="!isExpanded ? 'Hábitos' : undefined"
+        :title="!isExpanded ? $t('nav.habits') : undefined"
         @click="closeMobile"
       >
         <Icon name="lucide:heart" />
-        <Transition name="fade"
-          ><span v-if="isExpanded">Hábitos</span></Transition
-        >
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.habits") }}</span></Transition>
       </NuxtLink>
 
       <NuxtLink
         to="/finance"
         class="nav-item"
         active-class="active"
-        :title="!isExpanded ? 'Finanças' : undefined"
+        :title="!isExpanded ? $t('nav.finance') : undefined"
         @click="closeMobile"
       >
         <Icon name="lucide:wallet" />
-        <Transition name="fade"
-          ><span v-if="isExpanded">Finanças</span></Transition
-        >
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.finance") }}</span></Transition>
       </NuxtLink>
       <NuxtLink
         to="/projects"
         class="nav-item"
         active-class="active"
-        :title="!isExpanded ? 'Projetos' : undefined"
+        :title="!isExpanded ? $t('nav.projects') : undefined"
         @click="closeMobile"
       >
         <Icon name="lucide:folder-kanban" />
-        <Transition name="fade"
-          ><span v-if="isExpanded">Projetos</span></Transition
-        >
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.projects") }}</span></Transition>
       </NuxtLink>
       <NuxtLink
         to="/goals"
         class="nav-item"
         active-class="active"
-        :title="!isExpanded ? 'Metas' : undefined"
+        :title="!isExpanded ? $t('nav.goals') : undefined"
         @click="closeMobile"
       >
         <Icon name="lucide:target" />
-        <Transition name="fade"
-          ><span v-if="isExpanded">Metas</span></Transition
-        >
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.goals") }}</span></Transition>
       </NuxtLink>
     </nav>
 
     <div class="sidebar-footer">
+      <div
+        v-if="isExpanded"
+        class="lang-switcher"
+      >
+        <button
+          :class="['lang-btn', { active: locale === 'pt' }]"
+          @click="setLocale('pt')"
+        >
+          PT
+        </button>
+        <button
+          :class="['lang-btn', { active: locale === 'en' }]"
+          @click="setLocale('en')"
+        >
+          EN
+        </button>
+      </div>
+      <button
+        v-else
+        class="nav-item lang-rail"
+        :title="locale.toUpperCase()"
+        @click="toggleLocale"
+      >
+        <Icon name="lucide:globe" />
+      </button>
+
       <NuxtLink
         to="/settings"
         class="nav-item"
         active-class="active"
-        :title="!isExpanded ? 'Configurações' : undefined"
+        :title="!isExpanded ? $t('nav.settings') : undefined"
         @click="closeMobile"
       >
         <Icon name="lucide:settings" />
-        <Transition name="fade"
-          ><span v-if="isExpanded">Configurações</span></Transition
-        >
+        <Transition name="fade"><span v-if="isExpanded">{{ $t("nav.settings") }}</span></Transition>
       </NuxtLink>
 
       <div
@@ -220,7 +255,7 @@
         </div>
         <button
           class="logout-btn"
-          title="Sair"
+          :title="$t('nav.logout')"
           @click="handleLogout"
         >
           <Icon name="lucide:log-out" />
@@ -229,7 +264,7 @@
       <button
         v-else
         class="nav-item logout-rail"
-        title="Sair"
+        :title="$t('nav.logout')"
         @click="handleLogout"
       >
         <Icon name="lucide:log-out" />
@@ -243,12 +278,16 @@ import { useAuth } from "../../composables/useAuth";
 
 const { user, logout } = useAuth();
 const toast = useToast();
-const { isExpanded, isMobile, closeMobile, onMouseEnter, onMouseLeave } =
-  useSidebar();
+const { locale, setLocale } = useI18n();
+const { t } = useI18n();
+const { isExpanded, isMobile, closeMobile, onMouseEnter, onMouseLeave }
+  = useSidebar();
 
 const swipeTarget = ref<HTMLElement | null>(null);
 
-const userName = computed(() => user.value?.name || "Usuário");
+const toggleLocale = () => setLocale(locale.value === "pt" ? "en" : "pt");
+
+const userName = computed(() => user.value?.name || t("nav.user"));
 const userEmail = computed(() => user.value?.email || "");
 const userInitial = computed(() =>
   (user.value?.name || "U").charAt(0).toUpperCase(),
@@ -260,7 +299,7 @@ const checkMobile = () => {
 };
 
 const handleLogout = async () => {
-  toast.info({ title: "Saindo..." });
+  toast.info({ title: t("nav.loggingOut") });
   isExpanded.value = false;
   await logout();
 };
@@ -378,9 +417,9 @@ onUnmounted(() => {
 }
 
 .brand-icon {
-  width: 26px;
-  height: 26px;
-  color: var(--color-primary);
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
 }
 
 .brand-text {
@@ -576,6 +615,36 @@ onUnmounted(() => {
 .logout-rail:hover {
   background: #fef2f2 !important;
   color: #dc2626 !important;
+}
+
+.lang-switcher {
+  display: flex;
+  gap: 4px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+.lang-btn {
+  flex: 1;
+  padding: 4px 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lang-btn.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.lang-rail {
+  border: none;
+  background: transparent;
 }
 
 .fade-enter-active,

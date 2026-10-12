@@ -4,7 +4,7 @@
       :value="modelValue"
       type="date"
       class="date-input"
-      placeholder="Filtrar por data"
+      :placeholder="$t('tasks.actions.filterByDate')"
       @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
     />
     <button

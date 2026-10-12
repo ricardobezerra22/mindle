@@ -17,7 +17,7 @@
           v-model="editData.title"
           type="text"
           class="edit-input title-input"
-          placeholder="Título da tarefa"
+          :placeholder="$t('tasks.edit.titlePlaceholder')"
           @click.stop
         />
         <h4
@@ -31,7 +31,7 @@
           v-if="editMode"
           v-model="editData.description"
           class="edit-input description-input"
-          placeholder="Descrição da tarefa"
+          :placeholder="$t('tasks.edit.descPlaceholder')"
           rows="2"
           @click.stop
         />

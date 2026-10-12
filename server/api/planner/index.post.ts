@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     const { taskId, date } = body;
 
     if (!taskId || !date) {
-      return sendError(event, "Task ID and date are required", 400);
+      return sendError(event, serverT(event, "server.taskIdAndDateAreRequired"), 400);
     }
 
     const existingEntry = await prisma.plannerEntry.findFirst({
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     });
 
     if (existingEntry) {
-      return sendError(event, "Task already planned for this day", 400);
+      return sendError(event, serverT(event, "server.taskAlreadyPlannedForThisDay"), 400);
     }
 
     const entry = await prisma.plannerEntry.create({
@@ -37,6 +37,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, entry);
   } catch (error) {
     console.error("Error creating planner entry:", error);
-    return sendError(event, "Failed to create planner entry", 500);
+    return sendError(event, serverT(event, "server.failedToCreatePlannerEntry"), 500);
   }
 });

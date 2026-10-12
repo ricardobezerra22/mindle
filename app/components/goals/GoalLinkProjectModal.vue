@@ -8,19 +8,30 @@
       >
         <div class="modal-container">
           <div class="modal-header">
-            <h2 class="modal-title">Vincular projeto</h2>
-            <button class="close-btn" @click="close">
-              <Icon name="lucide:x" size="18" />
+            <h2 class="modal-title">
+              {{ $t('goals.linkProject.title') }}
+            </h2>
+            <button
+              class="close-btn"
+              @click="close"
+            >
+              <Icon
+                name="lucide:x"
+                size="18"
+              />
             </button>
           </div>
 
           <div class="modal-body">
             <div class="search-field">
-              <Icon name="lucide:search" size="16" />
+              <Icon
+                name="lucide:search"
+                size="16"
+              />
               <input
                 v-model="search"
                 type="text"
-                placeholder="Buscar projeto..."
+                :placeholder="$t('goals.linkProject.search')"
                 autofocus
               />
             </div>
@@ -29,17 +40,24 @@
               v-if="loading"
               class="loading-state"
             >
-              <Icon name="lucide:loader-2" class="spinning" size="20" />
+              <Icon
+                name="lucide:loader-2"
+                class="spinning"
+                size="20"
+              />
             </div>
 
             <div
               v-else-if="filteredProjects.length === 0"
               class="empty-state"
             >
-              <p>{{ search ? 'Nenhum projeto encontrado.' : 'Todos os projetos já estão vinculados.' }}</p>
+              <p>{{ search ? $t('goals.linkProject.none') : $t('goals.linkProject.allLinked') }}</p>
             </div>
 
-            <div v-else class="project-list">
+            <div
+              v-else
+              class="project-list"
+            >
               <button
                 v-for="project in filteredProjects"
                 :key="project.id"
@@ -86,11 +104,12 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
-  linked: [];
+  "linked": [];
 }>();
 
 const toast = useToast();
 const { linkProject } = useGoals();
+const { t } = useI18n();
 
 const search = ref("");
 const loading = ref(false);
@@ -105,7 +124,7 @@ const fetchProjects = async () => {
       allProjects.value = response.data;
     }
   } catch {
-    toast.error({ title: "Erro ao carregar projetos" });
+    toast.error({ title: t("goals.toasts.projectsError") });
   } finally {
     loading.value = false;
   }
@@ -127,10 +146,10 @@ const handleLink = async (projectId: string) => {
   try {
     const success = await linkProject(props.goalId, projectId);
     if (success) {
-      toast.success({ title: "Projeto vinculado" });
+      toast.success({ title: t("goals.toasts.linked") });
       emit("linked");
     } else {
-      toast.error({ title: "Erro ao vincular projeto" });
+      toast.error({ title: t("goals.toasts.linkError") });
     }
   } finally {
     linking.value = null;

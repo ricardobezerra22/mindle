@@ -36,6 +36,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, entries);
   } catch (error) {
     console.error("Error fetching finance entries:", error);
-    return sendError(event, "Failed to fetch finance entries", 500);
+    return sendError(event, serverT(event, "server.failedToFetchFinanceEntries"), 500);
   }
 });

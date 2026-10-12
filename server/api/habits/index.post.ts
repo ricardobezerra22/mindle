@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     const { title, icon, weeklyGoal } = body;
 
     if (!title) {
-      return sendError(event, "Title is required", 400);
+      return sendError(event, serverT(event, "server.titleIsRequired"), 400);
     }
 
     const count = await prisma.habit.count({ where: { userId } });
@@ -26,6 +26,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, habit);
   } catch (error) {
     console.error("Error creating habit:", error);
-    return sendError(event, "Failed to create habit", 500);
+    return sendError(event, serverT(event, "server.failedToCreateHabit"), 500);
   }
 });

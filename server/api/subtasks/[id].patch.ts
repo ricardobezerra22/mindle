@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
 
     if (!id) {
-      return sendError(event, "SubTask ID is required", 400);
+      return sendError(event, serverT(event, "server.subtaskIdIsRequired"), 400);
     }
 
     const { done, title } = body;
@@ -22,6 +22,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, subTask);
   } catch (error) {
     console.error("Error updating subtask:", error);
-    return sendError(event, "Failed to update subtask", 500);
+    return sendError(event, serverT(event, "server.failedToUpdateSubtask"), 500);
   }
 });

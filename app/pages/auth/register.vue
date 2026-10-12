@@ -1,157 +1,80 @@
 <template>
-  <div class="auth-card">
-    <h2 class="auth-title">Criar sua conta</h2>
-    <p class="auth-subtitle">Comece a organizar o que importa</p>
+  <div>
+    <h2 class="auth-title">
+      {{ $t("auth.register.title") }}
+    </h2>
+    <p class="auth-subtitle">
+      {{ $t("auth.register.subtitle") }}
+    </p>
 
     <div
       v-if="errorMessage"
-      class="alert alert-error"
+      class="alert"
+      role="alert"
     >
       <Icon
         name="lucide:alert-circle"
-        size="16"
+        size="18"
       />
       <span>{{ errorMessage }}</span>
     </div>
 
     <form
       class="auth-form"
+      novalidate
       @submit.prevent="handleRegister"
     >
-      <div class="form-group">
-        <label
-          for="name"
-          class="form-label"
-          >Nome</label
-        >
-        <div
-          :class="['input-wrapper', { focused: nameFocused, error: nameError }]"
-        >
-          <Icon
-            name="lucide:user"
-            size="18"
-            class="input-icon"
-          />
-          <input
-            id="name"
-            v-model="name"
-            type="text"
-            placeholder="Seu nome"
-            autocomplete="name"
-            @focus="nameFocused = true"
-            @blur="
-              nameFocused = false;
-              validateName();
-            "
-          />
-        </div>
-        <span
-          v-if="nameError"
-          class="field-error"
-          >{{ nameError }}</span
-        >
-      </div>
+      <AuthField
+        id="name"
+        v-model="name"
+        icon="lucide:user"
+        :label="$t('auth.register.nameLabel')"
+        :placeholder="$t('auth.register.namePlaceholder')"
+        :error="nameError"
+        autocomplete="name"
+        @blur="validateName"
+      />
 
-      <div class="form-group">
-        <label
-          for="email"
-          class="form-label"
-          >Email</label
-        >
-        <div
-          :class="[
-            'input-wrapper',
-            { focused: emailFocused, error: emailError },
-          ]"
-        >
-          <Icon
-            name="lucide:mail"
-            size="18"
-            class="input-icon"
-          />
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            placeholder="seu@email.com"
-            autocomplete="email"
-            @focus="emailFocused = true"
-            @blur="
-              emailFocused = false;
-              validateEmail();
-            "
-          />
-        </div>
-        <span
-          v-if="emailError"
-          class="field-error"
-          >{{ emailError }}</span
-        >
-      </div>
+      <AuthField
+        id="email"
+        v-model="email"
+        type="email"
+        icon="lucide:mail"
+        :label="$t('auth.register.emailLabel')"
+        :placeholder="$t('auth.register.emailPlaceholder')"
+        :error="emailError"
+        autocomplete="email"
+        @blur="validateEmail"
+      />
 
-      <div class="form-group">
-        <label
-          for="password"
-          class="form-label"
-          >Senha</label
-        >
-        <div
-          :class="[
-            'input-wrapper',
-            { focused: passwordFocused, error: passwordError },
-          ]"
-        >
-          <Icon
-            name="lucide:lock"
-            size="18"
-            class="input-icon"
-          />
-          <input
-            id="password"
-            v-model="password"
-            :type="showPassword ? 'text' : 'password'"
-            placeholder="Mínimo 6 caracteres"
-            autocomplete="new-password"
-            @focus="passwordFocused = true"
-            @blur="
-              passwordFocused = false;
-              validatePassword();
-            "
-            @input="updateStrength"
-          />
-          <button
-            type="button"
-            class="toggle-password"
-            tabindex="-1"
-            @click="showPassword = !showPassword"
-          >
-            <Icon
-              :name="showPassword ? 'lucide:eye-off' : 'lucide:eye'"
-              size="18"
-            />
-          </button>
-        </div>
-        <span
-          v-if="passwordError"
-          class="field-error"
-          >{{ passwordError }}</span
-        >
-        <div
-          v-if="password && !passwordError"
-          class="strength-bar"
-        >
+      <div class="password-block">
+        <AuthField
+          id="password"
+          v-model="password"
+          icon="lucide:lock"
+          toggleable
+          type="password"
+          :label="$t('auth.register.passwordLabel')"
+          :placeholder="$t('auth.register.passwordPlaceholder')"
+          :error="passwordError"
+          autocomplete="new-password"
+          @blur="validatePassword"
+          @input="updateStrength"
+        />
+        <template v-if="password && !passwordError">
           <div
-            class="strength-fill"
-            :style="{ width: strengthPercent + '%' }"
-            :class="strengthClass"
-          />
-        </div>
-        <span
-          v-if="password && !passwordError"
-          :class="['strength-text', strengthClass]"
-        >
-          {{ strengthLabel }}
-        </span>
+            class="strength-bar"
+            aria-hidden="true"
+          >
+            <div
+              :class="['strength-fill', strengthClass]"
+              :style="{ width: strengthPercent + '%' }"
+            />
+          </div>
+          <span :class="['strength-text', strengthClass]">
+            {{ strengthLabel }}
+          </span>
+        </template>
       </div>
 
       <label class="checkbox-label">
@@ -159,94 +82,67 @@
           v-model="acceptTerms"
           type="checkbox"
         />
-        <span class="checkbox-text">
-          Concordo com os
-          <a
-            href="#"
-            class="terms-link"
-            >Termos de Uso</a
-          >
-          e
-          <a
-            href="#"
-            class="terms-link"
-            >Política de Privacidade</a
-          >
-        </span>
+        {{ $t("auth.register.agreeTerms") }}
       </label>
 
-      <button
+      <AuthButton
         type="submit"
-        class="submit-btn"
-        :disabled="submitting || !acceptTerms || googleLoading"
+        :loading="submitting"
+        :disabled="!acceptTerms || googleLoading"
       >
+        {{
+          submitting
+            ? $t("auth.register.signingUp")
+            : $t("auth.register.signUp")
+        }}
         <Icon
-          v-if="submitting"
-          name="lucide:loader-2"
-          size="18"
-          class="spinning"
+          v-if="!submitting"
+          name="lucide:arrow-right"
+          size="20"
         />
-        {{ submitting ? "Criando conta..." : "Criar conta" }}
-      </button>
-
-      <div class="divider">
-        <span>ou</span>
-      </div>
-
-      <div class="google-btn-wrapper">
-        <ClientOnly>
-          <div
-            v-if="!googleLoading"
-            ref="googleButtonContainer"
-            class="google-button-container"
-          />
-          <div
-            v-if="googleLoading"
-            class="google-loading"
-          >
-            <Icon
-              name="lucide:loader-2"
-              size="18"
-              class="spinning"
-            />
-            <span>Criando conta com Google...</span>
-          </div>
-        </ClientOnly>
-      </div>
+      </AuthButton>
     </form>
 
+    <div class="divider">
+      <span>{{ $t("shared.or") }}</span>
+    </div>
+
+    <AuthGoogleButton
+      mode="signup"
+      :label="$t('auth.signUpWithGoogle')"
+      :loading-label="$t('auth.register.signingUpGoogle')"
+      :loading="googleLoading"
+      @success="handleGoogleSuccess"
+    />
+
     <p class="auth-footer">
-      Já tem uma conta?
+      {{ $t("auth.register.haveAccount") }}
       <NuxtLink
         to="/auth/login"
-        class="auth-link"
-        >Entrar</NuxtLink
+        class="auth-link strong"
       >
+        {{ $t("auth.register.signIn") }}
+      </NuxtLink>
     </p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useGoogleAuth } from "@/composables/useGoogleAuth";
+definePageMeta({
+  layout: "auth",
+  pageTransition: { name: "auth-page", mode: "out-in" },
+});
 
-definePageMeta({ layout: "auth" });
-
+const { t } = useI18n();
 const { register, googleLogin } = useAuth();
-const { googleReady, googleButtonContainer, initializeGoogleButton } =
-  useGoogleAuth();
 
 const name = ref("");
 const email = ref("");
 const password = ref("");
-const showPassword = ref(false);
 const acceptTerms = ref(false);
 const submitting = ref(false);
 const googleLoading = ref(false);
 const errorMessage = ref("");
-
-const nameFocused = ref(false);
-const emailFocused = ref(false);
-const passwordFocused = ref(false);
 const nameError = ref("");
 const emailError = ref("");
 const passwordError = ref("");
@@ -261,10 +157,10 @@ const strengthClass = computed(() => {
   return "strong";
 });
 const strengthLabel = computed(() => {
-  if (strength.value <= 1) return "Fraca";
-  if (strength.value <= 2) return "Razoável";
-  if (strength.value <= 3) return "Boa";
-  return "Forte";
+  if (strength.value <= 1) return t("auth.register.passwordStrengthWeak");
+  if (strength.value <= 2) return t("auth.register.passwordStrengthFair");
+  if (strength.value <= 3) return t("auth.register.passwordStrengthGood");
+  return t("auth.register.passwordStrengthStrong");
 });
 
 const updateStrength = () => {
@@ -279,7 +175,7 @@ const updateStrength = () => {
 
 const validateName = () => {
   if (!name.value.trim()) {
-    nameError.value = "Nome é obrigatório";
+    nameError.value = t("auth.register.nameRequired");
     return false;
   }
   nameError.value = "";
@@ -288,11 +184,11 @@ const validateName = () => {
 
 const validateEmail = () => {
   if (!email.value) {
-    emailError.value = "Email é obrigatório";
+    emailError.value = t("auth.register.emailRequired");
     return false;
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-    emailError.value = "Email inválido";
+    emailError.value = t("auth.register.emailInvalid");
     return false;
   }
   emailError.value = "";
@@ -301,11 +197,11 @@ const validateEmail = () => {
 
 const validatePassword = () => {
   if (!password.value) {
-    passwordError.value = "Senha é obrigatória";
+    passwordError.value = t("auth.register.passwordRequired");
     return false;
   }
   if (password.value.length < 6) {
-    passwordError.value = "Mínimo de 6 caracteres";
+    passwordError.value = t("auth.register.passwordTooShort");
     return false;
   }
   passwordError.value = "";
@@ -320,7 +216,7 @@ const handleRegister = async () => {
   if (!validName || !validEmail || !validPassword) return;
 
   if (!acceptTerms.value) {
-    errorMessage.value = "Aceite os termos para continuar";
+    errorMessage.value = t("auth.register.acceptTermsRequired");
     return;
   }
 
@@ -330,340 +226,89 @@ const handleRegister = async () => {
     if (response.success) {
       navigateTo("/");
     } else {
-      errorMessage.value = response.error || "Erro ao criar conta";
+      errorMessage.value
+        = response.error || t("auth.register.registrationError");
     }
   } catch {
-    errorMessage.value = "Erro de conexão. Tente novamente.";
+    errorMessage.value = t("auth.connectionError");
   } finally {
     submitting.value = false;
   }
 };
 
-const handleGoogleSuccess = async (e: { credential: string; claims: any }) => {
+const handleGoogleSuccess = async (credential: string) => {
   errorMessage.value = "";
   googleLoading.value = true;
   try {
-    const response = await googleLogin(e.credential);
+    const response = await googleLogin(credential);
     if (response.success) {
       navigateTo("/");
     } else {
-      errorMessage.value = response.error || "Erro ao criar conta com Google";
+      errorMessage.value
+        = response.error || t("auth.register.googleRegistrationError");
     }
   } catch {
-    errorMessage.value = "Erro de conexão. Tente novamente.";
+    errorMessage.value = t("auth.connectionError");
   } finally {
     googleLoading.value = false;
   }
 };
-
-const handleGoogleError = () => {
-  errorMessage.value = "Erro ao autenticar com Google. Tente novamente.";
-};
-
-onMounted(() => {
-  initializeGoogleButton(googleButtonContainer, handleGoogleSuccess, {
-    text: "signup_with",
-    theme: "filled_blue",
-    size: "large",
-    shape: "pill",
-    width: 200,
-  });
-});
 </script>
 
-<style scoped lang="css">
-.auth-card {
-  background: var(--color-surface);
-  border: 2px solid var(--color-border);
-  border-radius: 24px;
-  padding: var(--spacing-xl);
-}
-
-.auth-title {
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0;
-  text-align: center;
-}
-
-.auth-subtitle {
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  margin: var(--spacing-xs) 0 var(--spacing-lg) 0;
-  text-align: center;
-}
-
-.alert {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: 12px;
-  font-size: 13px;
-  margin-bottom: var(--spacing-md);
-}
-
-.alert-error {
-  background: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
-}
-
-.auth-form {
+<style scoped>
+.password-block {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.form-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--color-text-primary);
-}
-
-.input-wrapper {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  border: 2px solid var(--color-border);
-  border-radius: 12px;
-  padding: 0 var(--spacing-md);
-  height: 48px;
-  background: var(--color-background);
-  transition: all 0.2s ease;
-}
-
-.input-wrapper.focused {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(111, 175, 142, 0.12);
-}
-
-.input-wrapper.error {
-  border-color: #dc2626;
-}
-
-.input-icon {
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-}
-
-.input-wrapper.focused .input-icon {
-  color: var(--color-primary);
-}
-
-.input-wrapper input {
-  flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 15px;
-  font-family: inherit;
-  color: var(--color-text-primary);
-  min-width: 0;
-}
-
-.input-wrapper input::placeholder {
-  color: var(--color-text-secondary);
-  opacity: 0.6;
-}
-
-.toggle-password {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--color-text-secondary);
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  transition: color 0.2s ease;
-}
-
-.toggle-password:hover {
-  color: var(--color-text-primary);
-}
-
-.field-error {
-  font-size: 12px;
-  color: #dc2626;
-  margin-top: 2px;
+  gap: 8px;
 }
 
 .strength-bar {
-  height: 4px;
-  background: var(--color-border);
-  border-radius: 2px;
-  margin-top: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--auth-line);
   overflow: hidden;
 }
 
 .strength-fill {
   height: 100%;
-  border-radius: 2px;
-  transition:
-    width 0.3s ease,
-    background 0.3s ease;
+  border-radius: 3px;
+  transition: all 0.2s ease;
 }
 
 .strength-fill.weak {
   background: #dc2626;
 }
+
 .strength-fill.fair {
   background: #f59e0b;
 }
+
 .strength-fill.good {
-  background: #3b82f6;
+  background: #4e8f73;
 }
+
 .strength-fill.strong {
-  background: #16a34a;
+  background: #10b981;
 }
 
 .strength-text {
-  font-size: 11px;
-  margin-top: 2px;
-}
-
-.strength-text.weak {
-  color: #dc2626;
-}
-.strength-text.fair {
-  color: #f59e0b;
-}
-.strength-text.good {
-  color: #3b82f6;
-}
-.strength-text.strong {
-  color: #16a34a;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-sm);
-  cursor: pointer;
-}
-
-.checkbox-label input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--color-primary);
-  cursor: pointer;
-  margin-top: 2px;
-  flex-shrink: 0;
-}
-
-.checkbox-text {
   font-size: 13px;
-  color: var(--color-text-secondary);
-  line-height: 1.4;
-}
-
-.terms-link {
-  color: var(--color-primary);
-  text-decoration: none;
-}
-
-.terms-link:hover {
-  text-decoration: underline;
-}
-
-.submit-btn {
-  width: 100%;
-  height: 48px;
-  border: none;
-  border-radius: 12px;
-  background: var(--color-primary);
-  color: white;
-  font-size: 15px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-sm);
-}
-
-.submit-btn:hover:not(:disabled) {
-  background: var(--color-primary-dark);
-}
-
-.submit-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.spinning {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.divider {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.divider::before,
-.divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--color-border);
-}
-
-.divider span {
-  font-size: 13px;
-  color: var(--color-text-secondary);
-  white-space: nowrap;
-}
-
-.google-btn-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-sm);
-  min-height: 100%;
-}
-
-.google-loading {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-size: 13px;
-  color: var(--color-text-secondary);
-}
-
-.auth-footer {
-  text-align: center;
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  margin: var(--spacing-lg) 0 0 0;
-}
-
-.auth-link {
-  color: var(--color-primary);
-  text-decoration: none;
   font-weight: 500;
 }
 
-.auth-link:hover {
-  text-decoration: underline;
+.strength-text.weak {
+  color: #b91c1c;
+}
+
+.strength-text.fair {
+  color: #92400e;
+}
+
+.strength-text.good {
+  color: #2f6b52;
+}
+
+.strength-text.strong {
+  color: #065f46;
 }
 </style>

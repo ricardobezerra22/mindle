@@ -12,6 +12,7 @@ interface APIResponse<T> {
 }
 
 export const useProjects = () => {
+  const { $i18n } = useNuxtApp();
   const projects = ref<Project[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
@@ -34,7 +35,7 @@ export const useProjects = () => {
         projects.value = response.data;
       }
     } catch (e) {
-      error.value = "Failed to fetch projects";
+      error.value = $i18n.t("errors.c_fetchProjects");
       console.error(e);
     } finally {
       loading.value = false;
@@ -62,7 +63,7 @@ export const useProjects = () => {
   };
 
   const updateProject = async (id: string, updates: Partial<Project>) => {
-    const index = projects.value.findIndex((p) => p.id === id);
+    const index = projects.value.findIndex(p => p.id === id);
     if (index === -1) return;
 
     const previous = { ...projects.value[index] };
@@ -90,7 +91,7 @@ export const useProjects = () => {
   };
 
   const deleteProject = async (id: string) => {
-    const index = projects.value.findIndex((p) => p.id === id);
+    const index = projects.value.findIndex(p => p.id === id);
     if (index === -1) return;
 
     const removed = projects.value.splice(index, 1)[0];
@@ -114,7 +115,7 @@ export const useProjects = () => {
         },
       );
       if (response.success) {
-        const project = projects.value.find((p) => p.id === projectId);
+        const project = projects.value.find(p => p.id === projectId);
         if (project) {
           if (!project.topics) project.topics = [];
           project.topics.push(response.data);
@@ -138,7 +139,7 @@ export const useProjects = () => {
       );
       if (response.success) {
         for (const project of projects.value) {
-          const topicIndex = project.topics?.findIndex((t) => t.id === id);
+          const topicIndex = project.topics?.findIndex(t => t.id === id);
           if (topicIndex !== undefined && topicIndex >= 0 && project.topics) {
             project.topics[topicIndex] = response.data;
             break;
@@ -160,7 +161,7 @@ export const useProjects = () => {
       });
       for (const project of projects.value) {
         if (project.topics) {
-          project.topics = project.topics.filter((t) => t.id !== id);
+          project.topics = project.topics.filter(t => t.id !== id);
         }
       }
     } catch (e) {
@@ -180,7 +181,7 @@ export const useProjects = () => {
       );
       if (response.success) {
         for (const project of projects.value) {
-          const topic = project.topics?.find((t) => t.id === topicId);
+          const topic = project.topics?.find(t => t.id === topicId);
           if (topic) {
             if (!topic.subtopics) topic.subtopics = [];
             topic.subtopics.push(response.data);
@@ -207,7 +208,7 @@ export const useProjects = () => {
       if (response.success) {
         for (const project of projects.value) {
           for (const topic of project.topics || []) {
-            const idx = topic.subtopics?.findIndex((s) => s.id === id);
+            const idx = topic.subtopics?.findIndex(s => s.id === id);
             if (idx !== undefined && idx >= 0 && topic.subtopics) {
               topic.subtopics[idx] = response.data;
               return response.data;
@@ -230,7 +231,7 @@ export const useProjects = () => {
       for (const project of projects.value) {
         for (const topic of project.topics || []) {
           if (topic.subtopics) {
-            topic.subtopics = topic.subtopics.filter((s) => s.id !== id);
+            topic.subtopics = topic.subtopics.filter(s => s.id !== id);
           }
         }
       }
@@ -257,14 +258,14 @@ export const useProjects = () => {
       );
       if (response.success) {
         if (level === "project") {
-          const project = projects.value.find((p) => p.id === parentId);
+          const project = projects.value.find(p => p.id === parentId);
           if (project) {
             if (!project.tasks) project.tasks = [];
             project.tasks.push(response.data);
           }
         } else if (level === "topic") {
           for (const project of projects.value) {
-            const topic = project.topics?.find((t) => t.id === parentId);
+            const topic = project.topics?.find(t => t.id === parentId);
             if (topic) {
               if (!topic.tasks) topic.tasks = [];
               topic.tasks.push(response.data);
@@ -274,7 +275,7 @@ export const useProjects = () => {
         } else {
           for (const project of projects.value) {
             for (const topic of project.topics || []) {
-              const subtopic = topic.subtopics?.find((s) => s.id === parentId);
+              const subtopic = topic.subtopics?.find(s => s.id === parentId);
               if (subtopic) {
                 if (!subtopic.tasks) subtopic.tasks = [];
                 subtopic.tasks.push(response.data);
@@ -293,13 +294,13 @@ export const useProjects = () => {
 
   const findProjectTask = (id: string) => {
     for (const project of projects.value) {
-      const pt = project.tasks?.find((t) => t.id === id);
+      const pt = project.tasks?.find(t => t.id === id);
       if (pt) return pt;
       for (const topic of project.topics || []) {
-        const tt = topic.tasks?.find((t) => t.id === id);
+        const tt = topic.tasks?.find(t => t.id === id);
         if (tt) return tt;
         for (const subtopic of topic.subtopics || []) {
-          const st = subtopic.tasks?.find((t) => t.id === id);
+          const st = subtopic.tasks?.find(t => t.id === id);
           if (st) return st;
         }
       }
@@ -331,15 +332,15 @@ export const useProjects = () => {
       });
       for (const project of projects.value) {
         if (project.tasks) {
-          project.tasks = project.tasks.filter((t) => t.id !== id);
+          project.tasks = project.tasks.filter(t => t.id !== id);
         }
         for (const topic of project.topics || []) {
           if (topic.tasks) {
-            topic.tasks = topic.tasks.filter((t) => t.id !== id);
+            topic.tasks = topic.tasks.filter(t => t.id !== id);
           }
           for (const subtopic of topic.subtopics || []) {
             if (subtopic.tasks) {
-              subtopic.tasks = subtopic.tasks.filter((t) => t.id !== id);
+              subtopic.tasks = subtopic.tasks.filter(t => t.id !== id);
             }
           }
         }
@@ -374,7 +375,7 @@ export const useProjects = () => {
   };
 
   const archiveProject = async (id: string) => {
-    const index = projects.value.findIndex((p) => p.id === id);
+    const index = projects.value.findIndex(p => p.id === id);
     if (index === -1) return;
 
     const removed = projects.value.splice(index, 1)[0];
@@ -398,7 +399,7 @@ export const useProjects = () => {
   };
 
   const restoreProject = async (id: string) => {
-    const index = archivedProjects.value.findIndex((p) => p.id === id);
+    const index = archivedProjects.value.findIndex(p => p.id === id);
     if (index === -1) return;
 
     const removed = archivedProjects.value.splice(index, 1)[0];

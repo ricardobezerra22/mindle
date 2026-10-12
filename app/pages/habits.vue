@@ -14,7 +14,9 @@
 
       <div class="habits-section">
         <div class="section-header">
-          <h2 class="section-title">Hábitos</h2>
+          <h2 class="section-title">
+            {{ $t('habits.title') }}
+          </h2>
           <button
             class="add-habit-btn"
             @click="showAddModal = true"
@@ -22,7 +24,7 @@
             <Icon
               name="lucide:plus"
               size="16"
-            />Adicionar
+            />{{ $t('habits.add') }}
           </button>
         </div>
 
@@ -37,12 +39,26 @@
               class="skeleton-habit-card"
             >
               <div class="skeleton-habit-row">
-                <UiSkeleton variant="circle" width="36px" height="36px" />
+                <UiSkeleton
+                  variant="circle"
+                  width="36px"
+                  height="36px"
+                />
                 <div class="skeleton-habit-info">
-                  <UiSkeleton height="14px" :width="['70%', '55%', '80%', '60%'][i - 1]" />
-                  <UiSkeleton height="10px" width="40%" />
+                  <UiSkeleton
+                    height="14px"
+                    :width="['70%', '55%', '80%', '60%'][i - 1]"
+                  />
+                  <UiSkeleton
+                    height="10px"
+                    width="40%"
+                  />
                 </div>
-                <UiSkeleton variant="circle" width="28px" height="28px" />
+                <UiSkeleton
+                  variant="circle"
+                  width="28px"
+                  height="28px"
+                />
               </div>
             </div>
           </div>
@@ -53,8 +69,10 @@
           class="empty-state"
         >
           <Icon name="lucide:heart" />
-          <p>Nenhum hábito ainda</p>
-          <p class="empty-hint">Comece adicionando algo pequeno</p>
+          <p>{{ $t('habits.empty.title') }}</p>
+          <p class="empty-hint">
+            {{ $t('habits.empty.subtitle') }}
+          </p>
         </div>
 
         <div
@@ -97,7 +115,9 @@
                   :name="habit.icon"
                   class="habit-icon"
                 />
-                <h3 class="habit-title">{{ habit.title }}</h3>
+                <h3 class="habit-title">
+                  {{ habit.title }}
+                </h3>
               </div>
               <HabitsWeeklyProgress
                 :completed="getWeeklyCompleted(habit.id)"
@@ -132,7 +152,7 @@
         >
           <Icon
             :name="showInsights ? 'lucide:chevron-up' : 'lucide:chevron-down'"
-          />Insights
+          />{{ $t('habits.insights.toggle') }}
         </button>
 
         <div
@@ -140,23 +160,25 @@
           class="insights-content"
         >
           <div class="insight-card">
-            <h4>Dias com check-in</h4>
+            <h4>{{ $t('habits.insights.checkInDays') }}</h4>
             <p class="insight-value">
-              {{ checkedInDays }} {{ checkedInDays === 1 ? "dia" : "dias" }}
+              {{ $t('habits.insights.day', checkedInDays) }}
             </p>
           </div>
 
           <div class="insight-card">
-            <h4>Hábito mais frequente</h4>
+            <h4>{{ $t('habits.insights.mostFrequent') }}</h4>
             <p class="insight-value">
-              {{ mostFrequentHabit || "Nenhum ainda" }}
+              {{ mostFrequentHabit || $t('habits.insights.none') }}
             </p>
           </div>
         </div>
       </div>
 
       <div class="wellbeing-section">
-        <h2 class="section-title">Bem-estar</h2>
+        <h2 class="section-title">
+          {{ $t('habits.wellbeing.title') }}
+        </h2>
 
         <div class="breathing-tool">
           <button
@@ -164,7 +186,7 @@
             @click="toggleBreathing"
           >
             <div :class="['breathing-bubble', { active: isBreathing }]" />
-            <span>{{ isBreathing ? "Pausar" : "Respirar" }}</span>
+            <span>{{ isBreathing ? $t('habits.wellbeing.pause') : $t('habits.wellbeing.breathe') }}</span>
           </button>
           <p
             v-if="isBreathing"
@@ -183,7 +205,7 @@
     >
       <div class="modal-content">
         <div class="modal-header">
-          <h2>{{ editingHabit ? "Editar hábito" : "Novo hábito" }}</h2>
+          <h2>{{ editingHabit ? $t('habits.modal.edit') : $t('habits.modal.new') }}</h2>
           <button
             class="close-btn"
             @click="closeModal"
@@ -197,18 +219,18 @@
           @submit.prevent="saveHabit"
         >
           <div class="form-group">
-            <label for="title">Nome do hábito *</label>
+            <label for="title">{{ $t('habits.modal.nameLabel') }}</label>
             <input
               id="title"
               v-model="formData.title"
               type="text"
-              placeholder="ex: Beber água"
+              :placeholder="$t('habits.modal.placeholder')"
               required
             />
           </div>
 
           <div class="form-group">
-            <label>Ícone (opcional)</label>
+            <label>{{ $t('habits.modal.iconLabel') }}</label>
             <div class="icon-picker">
               <button
                 v-for="icon in iconOptions"
@@ -229,7 +251,7 @@
           </div>
 
           <div class="form-group">
-            <label for="weeklyGoal">Meta semanal</label>
+            <label for="weeklyGoal">{{ $t('habits.modal.weeklyGoal') }}</label>
             <div class="weekly-goal-input">
               <button
                 type="button"
@@ -237,16 +259,22 @@
                 :disabled="formData.weeklyGoal <= 1"
                 @click="formData.weeklyGoal--"
               >
-                <Icon name="lucide:minus" size="16" />
+                <Icon
+                  name="lucide:minus"
+                  size="16"
+                />
               </button>
-              <span class="goal-value">{{ formData.weeklyGoal }}x por semana</span>
+              <span class="goal-value">{{ $t('habits.modal.timesPerWeek', { count: formData.weeklyGoal }) }}</span>
               <button
                 type="button"
                 class="goal-btn"
                 :disabled="formData.weeklyGoal >= 7"
                 @click="formData.weeklyGoal++"
               >
-                <Icon name="lucide:plus" size="16" />
+                <Icon
+                  name="lucide:plus"
+                  size="16"
+                />
               </button>
             </div>
           </div>
@@ -263,7 +291,7 @@
               <Icon
                 name="lucide:trash-2"
                 size="16"
-              />Excluir hábito
+              />{{ $t('habits.modal.deleteHabit') }}
             </button>
           </div>
 
@@ -273,7 +301,7 @@
               class="btn-secondary"
               @click="closeModal"
             >
-              Cancelar
+              {{ $t('shared.cancel') }}
             </button>
             <button
               type="submit"
@@ -287,10 +315,10 @@
               />
               {{
                 isSaving
-                  ? "Salvando..."
+                  ? $t('shared.saving')
                   : editingHabit
-                  ? "Atualizar"
-                  : "Adicionar"
+                    ? $t('shared.update')
+                    : $t('shared.add')
               }}
             </button>
           </div>
@@ -301,9 +329,10 @@
 </template>
 
 <script setup lang="ts">
-import { Mood, EnergyLevel } from "~/types";
-import type { Habit, HabitLog } from "~/types";
+import { Mood } from "~/types";
+import type { Habit, HabitLog, EnergyLevel } from "~/types";
 
+const { t } = useI18n();
 const { preferences } = usePreferences();
 
 const showAddModal = ref(false);
@@ -312,7 +341,7 @@ const isSaving = ref(false);
 const editingHabit = ref<Habit | null>(null);
 const showInsights = ref(preferences.value.showInsights);
 const isBreathing = ref(false);
-const breathingPhase = ref("Inspire...");
+const breathingPhase = ref("");
 const showEncouragement = ref(false);
 const encouragementText = ref("");
 
@@ -358,17 +387,11 @@ const iconOptions = [
   { value: "lucide:smile" },
 ];
 
-const encouragementMessages = [
-  "Bom trabalho por aparecer.",
-  "Isso conta.",
-  "Você está fazendo o suficiente.",
-  "Pequenos passos importam.",
-  "Você está presente. Isso é o que importa.",
-];
+const encouragementMessages = computed(() => t("habits.encouragement") as unknown as string[]);
 
 const checkedInDays = computed(() => {
   const uniqueDates = new Set(
-    habitLogs.value.map((log) => new Date(log.date).toDateString()),
+    habitLogs.value.map(log => new Date(log.date).toDateString()),
   );
   return uniqueDates.size;
 });
@@ -385,20 +408,20 @@ const mostFrequentHabit = computed(() => {
 
   const maxCount = Math.max(...Object.values(habitCounts));
   const mostFrequentId = Object.keys(habitCounts).find(
-    (id) => habitCounts[id] === maxCount,
+    id => habitCounts[id] === maxCount,
   );
 
-  const habit = habits.value.find((h) => h.id === mostFrequentId);
+  const habit = habits.value.find(h => h.id === mostFrequentId);
   return habit?.title || null;
 });
 
 const isHabitCheckedToday = (habitId: string) => {
   const today = new Date().toDateString();
   return habitLogs.value.some(
-    (log) =>
-      log.habitId === habitId &&
-      new Date(log.date).toDateString() === today &&
-      log.done,
+    log =>
+      log.habitId === habitId
+      && new Date(log.date).toDateString() === today
+      && log.done,
   );
 };
 
@@ -440,10 +463,10 @@ const getWeekStartDate = () => {
 const getWeeklyCompleted = (habitId: string) => {
   const weekStart = getWeekStartDate();
   return habitLogs.value.filter(
-    (log) =>
-      log.habitId === habitId &&
-      log.done &&
-      new Date(log.date) >= weekStart,
+    log =>
+      log.habitId === habitId
+      && log.done
+      && new Date(log.date) >= weekStart,
   ).length;
 };
 
@@ -490,15 +513,15 @@ const toggleHabit = async (habitId: string) => {
   try {
     if (isChecked) {
       const log = habitLogs.value.find(
-        (l) =>
-          l.habitId === habitId &&
-          new Date(l.date).toDateString() === new Date().toDateString(),
+        l =>
+          l.habitId === habitId
+          && new Date(l.date).toDateString() === new Date().toDateString(),
       );
       if (log) {
         await $fetch(`/api/habits/log-${log.id}`, {
           method: "DELETE",
         });
-        habitLogs.value = habitLogs.value.filter((l) => l.id !== log.id);
+        habitLogs.value = habitLogs.value.filter(l => l.id !== log.id);
       }
     } else {
       const response = await $fetch("/api/habits/logs", {
@@ -520,9 +543,9 @@ const toggleHabit = async (habitId: string) => {
 };
 
 const showEncouragementMessage = () => {
-  encouragementText.value =
-    encouragementMessages[
-      Math.floor(Math.random() * encouragementMessages.length)
+  encouragementText.value
+    = encouragementMessages.value[
+      Math.floor(Math.random() * encouragementMessages.value.length)
     ];
   showEncouragement.value = true;
   setTimeout(() => {
@@ -540,7 +563,7 @@ const saveHabit = async () => {
       });
       if (response.success) {
         const index = habits.value.findIndex(
-          (h) => h.id === editingHabit.value.id,
+          h => h.id === editingHabit.value.id,
         );
         if (index !== -1) {
           habits.value[index] = response.data;
@@ -570,7 +593,7 @@ const deleteHabit = async () => {
     await $fetch(`/api/habits/${editingHabit.value.id}`, {
       method: "DELETE",
     });
-    habits.value = habits.value.filter((h) => h.id !== editingHabit.value.id);
+    habits.value = habits.value.filter(h => h.id !== editingHabit.value.id);
     closeModal();
   } catch (error) {
     console.error("Error deleting habit:", error);
@@ -603,7 +626,12 @@ const toggleBreathing = () => {
 
   if (isBreathing.value) {
     let phase = 0;
-    const phases = ["Inspire...", "Segure...", "Expire...", "Segure..."];
+    const phases = [
+      t("habits.wellbeing.inhale"),
+      t("habits.wellbeing.hold"),
+      t("habits.wellbeing.exhale"),
+      t("habits.wellbeing.hold"),
+    ];
     breathingPhase.value = phases[0];
 
     breathingInterval = setInterval(() => {

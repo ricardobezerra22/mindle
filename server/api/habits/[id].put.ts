@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     const id = getRouterParam(event, "id");
 
     if (!id) {
-      return sendError(event, "ID is required", 400);
+      return sendError(event, serverT(event, "server.idIsRequired"), 400);
     }
 
     const body = await readBody(event);
@@ -24,6 +24,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, habit);
   } catch (error) {
     console.error("Error updating habit:", error);
-    return sendError(event, "Failed to update habit", 500);
+    return sendError(event, serverT(event, "server.failedToUpdateHabit"), 500);
   }
 });

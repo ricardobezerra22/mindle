@@ -1,7 +1,7 @@
 <template>
   <div
-    class="inline-dropdown"
     ref="wrapperRef"
+    class="inline-dropdown"
     @click.stop
   >
     <span
@@ -9,7 +9,7 @@
       :style="badgeStyle"
       @click="toggleDropdown"
     >
-      {{ categoryName || 'Sem categoria' }}
+      {{ categoryName || $t('tasks.category.none') }}
       <Icon
         name="lucide:chevron-down"
         class="arrow-icon"
@@ -23,7 +23,7 @@
         :class="['dropdown-item', { 'is-active': !categoryId }]"
         @click="handleSelect(null)"
       >
-        Nenhuma
+        {{ $t('shared.none') }}
       </li>
       <li
         v-for="cat in categories"

@@ -20,7 +20,10 @@
     <DashboardSkeleton v-if="metricsLoading && !metrics" />
 
     <template v-else-if="metrics">
-      <Transition name="fade-content" mode="out-in">
+      <Transition
+        name="fade-content"
+        mode="out-in"
+      >
         <div
           :key="period"
           class="metrics-content"
@@ -29,58 +32,83 @@
             <DashboardKpiCard
               icon="lucide:target"
               :value="metrics.focus.totalMinutes"
-              label="Minutos de foco"
+              :label="$t('metrics.focusMinutes')"
               format="minutes"
               :growth="metrics.focus.growth"
               color="#6faf8e"
-              :subtitle="metrics.focus.topTask ? `Top: ${metrics.focus.topTask.title}` : undefined"
+              :subtitle="
+                metrics.focus.topTask
+                  ? `${t('metrics.topTaskPrefix')} ${metrics.focus.topTask.title}`
+                  : undefined
+              "
             />
             <DashboardKpiCard
               icon="lucide:check-circle-2"
               :value="metrics.tasks.done"
-              :label="`de ${metrics.tasks.total} tarefas`"
+              :label="$t('metrics.ofTasks', { n: metrics.tasks.total })"
               :growth="metrics.tasks.growth"
               color="#10b981"
-              :subtitle="`Taxa: ${metrics.tasks.completionRate}%`"
+              :subtitle="
+                $t('metrics.rate', { pct: metrics.tasks.completionRate })
+              "
             />
             <DashboardKpiCard
               icon="lucide:folder-kanban"
               :value="metrics.projects.activeCount"
-              label="Projetos ativos"
+              :label="$t('metrics.activeProjects')"
               color="#6366f1"
-              :subtitle="`Progresso médio: ${metrics.projects.avgProgress}%`"
+              :subtitle="
+                $t('metrics.avgProgress', { pct: metrics.projects.avgProgress })
+              "
             />
             <DashboardKpiCard
               icon="lucide:calendar-check"
               :value="`${metrics.planner.executionRate}%`"
-              label="Execução do planner"
+              :label="$t('metrics.plannerExecution')"
               color="#f59e0b"
-              :subtitle="`${metrics.planner.executed}/${metrics.planner.planned} executadas`"
+              :subtitle="
+                $t('metrics.executedOf', {
+                  done: metrics.planner.executed,
+                  total: metrics.planner.planned,
+                })
+              "
             />
             <DashboardKpiCard
               icon="lucide:heart"
               :value="`${metrics.habits.avgConsistency}%`"
-              label="Consistência hábitos"
+              :label="$t('metrics.habitConsistency')"
               color="#ec4899"
-              :subtitle="metrics.habits.best ? `Melhor: ${metrics.habits.best.title}` : undefined"
+              :subtitle="
+                metrics.habits.best
+                  ? $t('metrics.bestHabit', { name: metrics.habits.best.title })
+                  : undefined
+              "
             />
             <DashboardKpiCard
               icon="lucide:wallet"
               :value="metrics.finance.totalPending"
-              label="Pendente"
+              :label="$t('metrics.pending')"
               format="currency"
               color="#ef4444"
-              :subtitle="metrics.finance.overdue > 0 ? `${metrics.finance.overdue} vencido(s)` : `${metrics.finance.onTimeRate}% em dia`"
+              :subtitle="
+                metrics.finance.overdue > 0
+                  ? $t('metrics.overdue', { n: metrics.finance.overdue })
+                  : $t('metrics.onTime', { pct: metrics.finance.onTimeRate })
+              "
             />
           </section>
 
           <section class="charts-grid">
             <DashboardFocusChart :daily-data="metrics.focus.dailyData" />
-            <DashboardTaskPriorityChart :by-priority="metrics.tasks.byPriority" />
+            <DashboardTaskPriorityChart
+              :by-priority="metrics.tasks.byPriority"
+            />
           </section>
 
           <section class="charts-grid">
-            <DashboardProjectProgressChart :projects="metrics.projects.projectProgress" />
+            <DashboardProjectProgressChart
+              :projects="metrics.projects.projectProgress"
+            />
             <DashboardFinanceChart
               :total-paid="metrics.finance.totalPaid"
               :total-pending="metrics.finance.totalPending"
@@ -118,6 +146,8 @@ const {
   fetchMetrics,
 } = useDashboardMetrics();
 
+const { t, locale } = useI18n();
+
 const userName = computed(() => {
   const user = useAuth().user;
   const name = user.value?.name;
@@ -126,31 +156,24 @@ const userName = computed(() => {
 
 const greetingMessage = computed(() => {
   const hour = new Date().getHours();
-  if (hour < 12) return "Bom dia";
-  if (hour < 18) return "Boa tarde";
-  return "Boa noite";
+  if (hour < 12) return t("shared.greetings.morning");
+  if (hour < 18) return t("shared.greetings.afternoon");
+  return t("shared.greetings.evening");
 });
 
 const todayFormatted = computed(() => {
   const now = new Date();
-  const dayNames = [
-    "Domingo",
-    "Segunda",
-    "Terça",
-    "Quarta",
-    "Quinta",
-    "Sexta",
-    "Sábado",
-  ];
+  const dayKeys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
   return {
-    day: dayNames[now.getDay()],
-    full: now.toLocaleDateString("pt-BR", { day: "numeric", month: "long" }),
+    day: t(`shared.days.${dayKeys[now.getDay()]}`),
+    full: now.toLocaleDateString(locale.value === "en" ? "en-US" : "pt-BR", {
+      day: "numeric",
+      month: "long",
+    }),
   };
 });
 
-const contextLine = computed(() => {
-  return "Análise detalhada do seu desempenho.";
-});
+const contextLine = computed(() => t("metrics.subtitle"));
 
 onMounted(() => {
   fetchMetrics();

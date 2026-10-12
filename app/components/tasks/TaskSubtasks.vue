@@ -49,20 +49,20 @@
           v-model="newTitle"
           type="text"
           class="edit-input subtask-input"
-          placeholder="Nome da subtarefa"
+          :placeholder="$t('tasks.actions.subtaskPlaceholder')"
           @keyup.enter="handleAdd"
           @keyup.escape="addingSubTask = false"
         />
         <button
           class="action-btn save"
-          title="Adicionar"
+          :title="$t('tasks.actions.addSubtask')"
           @click.stop="handleAdd"
         >
           <Icon name="lucide:plus" />
         </button>
         <button
           class="action-btn cancel"
-          title="Cancelar"
+          :title="$t('tasks.actions.cancel')"
           @click.stop="addingSubTask = false"
         >
           <Icon name="lucide:x" />
@@ -74,7 +74,7 @@
         @click.stop="addingSubTask = true"
       >
         <Icon name="lucide:plus" />
-        <span>Subtarefa</span>
+        <span>{{ $t('tasks.actions.subtask') }}</span>
       </button>
     </div>
   </div>
@@ -101,7 +101,7 @@ const addingSubTask = ref(false);
 const newTitle = ref("");
 
 const completedCount = computed(() => {
-  return props.subTasks?.filter((st) => st.done).length || 0;
+  return props.subTasks?.filter(st => st.done).length || 0;
 });
 
 const handleAdd = () => {

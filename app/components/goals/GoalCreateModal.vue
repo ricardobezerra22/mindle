@@ -8,37 +8,48 @@
       >
         <div class="modal-container">
           <div class="modal-header">
-            <h2 class="modal-title">{{ isEditing ? 'Editar meta' : 'Nova meta' }}</h2>
-            <button class="close-btn" @click="close">
-              <Icon name="lucide:x" size="18" />
+            <h2 class="modal-title">
+              {{ isEditing ? $t('goals.modal.edit') : $t('goals.modal.new') }}
+            </h2>
+            <button
+              class="close-btn"
+              @click="close"
+            >
+              <Icon
+                name="lucide:x"
+                size="18"
+              />
             </button>
           </div>
 
-          <form class="modal-body" @submit.prevent="handleSubmit">
+          <form
+            class="modal-body"
+            @submit.prevent="handleSubmit"
+          >
             <div class="field">
-              <label for="goal-title">Título</label>
+              <label for="goal-title">{{ $t('goals.modal.titleLabel') }}</label>
               <input
                 id="goal-title"
                 v-model="form.title"
                 type="text"
-                placeholder="Ex: Certificação Vue.js"
+                :placeholder="$t('goals.modal.titlePlaceholder')"
                 autofocus
               />
             </div>
 
             <div class="field">
-              <label for="goal-description">Descrição</label>
+              <label for="goal-description">{{ $t('goals.modal.descLabel') }}</label>
               <textarea
                 id="goal-description"
                 v-model="form.description"
                 rows="2"
-                placeholder="O que você quer alcançar?"
+                :placeholder="$t('goals.modal.descPlaceholder')"
               />
             </div>
 
             <div class="field-row">
               <div class="field">
-                <label for="goal-deadline">Prazo</label>
+                <label for="goal-deadline">{{ $t('goals.modal.deadlineLabel') }}</label>
                 <input
                   id="goal-deadline"
                   v-model="form.deadline"
@@ -47,7 +58,7 @@
               </div>
 
               <div class="field">
-                <label for="goal-color">Cor</label>
+                <label for="goal-color">{{ $t('goals.modal.colorLabel') }}</label>
                 <div class="color-picker">
                   <button
                     v-for="c in colors"
@@ -62,7 +73,10 @@
                     :class="['color-swatch', 'no-color', { selected: !form.color }]"
                     @click="form.color = ''"
                   >
-                    <Icon name="lucide:x" size="10" />
+                    <Icon
+                      name="lucide:x"
+                      size="10"
+                    />
                   </button>
                 </div>
               </div>
@@ -72,13 +86,17 @@
               v-if="isEditing"
               class="field"
             >
-              <label for="goal-status">Status</label>
+              <label for="goal-status">{{ $t('goals.modal.statusLabel') }}</label>
               <select
                 id="goal-status"
                 v-model="form.status"
               >
-                <option value="IN_PROGRESS">Em andamento</option>
-                <option value="DONE">Concluída</option>
+                <option value="IN_PROGRESS">
+                  {{ $t('goals.modal.statusActive') }}
+                </option>
+                <option value="DONE">
+                  {{ $t('goals.modal.statusDone') }}
+                </option>
               </select>
             </div>
 
@@ -87,7 +105,9 @@
                 type="button"
                 class="btn-secondary"
                 @click="close"
-              >Cancelar</button>
+              >
+                {{ $t('shared.cancel') }}
+              </button>
               <button
                 type="submit"
                 class="btn-primary"
@@ -99,7 +119,7 @@
                   class="spinning"
                   size="14"
                 />
-                {{ isEditing ? 'Salvar' : 'Criar meta' }}
+                {{ isEditing ? $t('shared.save') : $t('goals.modal.new') }}
               </button>
             </div>
           </form>
@@ -123,12 +143,13 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
-  created: [goal: any];
-  updated: [goal: any];
+  "created": [goal: any];
+  "updated": [goal: any];
 }>();
 
 const { createGoal, updateGoal } = useGoals();
 const toast = useToast();
+const { t } = useI18n();
 
 const submitting = ref(false);
 
@@ -186,20 +207,20 @@ const handleSubmit = async () => {
     if (isEditing.value && props.editGoal) {
       const goal = await updateGoal(props.editGoal.id, payload);
       if (goal) {
-        toast.success({ title: "Meta atualizada" });
+        toast.success({ title: t("goals.toasts.updated") });
         emit("updated", goal);
         close();
       } else {
-        toast.error({ title: "Erro ao atualizar meta" });
+        toast.error({ title: t("goals.toasts.updateError") });
       }
     } else {
       const goal = await createGoal(payload);
       if (goal) {
-        toast.success({ title: "Meta criada" });
+        toast.success({ title: t("goals.toasts.created") });
         emit("created", goal);
         close();
       } else {
-        toast.error({ title: "Erro ao criar meta" });
+        toast.error({ title: t("goals.toasts.createError") });
       }
     }
   } finally {

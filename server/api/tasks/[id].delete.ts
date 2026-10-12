@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     const id = getRouterParam(event, "id");
 
     if (!id) {
-      return sendError(event, "Task ID is required", 400);
+      return sendError(event, serverT(event, "server.taskIdIsRequired"), 400);
     }
 
     await prisma.subTask.deleteMany({
@@ -20,9 +20,9 @@ export default defineEventHandler(async (event) => {
       where: { id },
     });
 
-    return sendSuccess(event, { message: "Task deleted successfully" });
+    return sendSuccess(event, { message: serverT(event, "server.taskDeleted") });
   } catch (error) {
     console.error("Error deleting task:", error);
-    return sendError(event, "Failed to delete task", 500);
+    return sendError(event, serverT(event, "server.failedToDeleteTask"), 500);
   }
 });

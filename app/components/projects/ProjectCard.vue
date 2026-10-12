@@ -54,31 +54,43 @@
             <div class="project-actions">
               <button
                 class="action-btn"
-                title="Adicionar tópico"
+                :title="$t('projects.card.addTopic')"
                 @click.stop="showAddTopic = true"
               >
-                <Icon name="lucide:plus" size="16" />
+                <Icon
+                  name="lucide:plus"
+                  size="16"
+                />
               </button>
               <button
                 class="action-btn"
-                title="Editar projeto"
+                :title="$t('projects.card.editProject')"
                 @click.stop="$emit('edit', project.id)"
               >
-                <Icon name="lucide:pencil" size="14" />
+                <Icon
+                  name="lucide:pencil"
+                  size="14"
+                />
               </button>
               <button
                 class="action-btn"
-                title="Arquivar projeto"
+                :title="$t('projects.card.archiveProject')"
                 @click.stop="$emit('archive', project.id)"
               >
-                <Icon name="lucide:archive" size="14" />
+                <Icon
+                  name="lucide:archive"
+                  size="14"
+                />
               </button>
               <button
                 class="action-btn danger"
-                title="Excluir projeto"
+                :title="$t('projects.card.deleteProject')"
                 @click.stop="$emit('delete', project.id)"
               >
-                <Icon name="lucide:trash-2" size="14" />
+                <Icon
+                  name="lucide:trash-2"
+                  size="14"
+                />
               </button>
             </div>
           </div>
@@ -97,7 +109,10 @@
           v-if="project.dueDate"
           :class="['project-deadline', { overdue: isOverdue }]"
         >
-          <Icon name="lucide:calendar-clock" size="14" />
+          <Icon
+            name="lucide:calendar-clock"
+            size="14"
+          />
           <span>{{ formatDeadline(project.dueDate) }}</span>
           <span
             v-if="daysRemaining !== null"
@@ -132,7 +147,7 @@
             ref="newTopicInput"
             v-model="newTopicTitle"
             class="add-input"
-            placeholder="Novo tópico..."
+            :placeholder="$t('projects.card.newTopicPlaceholder')"
             @keydown.enter="addTopic"
             @keydown.escape="cancelAddTopic"
             @blur="addTopic"
@@ -161,7 +176,7 @@
             ref="newProjectTaskInput"
             v-model="newProjectTaskTitle"
             class="add-input"
-            placeholder="Nova tarefa..."
+            :placeholder="$t('projects.card.newTaskPlaceholder')"
             @keydown.enter="addProjectTask"
             @keydown.escape="cancelAddProjectTask"
             @blur="addProjectTask"
@@ -174,16 +189,22 @@
             class="add-topic-btn"
             @click="showAddProjectTask = true"
           >
-            <Icon name="lucide:plus" size="14" />
-            Tarefa
+            <Icon
+              name="lucide:plus"
+              size="14"
+            />
+            {{ $t("projects.card.task") }}
           </button>
           <button
             v-if="!showAddTopic"
             class="add-topic-btn"
             @click="showAddTopic = true"
           >
-            <Icon name="lucide:plus" size="14" />
-            Tópico
+            <Icon
+              name="lucide:plus"
+              size="14"
+            />
+            {{ $t("projects.card.topic") }}
           </button>
         </div>
       </div>
@@ -199,6 +220,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { t, locale } = useI18n();
 
 const emit = defineEmits<{
   edit: [id: string];
@@ -240,11 +262,11 @@ const totalTasks = computed(() => {
 });
 
 const doneTasks = computed(() => {
-  let count = props.project.tasks?.filter((t) => t.done).length ?? 0;
+  let count = props.project.tasks?.filter(t => t.done).length ?? 0;
   for (const topic of props.project.topics || []) {
-    count += topic.tasks?.filter((t) => t.done).length ?? 0;
+    count += topic.tasks?.filter(t => t.done).length ?? 0;
     for (const sub of topic.subtopics || []) {
-      count += sub.tasks?.filter((t) => t.done).length ?? 0;
+      count += sub.tasks?.filter(t => t.done).length ?? 0;
     }
   }
   return count;
@@ -268,14 +290,14 @@ const isOverdue = computed(() => daysRemaining.value !== null && daysRemaining.v
 
 const deadlineLabel = computed(() => {
   if (daysRemaining.value === null) return "";
-  if (daysRemaining.value < 0) return `${Math.abs(daysRemaining.value)}d atrasado`;
-  if (daysRemaining.value === 0) return "Hoje";
-  if (daysRemaining.value === 1) return "Amanhã";
-  return `${daysRemaining.value}d restantes`;
+  if (daysRemaining.value < 0) return t("projects.card.overdue", { days: Math.abs(daysRemaining.value) });
+  if (daysRemaining.value === 0) return t("projects.card.today");
+  if (daysRemaining.value === 1) return t("projects.card.tomorrow");
+  return t("projects.card.remaining", { days: daysRemaining.value });
 });
 
 const formatDeadline = (date: Date | string) => {
-  return new Date(date).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+  return new Date(date).toLocaleDateString(locale.value === "pt" ? "pt-BR" : "en-US", { day: "2-digit", month: "short", year: "numeric" });
 };
 
 const cardBorderStyle = computed(() => {
@@ -341,13 +363,13 @@ const cancelAddProjectTask = () => {
 };
 
 const handleTopicExpand = (topicId: string, expanded: boolean) => {
-  const topic = props.project.topics?.find((t) => t.id === topicId);
+  const topic = props.project.topics?.find(t => t.id === topicId);
   if (topic) topic.expanded = expanded;
 };
 
 const handleSubtopicExpand = (subtopicId: string, expanded: boolean) => {
   for (const topic of props.project.topics || []) {
-    const sub = topic.subtopics?.find((s) => s.id === subtopicId);
+    const sub = topic.subtopics?.find(s => s.id === subtopicId);
     if (sub) {
       sub.expanded = expanded;
       break;

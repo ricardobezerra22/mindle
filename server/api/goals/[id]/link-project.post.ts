@@ -8,17 +8,17 @@ export default defineEventHandler(async (event) => {
     const { projectId } = body;
 
     if (!goalId || !projectId) {
-      return sendError(event, "Goal ID and Project ID are required", 400);
+      return sendError(event, serverT(event, "server.goalIdAndProjectIdAreRequired"), 400);
     }
 
     const project = await linkProjectToGoal(goalId, projectId, userId);
     if (!project) {
-      return sendError(event, "Goal or Project not found", 404);
+      return sendError(event, serverT(event, "server.goalOrProjectNotFound"), 404);
     }
 
     return sendSuccess(event, project);
   } catch (error) {
     console.error("Error linking project to goal:", error);
-    return sendError(event, "Failed to link project", 500);
+    return sendError(event, serverT(event, "server.failedToLinkProject"), 500);
   }
 });

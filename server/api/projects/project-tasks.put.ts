@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const { id, title, done, position } = body;
 
-    if (!id) return sendError(event, "Task ID is required", 400);
+    if (!id) return sendError(event, serverT(event, "server.taskIdIsRequired"), 400);
 
     const task = await prisma.projectTask.update({
       where: { id },
@@ -19,6 +19,6 @@ export default defineEventHandler(async (event) => {
     return sendSuccess(event, task);
   } catch (error) {
     console.error("Error updating project task:", error);
-    return sendError(event, "Failed to update project task", 500);
+    return sendError(event, serverT(event, "server.failedToUpdateProjectTask"), 500);
   }
 });

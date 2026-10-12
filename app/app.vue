@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { Analytics } from "@vercel/analytics/nuxt";
 
+const { t, locale } = useI18n();
+
 useHead({
   meta: [{ name: "viewport", content: "width=device-width, initial-scale=1" }],
   link: [{ rel: "icon", href: "/favicon.ico" }],
   htmlAttrs: {
-    lang: "pt",
+    lang: computed(() => locale.value),
   },
 });
-const title = "Mindle - Gestão de Tarefas e Produtividade";
-const description
-  = "Sistema completo de gestão de tarefas, planner, foco e bem-estar.";
+usePalette();
+const title = computed(() => t("app.title"));
+const description = computed(() => t("app.description"));
 
 useSeoMeta({
   title,

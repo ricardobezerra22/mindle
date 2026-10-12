@@ -1,8 +1,13 @@
 <template>
   <div class="insight-card">
     <div class="insight-header">
-      <Icon name="lucide:sparkles" size="18" />
-      <h3 class="insight-title">Resumo Inteligente</h3>
+      <Icon
+        name="lucide:sparkles"
+        size="18"
+      />
+      <h3 class="insight-title">
+        {{ $t('dashboard.insights.title') }}
+      </h3>
     </div>
 
     <div class="insights-list">
@@ -15,7 +20,9 @@
           :name="insight.icon"
           size="16"
         />
-        <p class="insight-text">{{ insight.text }}</p>
+        <p class="insight-text">
+          {{ insight.text }}
+        </p>
       </div>
     </div>
   </div>
@@ -30,6 +37,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { t } = useI18n();
 
 interface Insight {
   icon: string;
@@ -53,14 +61,14 @@ const insights = computed<Insight[]>(() => {
   if (m.focus.totalMinutes > 0) {
     list.push({
       icon: "lucide:target",
-      text: `Você dedicou ${formatMinutes(m.focus.totalMinutes)} ao foco profundo (${props.periodLabel.toLowerCase()}).`,
+      text: t("dashboard.insights.focusTime", { time: formatMinutes(m.focus.totalMinutes), period: props.periodLabel.toLowerCase() }),
       type: m.focus.growth >= 0 ? "positive" : "neutral",
     });
 
     if (m.focus.topTask) {
       list.push({
         icon: "lucide:star",
-        text: `Sua tarefa mais focada foi "${m.focus.topTask.title}" com ${formatMinutes(m.focus.topTask.minutes)}.`,
+        text: t("dashboard.insights.topTask", { title: m.focus.topTask.title, time: formatMinutes(m.focus.topTask.minutes) }),
         type: "neutral",
       });
     }
@@ -68,13 +76,13 @@ const insights = computed<Insight[]>(() => {
     if (m.focus.growth > 0) {
       list.push({
         icon: "lucide:trending-up",
-        text: `Seu foco cresceu ${m.focus.growth}% comparado ao período anterior.`,
+        text: t("dashboard.insights.focusGrowth", { pct: m.focus.growth }),
         type: "positive",
       });
     } else if (m.focus.growth < 0) {
       list.push({
         icon: "lucide:trending-down",
-        text: `Seu foco caiu ${Math.abs(m.focus.growth)}% comparado ao período anterior.`,
+        text: t("dashboard.insights.focusDrop", { pct: Math.abs(m.focus.growth) }),
         type: "warning",
       });
     }
@@ -83,7 +91,7 @@ const insights = computed<Insight[]>(() => {
   if (m.tasks.total > 0) {
     list.push({
       icon: "lucide:check-circle-2",
-      text: `Você completou ${m.tasks.done} de ${m.tasks.total} tarefas (${m.tasks.completionRate}%).`,
+      text: t("dashboard.insights.tasksCompleted", { done: m.tasks.done, total: m.tasks.total, pct: m.tasks.completionRate }),
       type: m.tasks.completionRate >= 70 ? "positive" : m.tasks.completionRate >= 40 ? "neutral" : "warning",
     });
 
@@ -94,8 +102,8 @@ const insights = computed<Insight[]>(() => {
       list.push({
         icon: "lucide:alert-triangle",
         text: highRate >= 70
-          ? `Ótimo desempenho em tarefas de alta prioridade: ${highRate}% concluídas.`
-          : `Atenção: apenas ${highRate}% das tarefas de alta prioridade foram concluídas.`,
+          ? t("dashboard.insights.highPriorityGood", { pct: highRate })
+          : t("dashboard.insights.highPriorityBad", { pct: highRate }),
         type: highRate >= 70 ? "positive" : "warning",
       });
     }
@@ -104,7 +112,7 @@ const insights = computed<Insight[]>(() => {
   if (m.projects.topProject && m.projects.topProject.progress > 0) {
     list.push({
       icon: "lucide:folder-kanban",
-      text: `Seu projeto "${m.projects.topProject.title}" avançou para ${m.projects.topProject.progress}%.`,
+      text: t("dashboard.insights.topProject", { title: m.projects.topProject.title, pct: m.projects.topProject.progress }),
       type: "positive",
     });
   }
@@ -113,7 +121,9 @@ const insights = computed<Insight[]>(() => {
     const names = m.projects.staleProjects.slice(0, 2).map(p => `"${p.title}"`).join(", ");
     list.push({
       icon: "lucide:archive",
-      text: `${m.projects.staleProjects.length === 1 ? "Projeto" : "Projetos"} sem atualização recente: ${names}.`,
+      text: m.projects.staleProjects.length === 1
+        ? t("dashboard.insights.staleProject", { names })
+        : t("dashboard.insights.staleProjects", { names }),
       type: "warning",
     });
   }
@@ -121,7 +131,7 @@ const insights = computed<Insight[]>(() => {
   if (m.planner.planned > 0) {
     list.push({
       icon: "lucide:calendar-check",
-      text: `Taxa de execução do planejamento: ${m.planner.executionRate}% (${m.planner.executed}/${m.planner.planned}).`,
+      text: t("dashboard.insights.plannerRate", { pct: m.planner.executionRate, done: m.planner.executed, planned: m.planner.planned }),
       type: m.planner.executionRate >= 70 ? "positive" : m.planner.executionRate >= 40 ? "neutral" : "warning",
     });
   }
@@ -129,7 +139,7 @@ const insights = computed<Insight[]>(() => {
   if (m.habits.best) {
     list.push({
       icon: "lucide:heart",
-      text: `Seu hábito mais consistente foi "${m.habits.best.title}" com ${m.habits.best.consistency}%.`,
+      text: t("dashboard.insights.bestHabit", { title: m.habits.best.title, pct: m.habits.best.consistency }),
       type: "positive",
     });
   }
@@ -137,7 +147,7 @@ const insights = computed<Insight[]>(() => {
   if (m.habits.neglected && m.habits.habits.length > 1 && m.habits.neglected.consistency < 30) {
     list.push({
       icon: "lucide:heart-off",
-      text: `"${m.habits.neglected.title}" precisa de atenção: apenas ${m.habits.neglected.consistency}% de consistência.`,
+      text: t("dashboard.insights.neglectedHabit", { title: m.habits.neglected.title, pct: m.habits.neglected.consistency }),
       type: "warning",
     });
   }
@@ -145,26 +155,30 @@ const insights = computed<Insight[]>(() => {
   if (m.mood.total > 0) {
     const moodEntries = Object.entries(m.mood.distribution);
     const dominant = moodEntries.sort((a, b) => b[1] - a[1])[0];
-    const moodLabels: Record<string, string> = {
-      HAPPY: "feliz", CALMLY: "calmo", OK: "neutro",
-      SAD: "triste", TIRED: "cansado", OVERWHELMED: "sobrecarregado",
+    const moodLabelMap: Record<string, string> = {
+      HAPPY: t("dashboard.insights.moodLabels.happy"),
+      CALMLY: t("dashboard.insights.moodLabels.calmly"),
+      OK: t("dashboard.insights.moodLabels.ok"),
+      SAD: t("dashboard.insights.moodLabels.sad"),
+      TIRED: t("dashboard.insights.moodLabels.tired"),
+      OVERWHELMED: t("dashboard.insights.moodLabels.overwhelmed"),
     };
     if (dominant) {
-      const label = moodLabels[dominant[0]] || dominant[0];
+      const label = moodLabelMap[dominant[0]] || dominant[0];
       const pct = Math.round((dominant[1] / m.mood.total) * 100);
       list.push({
         icon: "lucide:smile",
-        text: `Seu humor predominante foi "${label}" em ${pct}% dos dias registrados.`,
+        text: t("dashboard.insights.dominantMood", { mood: label, pct }),
         type: ["HAPPY", "CALMLY"].includes(dominant[0]) ? "positive" : ["SAD", "OVERWHELMED"].includes(dominant[0]) ? "warning" : "neutral",
       });
     }
 
     const bestMoodHabit = Object.entries(m.mood.moodHabitCorrelation).sort((a, b) => b[1] - a[1])[0];
     if (bestMoodHabit && bestMoodHabit[1] > 50) {
-      const label = moodLabels[bestMoodHabit[0]] || bestMoodHabit[0];
+      const label = moodLabelMap[bestMoodHabit[0]] || bestMoodHabit[0];
       list.push({
         icon: "lucide:heart-handshake",
-        text: `Nos dias em que você se sentiu "${label}", completou ${bestMoodHabit[1]}% dos hábitos.`,
+        text: t("dashboard.insights.moodHabit", { mood: label, pct: bestMoodHabit[1] }),
         type: "positive",
       });
     }
@@ -173,7 +187,7 @@ const insights = computed<Insight[]>(() => {
   if (m.finance.overdue > 0) {
     list.push({
       icon: "lucide:alert-circle",
-      text: `Finanças pedem atenção: ${m.finance.overdue} ${m.finance.overdue === 1 ? "pendência vencida" : "pendências vencidas"}.`,
+      text: t("dashboard.insights.overdueFinance", { count: m.finance.overdue, label: t("dashboard.insights.overdueLabel", m.finance.overdue) }),
       type: "warning",
     });
   }
@@ -181,7 +195,7 @@ const insights = computed<Insight[]>(() => {
   if (m.finance.pendingCount > 0 && m.finance.overdue === 0) {
     list.push({
       icon: "lucide:wallet",
-      text: `${m.finance.pendingCount} ${m.finance.pendingCount === 1 ? "pagamento pendente" : "pagamentos pendentes"} no período.`,
+      text: t("dashboard.insights.pendingFinance", { count: m.finance.pendingCount, label: t("dashboard.insights.pendingLabel", m.finance.pendingCount) }),
       type: "neutral",
     });
   }
@@ -189,7 +203,7 @@ const insights = computed<Insight[]>(() => {
   if (list.length === 0) {
     list.push({
       icon: "lucide:coffee",
-      text: "Ainda não há dados suficientes neste período para gerar insights.",
+      text: t("dashboard.insights.noData"),
       type: "neutral",
     });
   }

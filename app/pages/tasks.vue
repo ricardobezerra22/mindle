@@ -5,18 +5,25 @@
         :class="['tasks-tab-btn', { active: activeTasksTab === 'active' }]"
         @click="activeTasksTab = 'active'"
       >
-        Tarefas
+        {{ $t("tasks.title") }}
       </button>
       <button
         :class="['tasks-tab-btn', { active: activeTasksTab === 'done' }]"
-        @click="activeTasksTab = 'done'; fetchDoneTasks()"
+        @click="
+          activeTasksTab = 'done';
+          fetchDoneTasks();
+        "
       >
-        <Icon name="lucide:check-circle-2" size="14" />
-        Concluídas
+        <Icon
+          name="lucide:check-circle-2"
+          size="14"
+        />
+        {{ $t("tasks.completed") }}
         <span
           v-if="doneTasks.length > 0"
           class="tasks-tab-badge"
-        >{{ doneTasks.length }}</span>
+          >{{ doneTasks.length }}</span
+        >
       </button>
     </div>
 
@@ -43,7 +50,7 @@
 
       <UiButton @click="openCreateModal">
         <Icon name="lucide:plus" />
-        Nova Tarefa
+        {{ $t("tasks.newTask") }}
       </UiButton>
     </div>
 
@@ -51,28 +58,46 @@
       <div class="done-tasks-header">
         <div class="done-date-filters">
           <button
-            :class="['done-filter-pill', { active: doneFilterMode === 'today' }]"
-            @click="doneFilterMode = 'today'; fetchDoneTasks()"
+            :class="[
+              'done-filter-pill',
+              { active: doneFilterMode === 'today' },
+            ]"
+            @click="
+              doneFilterMode = 'today';
+              fetchDoneTasks();
+            "
           >
-            Hoje
+            {{ $t("tasks.filters.today") }}
           </button>
           <button
             :class="['done-filter-pill', { active: doneFilterMode === 'week' }]"
-            @click="doneFilterMode = 'week'; fetchDoneTasks()"
+            @click="
+              doneFilterMode = 'week';
+              fetchDoneTasks();
+            "
           >
-            Esta semana
+            {{ $t("tasks.filters.thisWeek") }}
           </button>
           <button
-            :class="['done-filter-pill', { active: doneFilterMode === 'month' }]"
-            @click="doneFilterMode = 'month'; fetchDoneTasks()"
+            :class="[
+              'done-filter-pill',
+              { active: doneFilterMode === 'month' },
+            ]"
+            @click="
+              doneFilterMode = 'month';
+              fetchDoneTasks();
+            "
           >
-            Este mês
+            {{ $t("tasks.filters.thisMonth") }}
           </button>
           <button
-            :class="['done-filter-pill', { active: doneFilterMode === 'custom' }]"
+            :class="[
+              'done-filter-pill',
+              { active: doneFilterMode === 'custom' },
+            ]"
             @click="doneFilterMode = 'custom'"
           >
-            Personalizado
+            {{ $t("tasks.filters.custom") }}
           </button>
         </div>
         <div
@@ -101,15 +126,25 @@
       >
         <div class="skeleton-columns">
           <div class="skeleton-column">
-            <UiSkeleton width="120px" height="12px" />
+            <UiSkeleton
+              width="120px"
+              height="12px"
+            />
             <div
               v-for="j in 4"
               :key="j"
               class="skeleton-task-card"
             >
               <div class="skeleton-task-row">
-                <UiSkeleton variant="circle" width="20px" height="20px" />
-                <UiSkeleton height="14px" :width="['90%', '70%', '80%', '60%'][j - 1]" />
+                <UiSkeleton
+                  variant="circle"
+                  width="20px"
+                  height="20px"
+                />
+                <UiSkeleton
+                  height="14px"
+                  :width="['90%', '70%', '80%', '60%'][j - 1]"
+                />
               </div>
             </div>
           </div>
@@ -120,9 +155,16 @@
         v-else-if="doneTasks.length === 0"
         class="empty-state"
       >
-        <Icon name="lucide:check-circle-2" size="48" />
-        <h3 class="empty-title">Nenhuma tarefa concluída</h3>
-        <p class="empty-text">Tarefas concluídas no período selecionado aparecerão aqui.</p>
+        <Icon
+          name="lucide:check-circle-2"
+          size="48"
+        />
+        <h3 class="empty-title">
+          {{ $t("tasks.empty.noCompleted") }}
+        </h3>
+        <p class="empty-text">
+          {{ $t("tasks.empty.noCompletedSub") }}
+        </p>
       </div>
 
       <div
@@ -135,7 +177,10 @@
           class="done-task-card"
         >
           <div class="done-task-check">
-            <Icon name="lucide:check-circle-2" size="18" />
+            <Icon
+              name="lucide:check-circle-2"
+              size="18"
+            />
           </div>
           <div class="done-task-info">
             <span class="done-task-title">{{ task.title }}</span>
@@ -144,14 +189,17 @@
                 v-if="task.category"
                 class="done-task-cat"
                 :style="{ color: task.category.color }"
-              >{{ task.category.name }}</span>
+                >{{ task.category.name }}</span
+              >
               <span
                 v-if="task.doneAt"
                 class="done-task-date"
-              >{{ formatDoneDate(task.doneAt) }}</span>
+                >{{ formatDoneDate(task.doneAt) }}</span
+              >
               <span
                 :class="['done-task-priority', task.priority.toLowerCase()]"
-              >{{ priorityLabel(task.priority) }}</span>
+                >{{ priorityLabel(task.priority) }}</span
+              >
             </div>
           </div>
         </div>
@@ -168,17 +216,30 @@
           :key="i"
           class="skeleton-column"
         >
-          <UiSkeleton width="80px" height="12px" />
+          <UiSkeleton
+            width="80px"
+            height="12px"
+          />
           <div
             v-for="j in 3"
             :key="j"
             class="skeleton-task-card"
           >
             <div class="skeleton-task-row">
-              <UiSkeleton variant="circle" width="20px" height="20px" />
-              <UiSkeleton height="14px" :width="['90%', '70%', '80%'][j - 1]" />
+              <UiSkeleton
+                variant="circle"
+                width="20px"
+                height="20px"
+              />
+              <UiSkeleton
+                height="14px"
+                :width="['90%', '70%', '80%'][j - 1]"
+              />
             </div>
-            <UiSkeleton height="10px" width="50%" />
+            <UiSkeleton
+              height="10px"
+              width="50%"
+            />
           </div>
         </div>
       </div>
@@ -190,7 +251,7 @@
         class="kanban-board"
       >
         <TasksTaskColumn
-          title="Não Iniciado"
+          :title="$t('tasks.columns.notStarted')"
           status="NOT_STARTED"
           :task-count="tasksByStatus.NOT_STARTED.length"
           icon="lucide:circle"
@@ -260,7 +321,7 @@
         </TasksTaskColumn>
 
         <TasksTaskColumn
-          title="Em Progresso"
+          :title="$t('tasks.columns.inProgress')"
           status="IN_PROGRESS"
           :task-count="tasksByStatus.IN_PROGRESS.length"
           icon="lucide:loader"
@@ -330,7 +391,7 @@
         </TasksTaskColumn>
 
         <TasksTaskColumn
-          title="Concluído"
+          :title="$t('tasks.columns.done')"
           status="DONE"
           :task-count="tasksByStatus.DONE.length"
           icon="lucide:check-circle-2"
@@ -408,13 +469,20 @@
           class="view-empty-state"
         >
           <div class="view-empty-icon">
-            <Icon name="lucide:folder-open" size="48" />
+            <Icon
+              name="lucide:folder-open"
+              size="48"
+            />
           </div>
-          <h3 class="view-empty-title">Nenhuma tarefa por categoria</h3>
-          <p class="view-empty-description">Crie tarefas e organize por categorias para visualizar aqui.</p>
+          <h3 class="view-empty-title">
+            {{ $t("tasks.empty.noByCategory") }}
+          </h3>
+          <p class="view-empty-description">
+            {{ $t("tasks.empty.noByCategorySub") }}
+          </p>
           <UiButton @click="openCreateModal">
             <Icon name="lucide:plus" />
-            Nova Tarefa
+            {{ $t("tasks.newTask") }}
           </UiButton>
         </div>
 
@@ -507,7 +575,9 @@
                 class="category-color-dot"
                 :style="{ backgroundColor: '#94a3b8' }"
               />
-              <span class="category-header-name">Sem Categoria</span>
+              <span class="category-header-name">{{
+                $t("tasks.columns.noCategory")
+              }}</span>
               <span class="category-task-count">{{
                 uncategorizedTasks.length
               }}</span>
@@ -550,7 +620,10 @@
 
     <TasksTaskCreateModal
       v-model="showCreateModal"
-      @created="fetchTasks(); fetchCategories()"
+      @created="
+        fetchTasks();
+        fetchCategories();
+      "
     />
 
     <div
@@ -560,7 +633,7 @@
     >
       <div class="modal-content delete-modal">
         <div class="modal-header">
-          <h2>Confirmar Exclusão</h2>
+          <h2>{{ $t("tasks.deleteModal.title") }}</h2>
           <button
             class="close-btn"
             @click="showDeleteModal = false"
@@ -573,11 +646,15 @@
           <div class="delete-icon">
             <Icon name="lucide:alert-triangle" />
           </div>
-          <h3 class="delete-title">Excluir Tarefa</h3>
+          <h3 class="delete-title">
+            {{ $t("tasks.deleteModal.heading") }}
+          </h3>
           <p class="delete-message">
-            Tem certeza que deseja excluir esta tarefa?
+            {{ $t("tasks.deleteModal.body") }}
           </p>
-          <p class="delete-warning">Esta ação não pode ser desfeita.</p>
+          <p class="delete-warning">
+            {{ $t("shared.actionUndone") }}
+          </p>
         </div>
 
         <div class="modal-actions delete-actions">
@@ -587,7 +664,7 @@
             class="action-button"
             @click="showDeleteModal = false"
           >
-            Cancelar
+            {{ $t("shared.cancel") }}
           </UiButton>
           <UiButton
             type="button"
@@ -595,7 +672,7 @@
             @click="handleDelete"
           >
             <Icon name="lucide:trash-2" />
-            Excluir
+            {{ $t("shared.delete") }}
           </UiButton>
         </div>
       </div>
@@ -604,8 +681,8 @@
 </template>
 
 <script setup lang="ts">
-import { TaskStatus, Priority } from "~/types";
-import type { Task, TaskCategory, Groups } from "~/types";
+import { TaskStatus } from "~/types";
+import type { Task, TaskCategory, Groups, Priority } from "~/types";
 
 const {
   tasks,
@@ -623,6 +700,7 @@ const {
 } = useTasks();
 
 const toast = useToast();
+const { t } = useI18n();
 const { preferences } = usePreferences();
 const showCreateModal = ref(false);
 const showDeleteModal = ref(false);
@@ -633,7 +711,9 @@ const searchQuery = ref("");
 const dateFilter = ref("");
 const categoryFilter = ref("");
 const favoriteFilter = ref(false);
-const sortBy = ref<"HIGHEST_PRIORITY" | "LOWEST_PRIORITY" | "">("HIGHEST_PRIORITY");
+const sortBy = ref<"HIGHEST_PRIORITY" | "LOWEST_PRIORITY" | "">(
+  "HIGHEST_PRIORITY",
+);
 
 const activeTasksTab = ref<"active" | "done">("active");
 const doneTasks = ref<Task[]>([]);
@@ -667,7 +747,11 @@ const getDoneDateRange = () => {
     end.setHours(23, 59, 59, 999);
     return { doneFrom: start.toISOString(), doneTo: end.toISOString() };
   }
-  if (doneFilterMode.value === "custom" && doneCustomFrom.value && doneCustomTo.value) {
+  if (
+    doneFilterMode.value === "custom" &&
+    doneCustomFrom.value &&
+    doneCustomTo.value
+  ) {
     return {
       doneFrom: new Date(doneCustomFrom.value).toISOString(),
       doneTo: new Date(doneCustomTo.value + "T23:59:59").toISOString(),
@@ -680,9 +764,12 @@ const fetchDoneTasks = async () => {
   doneLoading.value = true;
   try {
     const range = getDoneDateRange();
-    const response = await $fetch<{ success: boolean; data: Task[] }>("/api/tasks", {
-      query: { status: "DONE", ...range },
-    });
+    const response = await $fetch<{ success: boolean; data: Task[] }>(
+      "/api/tasks",
+      {
+        query: { status: "DONE", ...range },
+      },
+    );
     if (response.success) {
       doneTasks.value = response.data;
     }
@@ -694,7 +781,8 @@ const fetchDoneTasks = async () => {
 };
 
 const formatDoneDate = (date: Date | string) => {
-  return new Date(date).toLocaleDateString("pt-BR", {
+  const { locale } = useI18n();
+  return new Date(date).toLocaleDateString(locale.value, {
     day: "2-digit",
     month: "short",
     hour: "2-digit",
@@ -703,7 +791,11 @@ const formatDoneDate = (date: Date | string) => {
 };
 
 const priorityLabel = (priority: string) => {
-  const labels: Record<string, string> = { HIGH: "Alta", MEDIUM: "Média", LOW: "Baixa" };
+  const labels: Record<string, string> = {
+    HIGH: t("shared.priorities.high"),
+    MEDIUM: t("shared.priorities.medium"),
+    LOW: t("shared.priorities.low"),
+  };
   return labels[priority] || priority;
 };
 
@@ -742,10 +834,16 @@ const filteredTasks = computed(() => {
   }
 
   if (sortBy.value) {
-    const priorityWeight: Record<string, number> = { HIGH: 3, MEDIUM: 2, LOW: 1 };
+    const priorityWeight: Record<string, number> = {
+      HIGH: 3,
+      MEDIUM: 2,
+      LOW: 1,
+    };
     const direction = sortBy.value === "HIGHEST_PRIORITY" ? -1 : 1;
     filtered = [...filtered].sort(
-      (a, b) => direction * ((priorityWeight[a.priority] || 0) - (priorityWeight[b.priority] || 0)),
+      (a, b) =>
+        direction *
+        ((priorityWeight[a.priority] || 0) - (priorityWeight[b.priority] || 0)),
     );
   }
 
@@ -792,7 +890,7 @@ const groupByCategory = (taskList: Task[]): CategoryGroup[] => {
   if (uncategorized.length > 0) {
     groups.push({
       id: "uncategorized",
-      name: "Sem Categoria",
+      name: t("tasks.columns.noCategory"),
       color: "#94a3b8",
       tasks: uncategorized,
     });
@@ -874,7 +972,7 @@ const handleEdit = async (
   try {
     await updateTask(id, data);
   } catch (e) {
-    toast.error({ title: "Erro ao atualizar tarefa" });
+    toast.error({ title: t("tasks.toasts.updateError") });
   }
 };
 
@@ -888,9 +986,9 @@ const handleDelete = async () => {
     try {
       await deleteTask(taskToDelete.value);
       showDeleteModal.value = false;
-      toast.success({ title: "Tarefa excluída" });
+      toast.success({ title: t("tasks.toasts.deleted") });
     } catch (e) {
-      toast.error({ title: "Erro ao excluir tarefa" });
+      toast.error({ title: t("tasks.toasts.deleteError") });
     } finally {
       taskToDelete.value = null;
     }
@@ -909,7 +1007,7 @@ const handleComplete = async (taskId: string) => {
   try {
     await updateTaskStatus(taskId, TaskStatus.DONE);
   } catch {
-    toast.error({ title: "Erro ao concluir tarefa" });
+    toast.error({ title: t("tasks.toasts.completeError") });
   }
 };
 
@@ -917,16 +1015,16 @@ const handleToggleFavorite = async (id: string) => {
   try {
     await toggleFavorite(id);
   } catch (e) {
-    toast.error({ title: "Erro ao atualizar prioridade" });
+    toast.error({ title: t("tasks.toasts.priorityError") });
   }
 };
 
 const handleUpdatePriority = async (id: string, priority: Priority) => {
   try {
     await updateTask(id, { priority });
-    toast.success({ title: "Prioridade atualizada" });
+    toast.success({ title: t("tasks.toasts.priorityUpdated") });
   } catch {
-    toast.error({ title: "Erro ao atualizar prioridade" });
+    toast.error({ title: t("tasks.toasts.priorityError") });
   }
 };
 
@@ -940,14 +1038,19 @@ const handleUpdateCategory = async (id: string, categoryId: string | null) => {
       category,
     });
     toast.success({
-      title: categoryId ? "Categoria atualizada" : "Categoria removida",
+      title: categoryId
+        ? t("tasks.toasts.categoryUpdated")
+        : t("tasks.toasts.categoryRemoved"),
     });
   } catch {
-    toast.error({ title: "Erro ao atualizar categoria" });
+    toast.error({ title: t("tasks.toasts.categoryError") });
   }
 };
 
-const preserveExpandedOnStatusChange = (taskId: string, newStatus: TaskStatus) => {
+const preserveExpandedOnStatusChange = (
+  taskId: string,
+  newStatus: TaskStatus,
+) => {
   const task = tasks.value.find((t) => t.id === taskId);
   if (!task) return;
 
@@ -968,7 +1071,7 @@ const handleUpdateStatus = async (id: string, status: TaskStatus) => {
   try {
     await updateTaskStatus(id, status);
   } catch {
-    toast.error({ title: "Erro ao atualizar status" });
+    toast.error({ title: t("tasks.toasts.statusError") });
   }
 };
 
@@ -979,7 +1082,7 @@ const handleDrop = async (taskId: string, newStatus: TaskStatus) => {
     try {
       await updateTaskStatus(taskId, newStatus);
     } catch (e) {
-      toast.error({ title: "Erro ao alterar status da tarefa" });
+      toast.error({ title: t("tasks.toasts.statusError") });
     }
   }
 };
@@ -988,7 +1091,7 @@ const handleAddSubTask = async (taskId: string, title: string) => {
   try {
     await addSubTask(taskId, title);
   } catch (e) {
-    toast.error({ title: "Erro ao adicionar subtarefa" });
+    toast.error({ title: t("tasks.toasts.subtaskAddError") });
   }
 };
 function shouldMoveToInProgress(done: boolean, task?: Task): task is Task {
@@ -1023,7 +1126,7 @@ const handleToggleSubTask = async (subTaskId: string, done: boolean) => {
   } catch {
     subTask.done = previousDone;
     desiredTask.status = previousStatus;
-    toast.error({ title: "Erro ao atualizar subtarefa" });
+    toast.error({ title: t("tasks.toasts.subtaskUpdateError") });
   }
 };
 
@@ -1057,7 +1160,6 @@ onMounted(() => {
 .filters-section > :first-child {
   grid-column: 1 / -1;
 }
-
 
 .loading-state {
   padding: var(--spacing-md) 0;
@@ -1452,7 +1554,6 @@ onMounted(() => {
   .filters-section > :first-child {
     grid-column: unset;
   }
-
 }
 
 @media (min-width: 1024px) {
