@@ -71,7 +71,8 @@
       "afternoon": "Boa tarde",
       "evening": "Boa noite"
     },
-    "none": "Nenhuma"
+    "none": "Nenhuma",
+    "category": "Categoria"
   },
   "index": {
     "focusToday": "Foco de hoje",

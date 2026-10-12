@@ -71,7 +71,8 @@
       "afternoon": "Good afternoon",
       "evening": "Good evening"
     },
-    "none": "None"
+    "none": "None",
+    "category": "Category"
   },
   "index": {
     "focusToday": "Today's focus",

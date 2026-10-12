@@ -44,7 +44,7 @@
             size="14"
           />
           <span class="category-label">
-            {{ selectedCategory?.name || 'Categoria' }}
+            {{ selectedCategory?.name || $t("shared.category") }}
           </span>
           <Icon
             :name="showCategories ? 'lucide:chevron-up' : 'lucide:chevron-down'"
@@ -116,7 +116,10 @@
         <span
           v-if="selectedCategory"
           class="filter-tag"
-          :style="{ backgroundColor: `${selectedCategory.color}15`, color: selectedCategory.color }"
+          :style="{
+            backgroundColor: `${selectedCategory.color}15`,
+            color: selectedCategory.color,
+          }"
         >
           {{ selectedCategory.name }}
           <button @click="updateFilter({ categoryId: '' })">
@@ -162,7 +165,9 @@ useClickOutside(categoryRef, () => {
 
 const selectedCategory = computed(() => {
   if (!props.modelValue.categoryId) return null;
-  return props.categories.find(c => c.id === props.modelValue.categoryId) || null;
+  return (
+    props.categories.find((c) => c.id === props.modelValue.categoryId) || null
+  );
 });
 
 const hasActiveFilters = computed(() => {
@@ -339,7 +344,7 @@ watch(
 }
 
 .dropdown-option.active {
-  background: #E8F3ED;
+  background: #e8f3ed;
   font-weight: 500;
 }
 
