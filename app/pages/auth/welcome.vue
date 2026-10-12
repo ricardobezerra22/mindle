@@ -19,6 +19,7 @@
         </button>
         <AuthLogo :size="34" />
         <span class="brand">Mindle</span>
+        <AuthLocaleSwitch class="locale-slot" />
       </header>
 
       <template v-if="step === 1">
@@ -437,6 +438,10 @@ const finish = () => {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.locale-slot {
+  margin-left: auto;
 }
 
 .brand {

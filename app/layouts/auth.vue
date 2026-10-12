@@ -1,6 +1,13 @@
 <template>
-  <div :class="['auth-layout', 'auth-theme', { 'palette-classic': preferences.palette === 'classic' }]">
+  <div
+    :class="[
+      'auth-layout',
+      'auth-theme',
+      { 'palette-classic': preferences.palette === 'classic' },
+    ]"
+  >
     <AuthBackdrop />
+    <AuthLocaleSwitch class="locale-slot" />
 
     <section class="hero">
       <div class="brand">
@@ -239,6 +246,13 @@ watchEffect(() => {
   font-family: var(--auth-font);
 }
 
+.locale-slot {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+}
+
 .hero {
   position: relative;
   z-index: 1;
@@ -265,6 +279,7 @@ watchEffect(() => {
 
 .headline {
   margin: 0;
+  text-align: start;
   font-size: clamp(34px, 5.2vw, 58px);
   line-height: 1.08;
   font-weight: 600;
@@ -275,6 +290,7 @@ watchEffect(() => {
 .headline-accent {
   display: block;
   color: var(--auth-mint);
+  text-align: start;
 }
 
 .hero-body {
@@ -284,6 +300,7 @@ watchEffect(() => {
   line-height: 1.65;
   font-weight: 300;
   color: var(--auth-pale);
+  text-align: start;
 }
 
 .phrases {
@@ -577,13 +594,12 @@ watchEffect(() => {
   }
 }
 
-@media (max-width: 760px) {
-  .scene {
-    display: none;
-  }
-}
-
 @media (min-width: 768px) {
+  .locale-slot {
+    top: 24px;
+    right: 32px;
+  }
+
   .auth-layout {
     gap: 56px;
     padding: 56px clamp(16px, 5vw, 72px);
@@ -595,6 +611,61 @@ watchEffect(() => {
 
   .card {
     padding: 40px;
+  }
+}
+
+@media (max-width: 899px) {
+  .auth-layout {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .hero {
+    display: none;
+  }
+
+  .locale-slot {
+    position: static;
+    margin-bottom: 24px;
+  }
+
+  .card {
+    flex: 0 1 auto;
+    width: 100%;
+    max-width: 440px;
+  }
+}
+
+@media (min-width: 900px) {
+  .auth-layout {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    flex-wrap: nowrap;
+    padding-block: clamp(24px, 4vh, 56px);
+  }
+
+  .hero {
+    gap: clamp(12px, 2.6vh, 28px);
+  }
+
+  .headline {
+    font-size: clamp(34px, min(5.2vw, 7vh), 58px);
+  }
+
+  .scene {
+    width: auto;
+    max-width: 100%;
+    max-height: 30vh;
+  }
+
+  .card {
+    max-height: calc(100dvh - 2 * clamp(24px, 4vh, 56px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 }
 

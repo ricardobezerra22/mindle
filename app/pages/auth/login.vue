@@ -120,9 +120,9 @@ const ERROR_MESSAGES: Record<number, string> = {
 };
 
 const resolveError = (statusCode?: number, fallback?: string) =>
-  (statusCode !== undefined ? ERROR_MESSAGES[statusCode] : undefined)
-  ?? fallback
-  ?? t("auth.login.invalidCredentials");
+  (statusCode !== undefined ? ERROR_MESSAGES[statusCode] : undefined) ??
+  fallback ??
+  t("auth.login.invalidCredentials");
 
 const email = ref("");
 const password = ref("");

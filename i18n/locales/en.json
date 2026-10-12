@@ -999,7 +999,8 @@
       "cap2": "Done. One step is already progress.",
       "createFirst": "Create my first task",
       "haveAccount": "I already have an account"
-    }
+    },
+    "language": "Language"
   },
   "planner": {
     "overview": "Overview",

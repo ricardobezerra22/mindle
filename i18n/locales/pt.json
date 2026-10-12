@@ -999,7 +999,8 @@
       "cap2": "Feito. Um passo já é progresso.",
       "createFirst": "Criar minha primeira tarefa",
       "haveAccount": "Já tenho conta"
-    }
+    },
+    "language": "Idioma"
   },
   "planner": {
     "overview": "Visão geral",

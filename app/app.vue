@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { Analytics } from "@vercel/analytics/nuxt";
 
+const { t, locale } = useI18n();
+
 useHead({
   meta: [{ name: "viewport", content: "width=device-width, initial-scale=1" }],
   link: [{ rel: "icon", href: "/favicon.ico" }],
   htmlAttrs: {
-    lang: "pt",
+    lang: computed(() => locale.value),
   },
 });
 usePalette();
-const { t } = useI18n();
 const title = computed(() => t("app.title"));
 const description = computed(() => t("app.description"));
 
