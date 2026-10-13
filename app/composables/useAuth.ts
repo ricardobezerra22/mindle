@@ -2,6 +2,8 @@ interface User {
   id: string;
   name: string | null;
   email: string | null;
+  emailNotifications?: boolean;
+  calendarConnected?: boolean;
 }
 
 export const useAuth = () => {

@@ -1,255 +1,388 @@
 <template>
   <div
     v-if="modelValue"
-    class="modal-overlay"
-    @click.self="close"
+    class="dlg-overlay"
+    @pointerdown.self="close"
   >
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>{{ $t('taskForm.title') }}</h2>
-        <button
-          class="close-btn"
-          @click="close"
-        >
-          <Icon name="lucide:x" />
-        </button>
-      </div>
-
+    <div
+      ref="dialogRef"
+      class="dlg"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="task-dialog-title"
+      @keydown="onDialogKeydown"
+    >
       <form
-        class="task-form"
+        class="card"
+        novalidate
         @submit.prevent="handleCreate"
       >
-        <div class="form-group">
-          <label for="create-title">{{ $t('taskForm.titleLabel') }}</label>
-          <input
-            id="create-title"
-            v-model="newTask.title"
-            type="text"
-            :placeholder="$t('taskForm.titlePlaceholder')"
-            required
-          />
-        </div>
+        <header class="dlg-head">
+          <h2 id="task-dialog-title">
+            {{ $t("taskForm.title") }}
+          </h2>
+          <button
+            type="button"
+            class="icon-btn"
+            :aria-label="$t('taskForm.closeDialog')"
+            :title="$t('taskForm.closeDialog')"
+            @click="close"
+          >
+            <Icon name="lucide:x" />
+          </button>
+        </header>
 
-        <div class="form-group">
-          <label for="create-description">{{ $t('taskForm.descLabel') }}</label>
-          <textarea
-            id="create-description"
-            v-model="newTask.description"
-            :placeholder="$t('taskForm.descPlaceholder')"
-            rows="3"
-          />
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="create-priority">{{ $t('taskForm.priorityLabel') }}</label>
-            <select
-              id="create-priority"
-              v-model="newTask.priority"
-            >
-              <option value="LOW">
-                {{ $t('shared.priorities.low') }}
-              </option>
-              <option value="MEDIUM">
-                {{ $t('shared.priorities.medium') }}
-              </option>
-              <option value="HIGH">
-                {{ $t('shared.priorities.high') }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="create-dueDate">{{ $t('taskForm.dueDateLabel') }}</label>
+        <div class="dlg-body">
+          <div class="field">
+            <label for="create-title">{{ $t("taskForm.titleLabel") }}</label>
             <input
-              id="create-dueDate"
-              v-model="newTask.dueDate"
-              type="date"
+              id="create-title"
+              ref="titleRef"
+              v-model="newTask.title"
+              type="text"
+              autocomplete="off"
+              required
+              :placeholder="$t('taskForm.titlePlaceholder')"
             />
           </div>
-        </div>
 
-        <div class="form-group">
-          <label>{{ $t('taskForm.categoryLabel') }}</label>
-          <div class="category-selector">
-            <div class="category-input-wrapper">
-              <input
-                v-if="!selectedCategory"
-                ref="categoryInputRef"
-                v-model="categorySearch"
-                type="text"
-                :placeholder="$t('taskForm.categoryPlaceholder')"
-                class="category-search-input"
-                @focus="showCategoryDropdown = true"
-                @input="onCategoryInput"
-                @blur="onCategoryBlur"
-                @keydown="onCategoryKeydown"
-              />
+          <div class="field">
+            <label for="create-description">{{
+              $t("taskForm.descLabel")
+            }}</label>
+            <textarea
+              id="create-description"
+              v-model="newTask.description"
+              rows="3"
+              :placeholder="$t('taskForm.descPlaceholder')"
+            />
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label for="create-priority">{{
+                $t("taskForm.priorityLabel")
+              }}</label>
+              <div class="control">
+                <select
+                  id="create-priority"
+                  v-model="newTask.priority"
+                >
+                  <option value="LOW">
+                    {{ $t("shared.priorities.low") }}
+                  </option>
+                  <option value="MEDIUM">
+                    {{ $t("shared.priorities.medium") }}
+                  </option>
+                  <option value="HIGH">
+                    {{ $t("shared.priorities.high") }}
+                  </option>
+                </select>
+                <Icon
+                  name="lucide:chevron-down"
+                  class="chev"
+                />
+              </div>
+            </div>
+
+            <TasksDatePicker
+              id="create-dueDate"
+              v-model="newTask.dueDate"
+              align="right"
+              :label="$t('taskForm.dueDateLabel')"
+              :placeholder="$t('taskForm.datePlaceholder')"
+              :week-start="weekStart"
+              @update:invalid="dueInvalid = $event"
+            />
+          </div>
+
+          <div class="field">
+            <label :for="selectedCategory ? undefined : 'create-category'">
+              {{ $t("taskForm.categoryLabel") }}
               <span
+                class="req"
+                aria-hidden="true"
+              >*</span>
+            </label>
+            <div :class="['control', { dotted: !!selectedCategory }]">
+              <div
                 v-if="selectedCategory"
-                class="selected-category-badge"
-                :style="{
-                  backgroundColor: selectedCategory.color + '20',
-                  color: selectedCategory.color,
-                  borderColor: selectedCategory.color + '40',
-                }"
+                class="selected-cat"
               >
                 <span
-                  class="cat-dot"
-                  :style="{ backgroundColor: selectedCategory.color }"
+                  class="dot"
+                  :style="{ '--dot': selectedCategory.color }"
                 />
-                {{ selectedCategory.name }}
+                <span class="selected-name">{{ selectedCategory.name }}</span>
                 <button
                   type="button"
-                  class="remove-cat-btn"
+                  class="icon-btn small"
+                  :aria-label="$t('taskForm.removeCategory')"
+                  :title="$t('taskForm.removeCategory')"
                   @click="clearCategory"
                 >
                   <Icon name="lucide:x" />
                 </button>
-              </span>
-            </div>
-
-            <div
-              v-if="showCategoryDropdown && !selectedCategory"
-              class="category-dropdown"
-            >
-              <div
-                v-for="(cat, idx) in dropdownItems"
-                :key="cat.id"
-                :class="[
-                  'category-option',
-                  {
-                    'active': idx === highlightedIndex,
-                    'create-new': cat.id === '__create__',
-                  },
-                ]"
-                @mousedown.prevent="onDropdownSelect(idx)"
-              >
-                <template v-if="cat.id === '__create__'">
-                  <Icon name="lucide:plus-circle" />
-                  <i18n-t
-                    keypath="taskForm.createCategory"
-                    tag="span"
+              </div>
+              <template v-else>
+                <input
+                  id="create-category"
+                  ref="categoryInputRef"
+                  v-model="categorySearch"
+                  type="text"
+                  autocomplete="off"
+                  role="combobox"
+                  aria-autocomplete="list"
+                  aria-controls="create-category-list"
+                  :aria-expanded="showCategoryDropdown"
+                  :aria-activedescendant="
+                    highlightedIndex >= 0
+                      ? `create-category-o${highlightedIndex}`
+                      : undefined
+                  "
+                  :placeholder="$t('taskForm.categoryPlaceholder')"
+                  @focus="showCategoryDropdown = true"
+                  @input="onCategoryInput"
+                  @blur="onCategoryBlur"
+                  @keydown="onCategoryKeydown"
+                />
+                <ul
+                  v-if="showCategoryDropdown"
+                  id="create-category-list"
+                  class="combo-list"
+                  role="listbox"
+                  :aria-label="$t('taskForm.categoriesList')"
+                >
+                  <li
+                    v-for="(cat, idx) in dropdownItems"
+                    :id="`create-category-o${idx}`"
+                    :key="cat.id"
+                    role="option"
+                    :aria-selected="idx === highlightedIndex"
+                    :class="{ create: cat.id === '__create__' }"
+                    @mousedown.prevent="onDropdownSelect(idx)"
                   >
-                    <template #name>
-                      <strong>{{ categorySearch.trim() }}</strong>
+                    <template v-if="cat.id === '__create__'">
+                      <Icon name="lucide:plus-circle" />
+                      <i18n-t
+                        keypath="taskForm.createCategory"
+                        tag="span"
+                      >
+                        <template #name>
+                          <strong>{{ categorySearch.trim() }}</strong>
+                        </template>
+                      </i18n-t>
                     </template>
-                  </i18n-t>
-                </template>
-                <template v-else>
-                  <span
-                    class="cat-dot"
-                    :style="{ backgroundColor: cat.color }"
-                  />
-                  {{ cat.name }}
-                </template>
-              </div>
-
-              <div
-                v-if="dropdownItems.length === 0 && !categorySearch.trim()"
-                class="category-empty"
-              >
-                <Icon name="lucide:info" />
-                <span>{{ $t('taskForm.newCategoryPlaceholder') }}</span>
-              </div>
+                    <template v-else>
+                      <span
+                        class="dot"
+                        :style="{ '--dot': cat.color }"
+                      />
+                      <span>{{ cat.name }}</span>
+                    </template>
+                  </li>
+                  <li
+                    v-if="dropdownItems.length === 0 && !categorySearch.trim()"
+                    class="empty"
+                    role="presentation"
+                  >
+                    {{ $t("taskForm.newCategoryPlaceholder") }}
+                  </li>
+                </ul>
+              </template>
             </div>
           </div>
-        </div>
 
-        <div
-          v-if="showNewCategoryForm && !selectedCategory"
-          class="form-group new-category-form"
-        >
-          <label>{{ $t('taskForm.newCategoryColor') }}</label>
-          <div class="color-picker-row">
-            <input
-              v-model="newCategoryColor"
-              type="color"
-              class="color-input"
-              :disabled="creatingCategory"
-            />
-            <input
-              v-model="newCategoryColor"
-              type="text"
-              placeholder="#6FAF8E"
-              class="color-text-input"
-              :disabled="creatingCategory"
-            />
-            <button
-              type="button"
-              class="confirm-cat-btn"
-              :disabled="creatingCategory"
-              @click="handleCreateCategory"
-            >
-              <Icon
-                :name="creatingCategory ? 'lucide:loader-2' : 'lucide:check'"
-                :class="{ spinning: creatingCategory }"
+          <div
+            v-if="showNewCategoryForm && !selectedCategory"
+            class="field"
+          >
+            <label for="create-category-color">{{
+              $t("taskForm.newCategoryColor")
+            }}</label>
+            <div class="color-row">
+              <input
+                id="create-category-color"
+                v-model="newCategoryColor"
+                type="color"
+                class="color-input"
+                :disabled="creatingCategory"
               />
-            </button>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>{{ $t('taskForm.subtasksLabel') }}</label>
-          <div class="subtasks-form-list">
-            <div
-              v-for="(st, idx) in newTask.subTasks"
-              :key="idx"
-              class="subtask-form-item"
-            >
-              <span class="subtask-form-bullet">{{ idx + 1 }}.</span>
-              <span class="subtask-form-title">{{ st.title }}</span>
+              <input
+                v-model="newCategoryColor"
+                type="text"
+                placeholder="#6FAF8E"
+                class="color-text"
+                :aria-label="$t('taskForm.newCategoryColor')"
+                :disabled="creatingCategory"
+              />
               <button
                 type="button"
-                class="subtask-remove-btn"
-                @click="newTask.subTasks.splice(idx, 1)"
+                class="btn primary square"
+                :aria-label="$t('shared.add')"
+                :title="$t('shared.add')"
+                :disabled="creatingCategory"
+                @click="handleCreateCategory"
               >
-                <Icon name="lucide:x" />
+                <Icon
+                  :name="creatingCategory ? 'lucide:loader-2' : 'lucide:check'"
+                  :class="{ spinning: creatingCategory }"
+                />
               </button>
             </div>
           </div>
-          <div class="subtask-add-row">
-            <input
-              v-model="newSubTaskInput"
-              type="text"
-              :placeholder="$t('taskForm.subtaskPlaceholder')"
-              class="subtask-add-input"
-              @keyup.enter="addSubTaskToForm"
+
+          <div class="field">
+            <label for="create-subtask">{{
+              $t("taskForm.subtasksLabel")
+            }}</label>
+            <div class="sub-add">
+              <input
+                id="create-subtask"
+                v-model="newSubTaskInput"
+                type="text"
+                autocomplete="off"
+                :placeholder="$t('taskForm.subtaskPlaceholder')"
+                @keydown.enter.prevent="addSubTaskToForm"
+              />
+              <button
+                type="button"
+                class="btn square"
+                :aria-label="$t('taskForm.addSubtask')"
+                :title="$t('taskForm.addSubtask')"
+                :disabled="!newSubTaskInput.trim()"
+                @click="addSubTaskToForm"
+              >
+                <Icon name="lucide:plus" />
+              </button>
+            </div>
+            <ul
+              v-if="newTask.subTasks.length"
+              class="sub-list"
+              :aria-label="$t('taskForm.subtasksList')"
+            >
+              <li
+                v-for="(st, idx) in newTask.subTasks"
+                :key="idx"
+              >
+                <span>{{ st.title }}</span>
+                <button
+                  type="button"
+                  class="icon-btn small"
+                  :aria-label="
+                    $t('taskForm.removeSubtask', { title: st.title })
+                  "
+                  :title="$t('taskForm.removeSubtask', { title: st.title })"
+                  @click="removeSubTask(idx)"
+                >
+                  <Icon name="lucide:x" />
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <template v-if="calendarConnected">
+            <div class="switch-row">
+              <span
+                id="create-sync-label"
+                class="lbl"
+              >{{ $t("taskForm.syncToCalendar") }}</span>
+              <button
+                type="button"
+                class="switch"
+                role="switch"
+                aria-labelledby="create-sync-label"
+                :aria-checked="newTask.syncToCalendar"
+                @click="newTask.syncToCalendar = !newTask.syncToCalendar"
+              />
+            </div>
+
+            <div
+              v-if="newTask.syncToCalendar"
+              class="sync-fields"
+            >
+              <div class="field">
+                <TasksDatePicker
+                  id="create-scheduledAt"
+                  v-model="newTask.scheduledAt"
+                  with-time
+                  :label="$t('taskForm.scheduledAt')"
+                  :placeholder="$t('taskForm.dateTimePlaceholder')"
+                  :week-start="weekStart"
+                  :error="scheduledError"
+                  @update:invalid="schedInvalid = $event"
+                />
+                <p class="hint">
+                  {{ $t("taskForm.timeHint15Min") }}
+                </p>
+              </div>
+              <div class="field">
+                <label for="create-scheduledDuration">{{
+                  $t("taskForm.scheduledDuration")
+                }}</label>
+                <input
+                  id="create-scheduledDuration"
+                  v-model.number="newTask.scheduledDuration"
+                  type="number"
+                  min="1"
+                  inputmode="numeric"
+                />
+              </div>
+            </div>
+          </template>
+
+          <div
+            v-else
+            class="connect-cta"
+          >
+            <Icon
+              name="lucide:calendar"
+              class="cta-icon"
             />
+            <div class="cta-text">
+              <span class="cta-title">{{
+                $t("taskForm.calendarNotConnected")
+              }}</span>
+              <span class="hint">{{ $t("taskForm.calendarConnectHint") }}</span>
+            </div>
             <button
               type="button"
-              class="subtask-add-btn"
-              :disabled="!newSubTaskInput.trim()"
-              @click="addSubTaskToForm"
+              class="btn"
+              @click="connectCalendar"
             >
-              <Icon name="lucide:plus" />
+              {{ $t("taskForm.calendarConnectCta") }}
             </button>
           </div>
         </div>
 
-        <div class="modal-actions">
-          <UiButton
+        <footer class="dlg-foot">
+          <button
             type="button"
-            variant="secondary"
+            class="btn"
             @click="close"
           >
-            {{ $t('shared.cancel') }}
-          </UiButton>
-          <UiButton
-            :loading="isCreating"
+            {{ $t("shared.cancel") }}
+          </button>
+          <button
             type="submit"
-            :disabled="!newTask.title || !selectedCategory"
+            class="btn primary"
+            :disabled="!canSubmit"
           >
-            {{ $t('shared.create') }}
-          </UiButton>
-        </div>
+            <Icon
+              v-if="isCreating"
+              name="lucide:loader-2"
+              class="spinning"
+            />
+            {{ $t("shared.create") }}
+          </button>
+        </footer>
       </form>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { TaskStatus } from "~/types";
+import { TaskStatus, Priority } from "~/types";
 import type { TaskCategory } from "~/types";
 
 interface Props {
@@ -267,6 +400,8 @@ const emit = defineEmits<{
 }>();
 
 const { categories, fetchCategories, createTask, createCategory } = useTasks();
+const { calendarConnected, connectCalendar } = useCalendar();
+const { preferences } = usePreferences();
 const toast = useToast();
 const { t } = useI18n();
 
@@ -280,14 +415,36 @@ const newSubTaskInput = ref("");
 const highlightedIndex = ref(-1);
 const creatingCategory = ref(false);
 const categoryInputRef = ref<HTMLInputElement | null>(null);
+const dialogRef = ref<HTMLElement | null>(null);
+const titleRef = ref<HTMLInputElement | null>(null);
+const dueInvalid = ref(false);
+const schedInvalid = ref(false);
+const scheduledError = ref("");
+let previousFocus: HTMLElement | null = null;
+
+const weekStart = computed<0 | 1>(() =>
+  preferences.value.weekStart === "sunday" ? 0 : 1,
+);
 
 const newTask = ref({
   title: "",
   description: "",
-  priority: "MEDIUM" as const,
+  priority: Priority.MEDIUM,
   dueDate: "",
   subTasks: [] as { title: string }[],
+  syncToCalendar: false,
+  scheduledAt: "",
+  scheduledDuration: 60,
 });
+
+const canSubmit = computed(
+  () =>
+    !!newTask.value.title.trim()
+    && !!selectedCategory.value
+    && !isCreating.value
+    && !dueInvalid.value
+    && !(newTask.value.syncToCalendar && schedInvalid.value),
+);
 
 const filteredCategories = computed(() => {
   if (!categorySearch.value.trim()) return categories.value;
@@ -346,6 +503,11 @@ const onCategoryBlur = () => {
 
 const onCategoryKeydown = (e: KeyboardEvent) => {
   const items = dropdownItems.value;
+  if (e.key === "ArrowDown" && !showCategoryDropdown.value) {
+    e.preventDefault();
+    showCategoryDropdown.value = true;
+    return;
+  }
   if (!showCategoryDropdown.value || items.length === 0) return;
 
   if (e.key === "ArrowDown") {
@@ -363,6 +525,8 @@ const onCategoryKeydown = (e: KeyboardEvent) => {
       onDropdownSelect(highlightedIndex.value);
     }
   } else if (e.key === "Escape") {
+    e.preventDefault();
+    e.stopPropagation();
     showCategoryDropdown.value = false;
     highlightedIndex.value = -1;
   }
@@ -402,8 +566,11 @@ const handleCreateCategory = async () => {
       showNewCategoryForm.value = false;
       newCategoryColor.value = "#6FAF8E";
     }
-  } catch (e: any) {
-    toast.error({ title: e.message || t("taskForm.toasts.categoryError") });
+  } catch (e) {
+    toast.error({
+      title:
+        (e instanceof Error && e.message) || t("taskForm.toasts.categoryError"),
+    });
   } finally {
     creatingCategory.value = false;
   }
@@ -416,13 +583,20 @@ const addSubTaskToForm = () => {
   newSubTaskInput.value = "";
 };
 
+const removeSubTask = (idx: number) => {
+  newTask.value.subTasks.splice(idx, 1);
+};
+
 const resetForm = () => {
   newTask.value = {
     title: "",
     description: "",
-    priority: "MEDIUM",
+    priority: Priority.MEDIUM,
     dueDate: props.defaultDate || "",
     subTasks: [],
+    syncToCalendar: false,
+    scheduledAt: "",
+    scheduledDuration: 60,
   };
   selectedCategory.value = null;
   categorySearch.value = "";
@@ -432,6 +606,9 @@ const resetForm = () => {
   newSubTaskInput.value = "";
   highlightedIndex.value = -1;
   creatingCategory.value = false;
+  dueInvalid.value = false;
+  schedInvalid.value = false;
+  scheduledError.value = "";
 };
 
 const close = () => {
@@ -439,11 +616,44 @@ const close = () => {
   resetForm();
 };
 
+const FOCUSABLE
+  = "button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex=\"-1\"])";
+
+const onDialogKeydown = (e: KeyboardEvent) => {
+  if (e.key === "Escape") {
+    e.preventDefault();
+    close();
+    return;
+  }
+  if (e.key !== "Tab") return;
+  const nodes = Array.from(
+    dialogRef.value?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? [],
+  ).filter(n => n.getClientRects().length > 0);
+  const first = nodes[0];
+  const last = nodes[nodes.length - 1];
+  if (!first || !last) return;
+  const active = document.activeElement;
+  if (e.shiftKey && active === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && active === last) {
+    e.preventDefault();
+    first.focus();
+  }
+};
+
 const handleCreate = async () => {
+  if (!canSubmit.value) return;
+  if (newTask.value.syncToCalendar && !newTask.value.scheduledAt) {
+    scheduledError.value = t("taskForm.scheduledRequired");
+    document.getElementById("create-scheduledAt")?.focus();
+    return;
+  }
+
   isCreating.value = true;
   try {
     const result = await createTask({
-      title: newTask.value.title,
+      title: newTask.value.title.trim(),
       description: newTask.value.description || undefined,
       priority: newTask.value.priority,
       dueDate: newTask.value.dueDate
@@ -453,6 +663,14 @@ const handleCreate = async () => {
       categoryId: selectedCategory.value?.id || undefined,
       subTasks:
         newTask.value.subTasks.length > 0 ? newTask.value.subTasks : undefined,
+      syncToCalendar: newTask.value.syncToCalendar,
+      scheduledAt:
+        newTask.value.syncToCalendar && newTask.value.scheduledAt
+          ? new Date(newTask.value.scheduledAt)
+          : undefined,
+      scheduledDuration: newTask.value.syncToCalendar
+        ? newTask.value.scheduledDuration
+        : undefined,
     });
 
     if (result) {
@@ -469,458 +687,542 @@ const handleCreate = async () => {
   }
 };
 
-watch(() => props.modelValue, (open) => {
-  if (open) {
-    fetchCategories();
-    if (props.defaultDate) {
-      newTask.value.dueDate = props.defaultDate;
+watch(
+  () => newTask.value.scheduledAt,
+  () => {
+    scheduledError.value = "";
+  },
+);
+
+watch(
+  () => props.modelValue,
+  (open) => {
+    if (open) {
+      fetchCategories();
+      if (props.defaultDate) {
+        newTask.value.dueDate = props.defaultDate;
+      }
+      previousFocus = document.activeElement as HTMLElement | null;
+      nextTick(() => titleRef.value?.focus());
+    } else {
+      previousFocus?.focus?.();
+      previousFocus = null;
     }
-  }
-});
+  },
+);
 </script>
 
 <style scoped>
-.modal-overlay {
+.dlg-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  inset: 0;
   z-index: 1000;
-  padding: var(--spacing-lg);
-}
-
-.modal-content {
-  background-color: var(--color-surface);
-  border-radius: var(--radius-lg);
-  width: 100%;
-  max-width: 540px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--spacing-lg);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.modal-header h2 {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0;
-}
-
-.close-btn {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  border: none;
-  background-color: transparent;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  color: var(--color-text-secondary);
-  transition: all 0.2s ease;
+  background: rgba(8, 18, 15, 0.55);
 }
 
-.close-btn:hover {
-  background-color: var(--color-background);
+.dlg {
+  width: 100%;
+  max-width: 560px;
   color: var(--color-text-primary);
 }
 
-.close-btn :deep(svg) {
+.card {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 16px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-bottom: 0;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 18px 48px rgba(12, 32, 26, 0.22);
+  animation: dlg-in 0.2s ease-out;
+}
+
+@keyframes dlg-in {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+
+.dlg-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 16px 16px 8px;
+}
+
+.dlg-head h2 {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.dlg-body {
+  display: grid;
+  gap: 20px;
+  align-content: start;
+  min-height: 0;
+  padding: 8px 16px 20px;
+  overflow-y: auto;
+}
+
+.dlg-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--color-border);
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field > label,
+.lbl {
+  font-weight: 700;
+}
+
+.req {
+  color: var(--color-danger);
+}
+
+.row2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field input[type="text"],
+.field input[type="number"],
+.field textarea,
+.field select {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 15px;
+  font: inherit;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.field textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.field input:hover,
+.field textarea:hover,
+.field select:hover {
+  border-color: var(--color-border-strong);
+}
+
+.field input:focus-visible,
+.field textarea:focus-visible,
+.field select:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+  border-color: var(--color-accent);
+}
+
+.control select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 44px;
+  cursor: pointer;
+}
+
+.chev {
+  position: absolute;
+  right: 14px;
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+
+.hint {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.icon-btn.small {
+  width: 36px;
+  height: 36px;
+}
+
+.icon-btn:hover {
+  background: var(--color-accent-soft);
+}
+
+.icon-btn:focus-visible,
+.btn:focus-visible,
+.switch:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.icon-btn :deep(svg) {
   width: 20px;
   height: 20px;
 }
 
-.task-form {
-  padding: var(--spacing-lg);
-}
-
-.form-group {
-  margin-bottom: var(--spacing-md);
-}
-
-.form-group label {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text-primary);
-  margin-bottom: var(--spacing-xs);
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  width: 100%;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-family: inherit;
-  color: var(--color-text-primary);
-  background-color: var(--color-surface);
-  transition: border-color 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: var(--color-primary);
-}
-
-.form-group textarea {
-  resize: vertical;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-md);
-}
-
-.category-selector {
-  position: relative;
-}
-
-.category-input-wrapper {
-  position: relative;
-}
-
-.category-search-input {
-  width: 100%;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-family: inherit;
-  color: var(--color-text-primary);
-  background-color: var(--color-surface);
-  transition: border-color 0.2s ease;
-}
-
-.category-search-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-}
-
-.selected-category-badge {
+.btn {
+  min-height: 44px;
+  padding: 8px 18px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 16px;
-  font-size: 13px;
-  font-weight: 500;
-  border: 1px solid;
-  margin-top: var(--spacing-xs);
-}
-
-.cat-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.remove-cat-btn {
-  display: flex;
-  align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  border-radius: 50%;
-  padding: 0;
-  color: inherit;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
-}
-
-.remove-cat-btn:hover {
-  opacity: 1;
-}
-
-.remove-cat-btn :deep(svg) {
-  width: 12px;
-  height: 12px;
-}
-
-.category-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
+  gap: 8px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  margin-top: 4px;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 10;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.category-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  cursor: pointer;
-  font-size: 13px;
   color: var(--color-text-primary);
-  transition: background-color 0.15s ease;
-}
-
-.category-option:hover,
-.category-option.active {
-  background-color: var(--color-background);
-}
-
-.category-option.active {
-  outline: 2px solid var(--color-primary);
-  outline-offset: -2px;
-}
-
-.category-option.create-new {
-  color: var(--color-primary);
-  border-top: 1px solid var(--color-border);
-  font-weight: 500;
-}
-
-.category-option.create-new :deep(svg) {
-  width: 16px;
-  height: 16px;
-}
-
-.category-empty {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px;
-  font-size: 12px;
-  color: var(--color-text-secondary);
-}
-
-.category-empty :deep(svg) {
-  width: 14px;
-  height: 14px;
-}
-
-.new-category-form {
-  background: var(--color-background);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-sm);
-  border: 1px dashed var(--color-primary);
-}
-
-.color-picker-row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.color-input {
-  width: 36px;
-  height: 36px;
-  border: 2px solid var(--color-border);
-  border-radius: 8px;
-  padding: 2px;
+  font: inherit;
+  font-weight: 700;
   cursor: pointer;
-  background: transparent;
+  transition: all 0.2s ease;
 }
 
-.color-input::-webkit-color-swatch-wrapper {
-  padding: 0;
+.btn:hover:not(:disabled) {
+  border-color: var(--color-accent);
 }
 
-.color-input::-webkit-color-swatch {
-  border: none;
-  border-radius: 4px;
+.btn.primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
 }
 
-.color-text-input {
-  flex: 1;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-family: monospace;
-  color: var(--color-text-primary);
-  background-color: var(--color-surface);
-  transition: border-color 0.2s ease;
-}
-
-.color-text-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-}
-
-.confirm-cat-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: var(--color-primary);
-  color: white;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-  flex-shrink: 0;
-}
-
-.confirm-cat-btn:hover {
+.btn.primary:hover:not(:disabled) {
   opacity: 0.9;
 }
 
-.confirm-cat-btn:disabled {
-  opacity: 0.6;
+.btn:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-.confirm-cat-btn :deep(svg) {
-  width: 18px;
-  height: 18px;
+.btn.square {
+  width: 44px;
+  padding: 0;
+  color: var(--color-text-secondary);
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.btn.square.primary {
+  color: var(--color-on-accent);
+}
+
+.btn.square:hover:not(:disabled) {
+  color: var(--color-accent);
+}
+
+.btn.square.primary:hover:not(:disabled) {
+  color: var(--color-on-accent);
+}
+
+.btn :deep(svg) {
+  width: 20px;
+  height: 20px;
 }
 
 .spinning {
   animation: spin 1s linear infinite;
 }
 
-.subtasks-form-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: var(--spacing-sm);
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.subtask-form-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  background: var(--color-background);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-}
-
-.subtask-form-bullet {
-  color: var(--color-text-secondary);
-  font-weight: 600;
-  font-size: 12px;
-  min-width: 18px;
-}
-
-.subtask-form-title {
-  flex: 1;
-  color: var(--color-text-primary);
-}
-
-.subtask-remove-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  color: var(--color-text-secondary);
+.dot {
+  width: 12px;
+  height: 12px;
+  flex: none;
   border-radius: 50%;
-  padding: 0;
-  transition: all 0.2s ease;
+  background: var(--dot, var(--color-border-strong));
 }
 
-.subtask-remove-btn:hover {
-  background: #fee2e2;
-  color: #dc2626;
+.dotted .selected-cat {
+  padding-left: 15px;
 }
 
-.subtask-remove-btn :deep(svg) {
-  width: 14px;
-  height: 14px;
-}
-
-.subtask-add-row {
-  display: flex;
-  gap: var(--spacing-xs);
-}
-
-.subtask-add-input {
-  flex: 1;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  font-family: inherit;
-  color: var(--color-text-primary);
-  background: transparent;
-  transition: border-color 0.2s ease;
-}
-
-.subtask-add-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  border-style: solid;
-}
-
-.subtask-add-input::placeholder {
-  color: var(--color-text-secondary);
-}
-
-.subtask-add-btn {
+.selected-cat {
+  width: 100%;
+  min-height: 44px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--color-border);
+  gap: 10px;
+  padding: 2px 3px 2px 15px;
   background: var(--color-surface);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  color: var(--color-text-secondary);
-  transition: all 0.2s ease;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
 }
 
-.subtask-add-btn:hover:not(:disabled) {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+.selected-name {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 700;
 }
 
-.subtask-add-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+.combo-list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 208px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  overflow-y: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 18px 48px rgba(12, 32, 26, 0.22);
 }
 
-.subtask-add-btn :deep(svg) {
-  width: 16px;
-  height: 16px;
-}
-
-.modal-actions {
+.combo-list li {
+  min-height: 40px;
+  padding: 8px 11px;
   display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-lg);
-  padding-top: var(--spacing-lg);
-  border-top: 1px solid var(--color-border);
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.combo-list li:hover {
+  background: var(--color-accent-soft);
+}
+
+.combo-list li[aria-selected="true"] {
+  background: var(--color-accent-soft);
+  font-weight: 700;
+}
+
+.combo-list li.create {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.combo-list li.create :deep(svg) {
+  width: 18px;
+  height: 18px;
+}
+
+.combo-list li.empty {
+  color: var(--color-text-secondary);
+  cursor: default;
+}
+
+.combo-list li.empty:hover {
+  background: transparent;
+}
+
+.color-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  gap: 8px;
+}
+
+.color-input {
+  width: 44px;
+  height: 44px;
+  padding: 2px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.sub-add {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  gap: 8px;
+}
+
+.sub-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sub-list li {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 4px 2px 12px;
+  background: var(--color-muted-bg);
+  border-radius: 10px;
+}
+
+.sub-list li span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--color-border-strong);
+}
+
+.switch {
+  position: relative;
+  flex: none;
+  width: 56px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 99px;
+  background: var(--color-border-strong);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: translate 0.2s ease;
+}
+
+.switch[aria-checked="true"] {
+  background: var(--color-accent);
+}
+
+.switch[aria-checked="true"]::after {
+  translate: 24px 0;
+}
+
+.sync-fields {
+  display: grid;
+  gap: 20px;
+}
+
+.connect-cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--color-muted-bg);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: 12px;
+}
+
+.cta-icon {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  color: var(--color-accent);
+}
+
+.cta-text {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.cta-title {
+  font-weight: 700;
+}
+
+@media (min-width: 640px) {
+  .dlg-overlay {
+    align-items: center;
+    padding: 16px;
+  }
+
+  .card {
+    max-height: calc(100dvh - 32px);
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 20px;
+  }
+
+  .dlg-head {
+    padding: 16px 16px 8px 24px;
+  }
+
+  .dlg-body {
+    padding: 8px 24px 20px;
+  }
+
+  .dlg-foot {
+    padding: 16px 24px;
+  }
+
+  .row2 {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .spinning {
+    animation: none;
+  }
+
+  .field input,
+  .field textarea,
+  .field select,
+  .icon-btn,
+  .btn,
+  .switch,
+  .switch::after {
+    transition: none;
+  }
 }
 </style>

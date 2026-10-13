@@ -78,6 +78,9 @@ export const useTasks = () => {
     color?: string;
     categoryId?: string;
     subTasks?: { title: string }[];
+    syncToCalendar?: boolean;
+    scheduledAt?: Date;
+    scheduledDuration?: number;
   }) => {
     loading.value = true;
     error.value = null;
@@ -104,7 +107,7 @@ export const useTasks = () => {
     if (index === -1) return;
 
     const previousTask = { ...tasks.value[index] };
-    tasks.value[index] = { ...tasks.value[index], ...updates };
+    tasks.value[index] = { ...tasks.value[index], ...updates } as Task;
 
     try {
       const response = await $fetch<APIResponse<Task>>(`/api/tasks/${id}`, {
@@ -116,14 +119,14 @@ export const useTasks = () => {
         tasks.value[index] = {
           ...response.data,
           subTasks: currentSubTasks ?? response.data.subTasks,
-        };
+        } as Task;
         return response.data;
       } else {
-        tasks.value[index] = previousTask;
+        tasks.value[index] = previousTask as Task;
         error.value = $i18n.t("errors.c_updateTask");
       }
     } catch (e) {
-      tasks.value[index] = previousTask;
+      tasks.value[index] = previousTask as Task;
       error.value = $i18n.t("errors.c_updateTask");
       console.error(e);
       throw e;
@@ -135,11 +138,11 @@ export const useTasks = () => {
     const taskIndex = tasks.value.findIndex(t => t.id === id);
     if (taskIndex === -1) return;
 
-    const deletedTask = tasks.value[taskIndex];
+    const deletedTask = tasks.value[taskIndex]!;
     tasks.value = tasks.value.filter(t => t.id !== id);
 
     try {
-      await $fetch(`/api/tasks/${id}`, { method: "DELETE" });
+      await $fetch<void>(`/api/tasks/${id}`, { method: "DELETE" });
     } catch (e) {
       tasks.value.splice(taskIndex, 0, deletedTask);
       error.value = $i18n.t("errors.c_deleteTask");

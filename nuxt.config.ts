@@ -30,6 +30,10 @@ export default defineNuxtConfig({
     },
 
     resendApiKey: process.env.NUXT_RESEND_API_KEY,
+    cronApiKey: process.env.CRON_API_KEY,
+    googleCalendarClientId: process.env.GOOGLE_CALENDAR_CLIENT_ID,
+    googleCalendarClientSecret: process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
+    googleCalendarRedirectUri: process.env.GOOGLE_CALENDAR_REDIRECT_URI,
   },
 
   compatibilityDate: "2025-01-15",

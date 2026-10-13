@@ -30,9 +30,15 @@
       </p>
 
       <div class="phrases">
-        <span class="phrase p1"><i class="dot" />{{ $t("auth.hero.phrase1") }}</span>
-        <span class="phrase p2"><i class="dot" />{{ $t("auth.hero.phrase2") }}</span>
-        <span class="phrase p3"><i class="dot" />{{ $t("auth.hero.phrase3") }}</span>
+        <span class="phrase p1"
+          ><i class="dot" />{{ $t("auth.hero.phrase1") }}</span
+        >
+        <span class="phrase p2"
+          ><i class="dot" />{{ $t("auth.hero.phrase2") }}</span
+        >
+        <span class="phrase p3"
+          ><i class="dot" />{{ $t("auth.hero.phrase3") }}</span
+        >
       </div>
 
       <svg
@@ -214,6 +220,24 @@
         {{ $t("auth.progressSaved") }}
       </div>
     </section>
+
+    <footer class="auth-legal-footer">
+      <NuxtLink
+        to="/terms/privacy"
+        class="legal-link"
+      >
+        {{ $t("legal.privacy") }}
+      </NuxtLink>
+      <span class="legal-sep">·</span>
+      <NuxtLink
+        to="/terms/service"
+        class="legal-link"
+      >
+        {{ $t("legal.terms") }}
+      </NuxtLink>
+    </footer>
+
+    <AuthCookieBanner />
   </div>
 </template>
 
@@ -666,6 +690,46 @@ watchEffect(() => {
     max-height: calc(100dvh - 2 * clamp(24px, 4vh, 56px));
     overflow-y: auto;
     overscroll-behavior: contain;
+  }
+}
+
+.auth-legal-footer {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--auth-soft);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.auth-legal-footer .legal-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 0.2s ease;
+}
+
+.auth-legal-footer .legal-link:hover {
+  opacity: 0.6;
+}
+
+.legal-sep {
+  opacity: 0.5;
+}
+
+@media (max-width: 899px) {
+  .auth-legal-footer {
+    position: static;
+    transform: none;
+    justify-content: center;
+    padding: 16px 0 8px;
+    color: var(--auth-muted);
+    opacity: 1;
   }
 }
 

@@ -462,6 +462,23 @@
       "dailySummary": "Daily summary",
       "dailySummaryHint": "Receive email at 7am with tasks, goals and habits"
     },
+    "integrations": {
+      "title": "Integrations",
+      "subtitle": "Connect external services to Mindle"
+    },
+    "calendar": {
+      "label": "Google Calendar",
+      "hint": "Sync events and tasks with your calendar",
+      "connect": "Connect Google Calendar",
+      "connected": "Connected",
+      "disconnect": "Disconnect",
+      "toasts": {
+        "connected": "Google Calendar connected successfully!",
+        "disconnected": "Google Calendar disconnected.",
+        "connectError": "Error connecting Google Calendar. Please try again.",
+        "disconnectError": "Error disconnecting. Please try again."
+      }
+    },
     "data": {
       "title": "Data & security",
       "subtitle": "Your data, your control",
@@ -762,6 +779,13 @@
     "categoryLabel": "Category",
     "newCategoryColor": "New category color",
     "subtasksLabel": "Subtask",
+    "syncToCalendar": "Sync with Google Calendar",
+    "calendarNotConnected": "Google Calendar not connected",
+    "calendarConnectHint": "Connect to automatically sync tasks",
+    "calendarConnectCta": "Connect",
+    "scheduledAt": "Scheduled date and time",
+    "scheduledDuration": "Duration (minutes)",
+    "timeHint15Min": "Times in 15-minute intervals",
     "titlePlaceholder": "Task name",
     "descPlaceholder": "Task details",
     "categoryPlaceholder": "Select or create a category...",
@@ -783,7 +807,38 @@
       "taskDone": "Task completed",
       "congrats": "Congrats!"
     },
-    "createCategory": "Create \"{name}\""
+    "createCategory": "Create \"{name}\"",
+    "closeDialog": "Close",
+    "removeCategory": "Remove category",
+    "categoriesList": "Categories",
+    "addSubtask": "Add subtask",
+    "removeSubtask": "Remove subtask {title}",
+    "subtasksList": "Subtasks",
+    "datePlaceholder": "dd/mm/yyyy",
+    "dateTimePlaceholder": "dd/mm/yyyy, hh:mm",
+    "dateFormatError": "Use the format dd/mm/yyyy, for example 24/12/2026.",
+    "dateTimeFormatError": "Use the format dd/mm/yyyy, hh:mm, for example 24/12/2026, 18:30.",
+    "timeStepError": "Use times in {step}-minute steps.",
+    "scheduledRequired": "Enter the scheduled date and time.",
+    "picker": {
+      "calendar": "Calendar",
+      "time": "Time",
+      "chooseMonthYear": "Choose month and year",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "prevYear": "Previous year",
+      "nextYear": "Next year",
+      "today": "Today",
+      "now": "Now",
+      "clear": "Clear",
+      "done": "Done",
+      "hour": "Hour",
+      "minute": "Min",
+      "openDate": "Open calendar: {label}",
+      "openDateTime": "Open calendar and clock: {label}"
+    },
+    "pastDateError": "The date cannot be earlier than today.",
+    "pastTimeError": "The time cannot be earlier than the current time."
   },
   "voice": {
     "title": "Create tasks by voice",
@@ -1009,9 +1064,15 @@
     "completed": "Completed",
     "pending": "Pending",
     "nothingPlanned": "Nothing planned yet.",
+    "allDay": "All day",
     "today": "Today",
     "tomorrow": "Tomorrow",
     "weekDaysShort": "Sun,Mon,Tue,Wed,Thu,Fri,Sat",
+    "eventDate": "Date",
+    "eventTime": "Time",
+    "eventDescription": "Description",
+    "eventCalendar": "Calendar",
+    "eventSyncedAt": "Synced at",
     "status": {
       "NOT_STARTED": "Not started",
       "IN_PROGRESS": "In progress",
@@ -1365,6 +1426,13 @@
     "cookies": "Cookies",
     "copyright": "© 2025 Mindle Inc. All rights reserved."
   },
+  "cookieBanner": {
+    "title": "We use cookies",
+    "description": "We use essential cookies for site functionality and optional cookies to improve your experience. See our",
+    "policyLink": "Cookie Policy",
+    "acceptRequired": "Required only",
+    "acceptAll": "Accept all"
+  },
   "server": {
     "unauthorized": "Unauthorized",
     "userNotFound": "User not found",
@@ -1403,6 +1471,9 @@
     "failedToFetchTasks": "Failed to fetch tasks",
     "titleIsRequired": "Title is required",
     "failedToCreateTask": "Failed to create task",
+    "scheduledAtRequired": "Scheduled date is required when syncing to calendar",
+    "calendarNotConnected": "Connect Google Calendar in settings first",
+    "calendarSyncFailed": "Task saved, but failed to sync with Google Calendar",
     "taskNotFound": "Task not found",
     "failedToFetchTask": "Failed to fetch task",
     "itemsArrayIsRequired": "Items array is required",

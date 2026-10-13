@@ -462,6 +462,23 @@
       "dailySummary": "Resumo diário",
       "dailySummaryHint": "Receber email às 7h com tarefas, metas e hábitos"
     },
+    "integrations": {
+      "title": "Integrações",
+      "subtitle": "Conecte serviços externos ao Mindle"
+    },
+    "calendar": {
+      "label": "Google Calendar",
+      "hint": "Sincronize eventos e tarefas com seu calendário",
+      "connect": "Conectar Google Calendar",
+      "connected": "Conectado",
+      "disconnect": "Desconectar",
+      "toasts": {
+        "connected": "Google Calendar conectado com sucesso!",
+        "disconnected": "Google Calendar desconectado.",
+        "connectError": "Erro ao conectar Google Calendar. Tente novamente.",
+        "disconnectError": "Erro ao desconectar. Tente novamente."
+      }
+    },
     "data": {
       "title": "Dados e segurança",
       "subtitle": "Seus dados, seu controle",
@@ -762,6 +779,13 @@
     "categoryLabel": "Categoria",
     "newCategoryColor": "Cor da nova categoria",
     "subtasksLabel": "Subtarefa",
+    "syncToCalendar": "Sincronizar com Google Calendar",
+    "calendarNotConnected": "Google Calendar não conectado",
+    "calendarConnectHint": "Conecte para sincronizar tarefas automaticamente",
+    "calendarConnectCta": "Conectar",
+    "scheduledAt": "Data e hora agendada",
+    "scheduledDuration": "Duração (minutos)",
+    "timeHint15Min": "Horários em intervalos de 15 minutos",
     "titlePlaceholder": "Nome da tarefa",
     "descPlaceholder": "Detalhes da tarefa",
     "categoryPlaceholder": "Selecione ou crie uma categoria...",
@@ -783,7 +807,38 @@
       "taskDone": "Tarefa concluída",
       "congrats": "Parabéns!"
     },
-    "createCategory": "Criar \"{name}\""
+    "createCategory": "Criar \"{name}\"",
+    "closeDialog": "Fechar",
+    "removeCategory": "Remover categoria",
+    "categoriesList": "Categorias",
+    "addSubtask": "Adicionar subtarefa",
+    "removeSubtask": "Remover subtarefa {title}",
+    "subtasksList": "Subtarefas",
+    "datePlaceholder": "dd/mm/aaaa",
+    "dateTimePlaceholder": "dd/mm/aaaa, hh:mm",
+    "dateFormatError": "Use o formato dd/mm/aaaa, por exemplo 24/12/2026.",
+    "dateTimeFormatError": "Use o formato dd/mm/aaaa, hh:mm, por exemplo 24/12/2026, 18:30.",
+    "timeStepError": "Use horários em intervalos de {step} minutos.",
+    "scheduledRequired": "Informe a data e hora agendada.",
+    "picker": {
+      "calendar": "Calendário",
+      "time": "Horário",
+      "chooseMonthYear": "Escolher mês e ano",
+      "prevMonth": "Mês anterior",
+      "nextMonth": "Próximo mês",
+      "prevYear": "Ano anterior",
+      "nextYear": "Próximo ano",
+      "today": "Hoje",
+      "now": "Agora",
+      "clear": "Limpar",
+      "done": "Concluir",
+      "hour": "Hora",
+      "minute": "Min",
+      "openDate": "Abrir calendário: {label}",
+      "openDateTime": "Abrir calendário e relógio: {label}"
+    },
+    "pastDateError": "A data não pode ser anterior a hoje.",
+    "pastTimeError": "O horário não pode ser anterior ao horário atual."
   },
   "voice": {
     "title": "Criar tarefas por voz",
@@ -1009,9 +1064,15 @@
     "completed": "Concluídas",
     "pending": "Pendentes",
     "nothingPlanned": "Nada planejado ainda.",
+    "allDay": "Dia inteiro",
     "today": "Hoje",
     "tomorrow": "Amanhã",
     "weekDaysShort": "Dom,Seg,Ter,Qua,Qui,Sex,Sáb",
+    "eventDate": "Data",
+    "eventTime": "Horário",
+    "eventDescription": "Descrição",
+    "eventCalendar": "Calendário",
+    "eventSyncedAt": "Sincronizado em",
     "status": {
       "NOT_STARTED": "Não iniciado",
       "IN_PROGRESS": "Em progresso",
@@ -1365,6 +1426,13 @@
     "cookies": "Cookies",
     "copyright": "© 2025 Mindle Inc. Todos os direitos reservados."
   },
+  "cookieBanner": {
+    "title": "Usamos cookies",
+    "description": "Utilizamos cookies essenciais para o funcionamento do site e cookies opcionais para melhorar sua experiência. Consulte nossa",
+    "policyLink": "Política de Cookies",
+    "acceptRequired": "Apenas necessários",
+    "acceptAll": "Aceitar todos"
+  },
   "server": {
     "unauthorized": "Não autorizado",
     "userNotFound": "Usuário não encontrado",
@@ -1403,6 +1471,9 @@
     "failedToFetchTasks": "Erro ao buscar tarefas",
     "titleIsRequired": "Título é obrigatório",
     "failedToCreateTask": "Erro ao criar tarefa",
+    "scheduledAtRequired": "Data agendada é obrigatória quando sincronizar com o calendário",
+    "calendarNotConnected": "Conecte o Google Calendar nas configurações primeiro",
+    "calendarSyncFailed": "Tarefa salva, mas falha ao sincronizar com o Google Calendar",
     "taskNotFound": "Tarefa não encontrada",
     "failedToFetchTask": "Erro ao buscar tarefa",
     "itemsArrayIsRequired": "Lista de itens é obrigatória",

@@ -426,6 +426,35 @@
         <section class="settings-section">
           <div class="section-header">
             <Icon
+              name="lucide:plug"
+              size="20"
+            />
+            <div>
+              <h2 class="section-title">
+                {{ $t("settings.integrations.title") }}
+              </h2>
+              <p class="section-hint">
+                {{ $t("settings.integrations.subtitle") }}
+              </p>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-label">{{
+                $t("settings.calendar.label")
+              }}</span>
+              <span class="setting-description">{{
+                $t("settings.calendar.hint")
+              }}</span>
+            </div>
+            <SettingsCalendarConnect />
+          </div>
+        </section>
+
+        <section class="settings-section">
+          <div class="section-header">
+            <Icon
               name="lucide:shield"
               size="20"
             />

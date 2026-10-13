@@ -55,6 +55,23 @@ export interface Task {
   createdAt: Date;
   userId: string;
   subTasks?: SubTask[];
+  syncToCalendar?: boolean;
+  scheduledAt?: Date;
+  scheduledDuration?: number;
+  googleCalendarEventId?: string;
+}
+
+export interface CalendarEvent {
+  id: string;
+  googleEventId: string;
+  userId: string;
+  title: string;
+  description?: string;
+  startTime: Date;
+  endTime: Date;
+  allDay: boolean;
+  calendarId: string;
+  syncedAt: Date;
 }
 
 export interface SubTask {

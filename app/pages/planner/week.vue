@@ -140,7 +140,7 @@
           </div>
 
           <div
-            v-if="getTasksForDay(day.date).length === 0"
+            v-if="getDayItems(day.date).length === 0"
             class="empty-day"
           >
             <p>{{ $t("planner.nothingPlanned") }}</p>
@@ -150,51 +150,60 @@
             v-else
             class="tasks-list"
           >
-            <div
-              v-for="task in getTasksForDay(day.date)"
-              :key="task.id"
-              :class="['task-card', `status-${task.status.toLowerCase()}`, { dragging: draggedTaskId === task.id }]"
-              :style="getTaskCardStyle(task)"
-              draggable="true"
-              @dragstart="handleDragStart(task.id, day.date)"
-              @dragend="handleDragEnd"
+            <template
+              v-for="item in getDayItems(day.date)"
+              :key="item.id"
             >
-              <button
-                class="task-check"
-                @click="toggleTaskStatus(task.id, task.status)"
+              <PlannerCalendarEvent
+                v-if="item._type === 'calendarEvent'"
+                :event="item"
+                @click="openCalendarEvent(item)"
+              />
+              <div
+                v-else
+                :class="['task-card', `status-${item.status.toLowerCase()}`, { dragging: draggedTaskId === item.id }]"
+                :style="getTaskCardStyle(item)"
+                draggable="true"
+                @dragstart="handleDragStart(item.id, day.date)"
+                @dragend="handleDragEnd"
               >
-                <Icon
-                  :name="
-                    task.status === 'DONE'
-                      ? 'lucide:check-circle-2'
-                      : 'lucide:circle'
-                  "
-                />
-              </button>
+                <button
+                  class="task-check"
+                  @click="toggleTaskStatus(item.id, item.status)"
+                >
+                  <Icon
+                    :name="
+                      item.status === 'DONE'
+                        ? 'lucide:check-circle-2'
+                        : 'lucide:circle'
+                    "
+                  />
+                </button>
 
-              <div class="task-content">
-                <h3 class="task-title">
-                  {{ task.title }}
-                </h3>
-                <div class="task-meta">
-                  <span
-                    :class="[
-                      'status-badge',
-                      `status-${task.status.toLowerCase()}`,
-                    ]"
-                  >
-                    {{ getStatusLabel(task.status) }}
-                  </span>
-                  <span
-                    v-if="task.priority"
-                    class="priority-badge"
-                    :class="`priority-${task.priority.toLowerCase()}`"
-                  >
-                    {{ $t(`shared.priorities.${task.priority.toLowerCase()}`) }}
-                  </span>
+                <div class="task-content">
+                  <h3 class="task-title">
+                    {{ item.title }}
+                  </h3>
+                  <div class="task-meta">
+                    <span
+                      :class="[
+                        'status-badge',
+                        `status-${item.status.toLowerCase()}`,
+                      ]"
+                    >
+                      {{ getStatusLabel(item.status) }}
+                    </span>
+                    <span
+                      v-if="item.priority"
+                      class="priority-badge"
+                      :class="`priority-${item.priority.toLowerCase()}`"
+                    >
+                      {{ $t(`shared.priorities.${item.priority.toLowerCase()}`) }}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </template>
           </div>
         </div>
       </div>
@@ -204,15 +213,22 @@
       v-model="showCreateModal"
       @created="fetchTasks"
     />
+
+    <PlannerCalendarEventModal
+      v-model="showCalendarEventModal"
+      :event="selectedCalendarEvent"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+
 const toast = useToast();
 const { t, te, locale } = useI18n();
 const dateLocale = computed(() => (locale.value === "pt" ? "pt-PT" : "en-US"));
 const { playDone } = useSound();
 const { preferences } = usePreferences();
+const { calendarEvents, fetchCalendarEvents } = useCalendar();
 
 const loading = ref(false);
 const showOverview = ref(false);
@@ -227,6 +243,8 @@ const toggleInFlight = new Set<string>();
 const draggedTaskId = ref<string | null>(null);
 const dragSourceDay = ref<string | null>(null);
 const dragOverDay = ref<string | null>(null);
+const showCalendarEventModal = ref(false);
+const selectedCalendarEvent = ref<any>(null);
 
 const weekDays = computed(() => {
   const days = [];
@@ -243,8 +261,8 @@ const weekDays = computed(() => {
     const date = new Date(weekStart);
     date.setDate(weekStart.getDate() + i);
 
-    const todayStr = today.toISOString().split("T")[0];
-    const dateStr = date.toISOString().split("T")[0];
+    const todayStr = today.toISOString().substring(0, 10);
+    const dateStr = date.toISOString().substring(0, 10);
     const isToday = dateStr === todayStr;
 
     const tomorrow = new Date(today);
@@ -343,6 +361,25 @@ const getTasksForDay = (date: string) => {
 
     return 0;
   });
+};
+
+const getCalendarEventsForDay = (date: string) =>
+  calendarEvents.value.filter(
+    ev => new Date(ev.startTime).toISOString().split("T")[0] === date,
+  );
+
+const getDayItems = (date: string) => {
+  const taskItems = getTasksForDay(date).map(t => ({ ...t, _type: "task" as const }));
+  const eventItems = getCalendarEventsForDay(date).map(ev => ({
+    ...ev,
+    _type: "calendarEvent" as const,
+  }));
+  return [...eventItems, ...taskItems];
+};
+
+const openCalendarEvent = (event: any) => {
+  selectedCalendarEvent.value = event;
+  showCalendarEventModal.value = true;
 };
 
 const handleDragStart = (taskId: string, date: string) => {
@@ -471,6 +508,7 @@ const getStatusLabel = (status: string) => {
 
 onMounted(() => {
   fetchTasks();
+  fetchCalendarEvents();
 });
 </script>
 
